@@ -1,0 +1,181 @@
+export interface ShopItem {
+  id: string;
+  name: string;
+  image: string;
+  piPrice: number;
+  flappyCoinPrice: number;
+  isDefault: boolean;
+  rarity: 'Common' | 'Rare' | 'Epic' | 'Special' | 'Legendary';
+  promoPiPrice?: number;
+  promoEndDate?: string;
+  supply?: number;
+  isLimited?: boolean;
+  description?: string;
+  quantity?: number;
+  locked?: boolean;
+  notForSale?: boolean;
+  claimByUltimatePack?: boolean;
+  type?: 'skin' | 'powerup' | 'subscription' | 'mysterybox' | 'bundle' | 'coins';
+}
+
+export const shopItems: ShopItem[] = [
+  {
+    id: "bird-0",
+    name: "Sky Blue Flappy",
+    image: "/flappy pi gif/flappy-2.gif.gif",
+    piPrice: 0,
+    flappyCoinPrice: 0,
+    isDefault: true,
+    rarity: "Common",
+    type: "skin",
+    description: "[Common 🟦] The classic blue bird that started it all - free for everyone!",
+  },
+  {
+    id: "inferno-phoenix",
+    name: "🔥 Fire Phoenix",
+    image: "/birds2/bird_12.gif",
+    piPrice: 0,
+    flappyCoinPrice: 0,
+    isDefault: false,
+    rarity: "Special",
+    type: "skin",
+    locked: false,
+    notForSale: true,
+    claimByUltimatePack: true,
+    description: `[Special 🟧] Born from the flames of hope, the Fire Phoenix is a legendary firebird that rises when all seems lost. Its violet-gold wings blaze a trail for true pioneers. Only available in the Ultimate Pack!\n\n• +5% Flappy Coin Boost\n• Legendary Player Badge\n• Glowing flame trail while flying\n• Immune to ad-based revives (during subscription)\n• Inspires all who see it to never give up`,
+  },
+  {
+    id: "bird-1",
+    name: "Red Flappy",
+    image: "/birds2/bird_1.gif",
+    piPrice: 3,
+    flappyCoinPrice: 3000,
+    isDefault: false,
+    rarity: "Common",
+    type: "skin",
+    description: "[Common 🟦] A fiery red bird with passionate energy.",
+  },
+  {
+    id: "bird-2",
+    name: "Green Flappy",
+    image: "/birds2/bird_2.gif",
+    piPrice: 4,
+    flappyCoinPrice: 4000,
+    isDefault: false,
+    rarity: "Common",
+    type: "skin",
+    description: "[Common 🟦] Nature-loving green bird perfect for forest adventures.",
+  },
+  {
+    id: "bird-3",
+    name: "Purple Flappy",
+    image: "/birds2/bird_3.gif",
+    piPrice: 20,
+    flappyCoinPrice: 20000,
+    isDefault: false,
+    rarity: "Legendary",
+    type: "skin",
+    description: "[Legendary 🟨] Mystical purple bird with magical powers. Limited supply!",
+    supply: 20000,
+    isLimited: true,
+  },
+  {
+    id: "bird-4",
+    name: "Elite Parrot",
+    image: "/birds2/bird_4.gif",
+    piPrice: 13,
+    flappyCoinPrice: 13000,
+    isDefault: false,
+    rarity: "Epic",
+    type: "skin",
+    description: "[Epic 🟪] Colorful elite parrot with tropical flair.",
+    promoPiPrice: 11,
+  },
+  {
+    id: "bird-5",
+    name: "Elite Eagle",
+    image: "/birds2/bird_5.gif",
+    piPrice: 15,
+    flappyCoinPrice: 15000,
+    isDefault: false,
+    rarity: "Epic",
+    type: "skin",
+    description: "[Epic 🟪] Majestic eagle soaring through the skies.",
+    promoPiPrice: 13,
+  },
+  {
+    id: "bird-6",
+    name: "Golden Phoenix",
+    image: "/birds2/bird_6.gif",
+    piPrice: 20,
+    flappyCoinPrice: 20000,
+    isDefault: false,
+    rarity: "Legendary",
+    type: "skin",
+    description: "[Legendary 🟨] Legendary phoenix rising from golden flames.",
+    supply: 10000,
+    isLimited: true,
+  },
+  {
+    id: "bird-7",
+    name: "Black Flappy",
+    image: "/birds2/bird_7.gif",
+    piPrice: 12,
+    flappyCoinPrice: 12000,
+    isDefault: false,
+    rarity: "Rare",
+    type: "skin",
+    description: "[Rare 🟩] Sleek black bird perfect for night flights.",
+    supply: 10000,
+    isLimited: true,
+  },
+  {
+    id: "bird-8",
+    name: "Pink Flappy",
+    image: "/birds2/bird_8.gif",
+    piPrice: 10,
+    flappyCoinPrice: 10000,
+    isDefault: false,
+    rarity: "Rare",
+    type: "skin",
+    description: "[Rare 🟩] Adorable pink bird spreading joy everywhere.",
+  },
+  {
+    id: "bird-9",
+    name: "Orange Flappy",
+    image: "/birds2/bird_9.gif",
+    piPrice: 11,
+    flappyCoinPrice: 11000,
+    isDefault: false,
+    rarity: "Rare",
+    type: "skin",
+    description: "[Rare 🟩] Vibrant orange bird full of energy and warmth.",
+  },
+  {
+    id: "bird-10",
+    name: "Golden Flappy",
+    image: "/birds2/bird_10.gif",
+    piPrice: 30,
+    flappyCoinPrice: 30000,
+    isDefault: false,
+    rarity: "Epic",
+    type: "skin",
+    description: "[Epic 🟪] ✨ Shimmering golden flappy bird with magical glow and special powers!",
+    promoPiPrice: 30,
+    supply: 20000,
+    isLimited: true,
+  },
+  {
+    id: "bird-11",
+    name: "Golden Dragon",
+    image: "/birds2/bird_11.gif",
+    piPrice: 50,
+    flappyCoinPrice: 50000,
+    isDefault: false,
+    rarity: "Legendary",
+    type: "skin",
+    description: "[Legendary 🟨] Ultimate legendary golden dragon with cosmic powers. Only 5000 will ever exist!",
+    supply: 5000,
+    isLimited: true,
+  },
+]; 

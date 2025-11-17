@@ -1,0 +1,29 @@
+# FLPY Token Metadata for Pi Network - Updated $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")
+[[CURRENCIES]]
+code="FLPY"
+issuer="GBVTV77XFMDYSSVIG6ZGSRAGZ3S7KA4275YYLOLIROOD3Y3F3TH5U3EI"
+name="Flappy Pi Team"
+desc="This is a test token that is created as an example and has no value."
+image="https://i.ibb.co/p6RypJ8X/image-png.png"
+
+# Additional Token Information
+[DOCUMENTATION]
+ORG_NAME="Flappy Pi"
+ORG_URL="https://flappypi.fun"
+ORG_LOGO="https://i.ibb.co/p6RypJ8X/image-png.png"
+ORG_DESCRIPTION="Flappy Pi is a blockchain-powered gaming platform on Pi Network, offering engaging gameplay with cryptocurrency rewards."
+ORG_SUPPORT_EMAIL="support@flappypi.fun"
+
+# Token Details
+[[CURRENCIES.DISPLAY_DECIMALS]]
+value=7
+
+[[CURRENCIES.CONDITIONS]]
+max_supply="21000000"
+is_asset_anchored=false
+
+[[CURRENCIES.METADATA]]
+name="Flappy Pi Team"
+description="This is a test token that is created as an example and has no value."
+image="https://i.ibb.co/p6RypJ8X/image-png.png"
+home_domain="flappypi.fun"

@@ -1,0 +1,14 @@
+{
+  "name": "flpy-token-setup",
+  "version": "1.0.0",
+  "description": "FLPY Token Setup for Pi Network Mainnet",
+  "main": "mint-flpy-token.js",
+  "scripts": {
+    "mint": "node mint-flpy-token.js",
+    "distribute": "node distribute-tokens.js",
+    "verify": "node verify-token.js"
+  },
+  "dependencies": {
+    "@stellar/stellar-sdk": "^12.3.0"
+  }
+}

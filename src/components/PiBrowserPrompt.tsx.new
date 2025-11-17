@@ -1,0 +1,180 @@
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Download, ExternalLink, Bug } from "lucide-react";
+import { isRunningInPiBrowser, redirectToPiBrowser, PI_BROWSER_DOWNLOAD_URL, detectPiBrowser, enablePiBrowserMock, isPiBrowserMocked } from "@/utils/pi-browser";
+
+const PiBrowserPrompt: React.FC = () => {
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [isMocked, setIsMocked] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<{
+    score: number;
+    threshold: number;
+    isPiBrowser: boolean;
+    methods: string[];
+    debug: string[];
+  } | null>(null);
+  const [showDebug, setShowDebug] = useState(false);
+
+  useEffect(() => {
+    // Check if we're using mocked Pi Browser
+    setIsMocked(isPiBrowserMocked());
+
+    // Override console.log to capture debug info
+    const originalConsoleLog = console.log;
+    console.log = (...args) => {
+      if (args[0] === 'Pi Browser Detection Debug:') {
+        setDebugInfo(args[1]);
+      }
+      originalConsoleLog.apply(console, args);
+    };
+
+    // Trigger detection to get debug info
+    detectPiBrowser();
+
+    // Restore original console.log
+    return () => {
+      console.log = originalConsoleLog;
+    };
+  }, []);
+
+  const handleRedirect = async () => {
+    setIsRedirecting(true);
+    redirectToPiBrowser();
+    // Reset the redirecting state after a delay
+    setTimeout(() => setIsRedirecting(false), 2000);
+  };
+
+  if (isRunningInPiBrowser()) return null;
+
+  const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-black/70 to-purple-900/70 backdrop-blur-sm transition-all duration-300">
+      <div className="bg-gradient-to-b from-white to-purple-50 rounded-2xl p-8 max-w-md w-full mx-4 text-center shadow-2xl transform transition-all duration-300 animate-fade-in">
+        {/* Logo and Game Title */}
+        <div className="mb-6">
+          <div className="flex justify-center mb-4">
+            <img 
+              src="/flappy-logo.png" 
+              alt="Flappy Pi Logo"
+              className="w-24 h-24 animate-bounce-slow"
+            />
+          </div>
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600">
+            Flappy Pi
+          </h1>
+        </div>
+
+        {/* Main Content */}
+        <div className="space-y-4 mb-6">
+          <h2 className="text-xl font-bold text-gray-800">
+            Open in Pi Browser
+          </h2>
+          <p className="text-gray-600">
+            To access all features of Flappy Pi, including payments and rewards, please open this game in the official Pi Browser.
+          </p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="space-y-3">
+          <Button 
+            onClick={handleRedirect}
+            disabled={isRedirecting}
+            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-4 rounded-xl shadow-lg transform transition-all duration-200 hover:scale-[1.02] disabled:opacity-50"
+          >
+            {isRedirecting ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Opening in Pi Browser...
+              </span>
+            ) : (
+              <>
+                <ExternalLink className="w-5 h-5 mr-2" />
+                Open in Pi Browser
+              </>
+            )}
+          </Button>
+
+          <a
+            href={PI_BROWSER_DOWNLOAD_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block w-full"
+          >
+            <Button 
+              variant="outline"
+              className="w-full border-2 border-purple-200 text-purple-700 hover:bg-purple-50 font-semibold py-4 rounded-xl"
+            >
+              <Download className="w-5 h-5 mr-2" />
+              Download Pi Browser
+            </Button>
+          </a>
+        </div>
+
+        {/* Security Notice */}
+        <div className="mt-6 text-xs text-gray-500">
+          🔒 For your security, certain features are only available in Pi Browser
+        </div>
+
+        {/* Development Mode Controls */}
+        {isDevelopment && (
+          <div className="mt-8 border-t pt-8">
+            <h3 className="text-sm font-semibold mb-4 text-purple-700">Development Tools</h3>
+            <div className="space-y-4">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => enablePiBrowserMock(!isMocked)}
+              >
+                {isMocked ? 'Disable' : 'Enable'} Pi Browser Mock
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => setShowDebug(!showDebug)}
+              >
+                <Bug className="w-4 h-4 mr-2" />
+                {showDebug ? 'Hide' : 'Show'} Debug Info
+              </Button>
+
+              {showDebug && debugInfo && (
+                <div className="text-xs bg-gray-50 p-4 rounded-lg overflow-auto max-h-60">
+                  <div className="mb-4 p-2 bg-blue-50 rounded">
+                    <p className="font-semibold">Development Mode Active</p>
+                    <p className="text-xs text-gray-600">Mock Status: {isMocked ? 'Enabled' : 'Disabled'}</p>
+                  </div>
+                  
+                  <p className="font-bold mb-2">Detection Score: {debugInfo.score} (Threshold: {debugInfo.threshold})</p>
+                  {debugInfo.methods.length > 0 && (
+                    <>
+                      <p className="font-bold mt-2">Detection Methods:</p>
+                      <ul className="list-disc pl-4 mb-2">
+                        {debugInfo.methods.map((method, i) => (
+                          <li key={i} className="text-green-600">{method}</li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                  <p className="font-bold mt-2">Debug Info:</p>
+                  <ul className="list-disc pl-4">
+                    {debugInfo.debug?.map((info, i) => (
+                      <li key={i} className="text-gray-600">{info}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default PiBrowserPrompt;

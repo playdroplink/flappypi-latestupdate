@@ -1,0 +1,1 @@
+// The browser detection code has been removed.

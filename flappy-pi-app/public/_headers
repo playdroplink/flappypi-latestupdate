@@ -1,0 +1,2 @@
+/*
+  Content-Security-Policy: script-src 'self' https://sdk.minepi.com https://vercel.live https://www.googletagmanager.com 'unsafe-inline' 

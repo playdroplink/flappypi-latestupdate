@@ -1,0 +1,142 @@
+/* Night Mode Visibility Fixes - Targeted Approach */
+
+/* Only apply to specific components that need night mode styling */
+[data-theme="dark"] .night-mode-component,
+[data-theme="night"] .night-mode-component,
+.dark .night-mode-component {
+  color-scheme: dark;
+}
+
+/* NPC Dialog Components - Only target specific NPC elements */
+[data-theme="dark"] .npc-dialog-bubble,
+[data-theme="night"] .npc-dialog-bubble,
+.dark .npc-dialog-bubble {
+  background-color: #1f2937 !important;
+  color: #ffffff !important;
+  border-color: #fbbf24 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="dark"] .npc-name-text,
+[data-theme="night"] .npc-name-text,
+.dark .npc-name-text {
+  color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .npc-subtitle-text,
+[data-theme="night"] .npc-subtitle-text,
+.dark .npc-subtitle-text {
+  color: #d1d5db !important;
+}
+
+/* Important Note and Warning Boxes - Only when specifically needed */
+[data-theme="dark"] .important-note-box,
+[data-theme="night"] .important-note-box,
+.dark .important-note-box {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+  border-color: #f59e0b !important;
+}
+
+[data-theme="dark"] .warning-box-specific,
+[data-theme="night"] .warning-box-specific,
+.dark .warning-box-specific {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+  border-color: #f59e0b !important;
+}
+
+/* Modal and Dialog Content - Only for specific modals */
+[data-theme="dark"] .night-mode-modal,
+[data-theme="night"] .night-mode-modal,
+.dark .night-mode-modal {
+  background-color: #1f2937 !important;
+  color: #ffffff !important;
+  border-color: #374151 !important;
+}
+
+/* Form Elements - Only for specific forms that need night mode */
+[data-theme="dark"] .night-mode-form input,
+[data-theme="night"] .night-mode-form input,
+.dark .night-mode-form input {
+  background-color: #374151 !important;
+  color: #ffffff !important;
+  border-color: #4b5563 !important;
+}
+
+[data-theme="dark"] .night-mode-form input::placeholder,
+[data-theme="night"] .night-mode-form input::placeholder,
+.dark .night-mode-form input::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Card backgrounds - Only for specific cards */
+[data-theme="dark"] .night-mode-card,
+[data-theme="night"] .night-mode-card,
+.dark .night-mode-card {
+  background-color: rgba(31, 41, 55, 0.95) !important;
+  border-color: rgba(75, 85, 99, 0.5) !important;
+}
+
+/* Header background - Only for specific headers */
+[data-theme="dark"] .night-mode-header,
+[data-theme="night"] .night-mode-header,
+.dark .night-mode-header {
+  background-color: rgba(17, 24, 39, 0.95) !important;
+  border-color: rgba(75, 85, 99, 0.5) !important;
+}
+
+/* Focus states for accessibility - Only for night mode components */
+[data-theme="dark"] .night-mode-component:focus,
+[data-theme="night"] .night-mode-component:focus,
+.dark .night-mode-component:focus {
+  outline: 2px solid #3b82f6 !important;
+  outline-offset: 2px !important;
+}
+
+/* High contrast mode support - Only for night mode components */
+@media (prefers-contrast: high) {
+  [data-theme="dark"] .night-mode-component,
+  [data-theme="night"] .night-mode-component,
+  .dark .night-mode-component {
+    color: #ffffff !important;
+    background-color: #000000 !important;
+    border-color: #ffffff !important;
+  }
+}
+
+/* Reduced motion support - Only for night mode components */
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="dark"] .night-mode-component,
+  [data-theme="night"] .night-mode-component,
+  .dark .night-mode-component {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Scrollbar - Only for night mode containers */
+[data-theme="dark"] .night-mode-container::-webkit-scrollbar,
+[data-theme="night"] .night-mode-container::-webkit-scrollbar,
+.dark .night-mode-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+[data-theme="dark"] .night-mode-container::-webkit-scrollbar-track,
+[data-theme="night"] .night-mode-container::-webkit-scrollbar-track,
+.dark .night-mode-container::-webkit-scrollbar-track {
+  background: #1f2937 !important;
+}
+
+[data-theme="dark"] .night-mode-container::-webkit-scrollbar-thumb,
+[data-theme="night"] .night-mode-container::-webkit-scrollbar-thumb,
+.dark .night-mode-container::-webkit-scrollbar-thumb {
+  background: #4b5563 !important;
+  border-radius: 4px;
+}
+
+[data-theme="dark"] .night-mode-container::-webkit-scrollbar-thumb:hover,
+[data-theme="night"] .night-mode-container::-webkit-scrollbar-thumb:hover,
+.dark .night-mode-container::-webkit-scrollbar-thumb:hover {
+  background: #6b7280 !important;
+}

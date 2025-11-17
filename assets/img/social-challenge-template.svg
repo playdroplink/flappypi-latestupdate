@@ -1,0 +1,32 @@
+<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7ed6ff"/>
+      <stop offset="100%" stop-color="#e0f7fa"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1080" fill="url(#sky)" />
+  <!-- Clouds -->
+  <ellipse cx="200" cy="200" rx="120" ry="50" fill="#fff" opacity="0.7"/>
+  <ellipse cx="800" cy="300" rx="100" ry="40" fill="#fff" opacity="0.6"/>
+  <!-- Flappy Pi mascot (placeholder: yellow circle) -->
+  <circle cx="540" cy="540" r="180" fill="#ffe066" stroke="#f9ca24" stroke-width="10"/>
+  <ellipse cx="540" cy="600" rx="80" ry="40" fill="#fff" opacity="0.7"/>
+  <!-- Flappy Coins (simple circles for now) -->
+  <circle cx="400" cy="400" r="30" fill="#ffd700" stroke="#fbc531" stroke-width="6"/>
+  <circle cx="700" cy="420" r="24" fill="#ffd700" stroke="#fbc531" stroke-width="5"/>
+  <circle cx="600" cy="700" r="20" fill="#ffd700" stroke="#fbc531" stroke-width="4"/>
+  <!-- Text -->
+  <text x="50%" y="120" text-anchor="middle" font-size="60" font-family="Comic Sans MS, Comic Sans, cursive" fill="#273c75" font-weight="bold">
+    I joined the
+  </text>
+  <text x="50%" y="200" text-anchor="middle" font-size="80" font-family="Comic Sans MS, Comic Sans, cursive" fill="#0097e6" font-weight="bold">
+    Flappy Pi Social Challenge!
+  </text>
+  <text x="50%" y="950" text-anchor="middle" font-size="48" font-family="Arial, sans-serif" fill="#353b48" font-weight="bold">
+    Follow @flappypifun + Post to win 314 Flappy Coins!
+  </text>
+  <text x="50%" y="1020" text-anchor="middle" font-size="40" font-family="Arial, sans-serif" fill="#e84118" font-weight="bold">
+    #FlappyPiChallenge
+  </text>
+</svg> 

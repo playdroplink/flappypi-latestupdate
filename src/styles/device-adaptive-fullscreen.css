@@ -1,0 +1,271 @@
+/* Device-Adaptive Fullscreen Styles */
+
+/* Base fullscreen styles */
+.adaptive-fullscreen {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.adaptive-fullscreen.fullscreen-active {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  z-index: 9999 !important;
+  background: #000 !important;
+  overflow: hidden !important;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  .adaptive-fullscreen.mobile {
+    /* Remove any padding/margins */
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .adaptive-fullscreen.mobile.fullscreen-active {
+    /* Hide browser UI */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    
+    /* Prevent zoom */
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  .adaptive-fullscreen.mobile .game-content.fullscreen-content {
+    /* Mobile fullscreen content */
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    background: #000;
+    overflow: hidden;
+  }
+
+  /* Hide browser UI elements on mobile */
+  .adaptive-fullscreen.mobile.fullscreen-active .header,
+  .adaptive-fullscreen.mobile.fullscreen-active [class*="header"],
+  .adaptive-fullscreen.mobile.fullscreen-active nav,
+  .adaptive-fullscreen.mobile.fullscreen-active [class*="navigation"] {
+    display: none !important;
+  }
+
+  /* Remove body padding on mobile fullscreen */
+  .adaptive-fullscreen.mobile.fullscreen-active body {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+}
+
+/* Tablet-specific optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .adaptive-fullscreen.tablet {
+    /* Tablet-specific styles */
+  }
+
+  .adaptive-fullscreen.tablet.fullscreen-active {
+    /* Tablet fullscreen optimizations */
+    background: #000;
+    overflow: hidden;
+  }
+
+  .adaptive-fullscreen.tablet .game-content.fullscreen-content {
+    /* Tablet fullscreen content */
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: #000;
+    overflow: hidden;
+  }
+}
+
+/* Desktop-specific optimizations */
+@media (min-width: 1025px) {
+  .adaptive-fullscreen.desktop {
+    /* Desktop-specific styles */
+  }
+
+  .adaptive-fullscreen.desktop.fullscreen-active {
+    /* Desktop fullscreen optimizations */
+    background: #000;
+    overflow: hidden;
+  }
+
+  .adaptive-fullscreen.desktop .game-content.fullscreen-content {
+    /* Desktop fullscreen content */
+    min-height: 100vh;
+    background: #000;
+    overflow: hidden;
+  }
+
+  /* Desktop hardware acceleration */
+  .adaptive-fullscreen.desktop.fullscreen-active {
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  .adaptive-fullscreen.desktop.fullscreen-active * {
+    transform: translateZ(0);
+  }
+}
+
+/* Landscape orientation optimizations */
+@media (max-width: 768px) and (orientation: landscape) {
+  .adaptive-fullscreen.fullscreen-active {
+    height: 100vh !important;
+    height: 100dvh !important;
+  }
+
+  .adaptive-fullscreen.mobile.fullscreen-active {
+    /* Optimize for landscape gaming */
+    height: 100vh !important;
+    height: 100dvh !important;
+  }
+}
+
+/* Portrait orientation optimizations */
+@media (max-width: 768px) and (orientation: portrait) {
+  .adaptive-fullscreen.mobile.fullscreen-active {
+    /* Optimize for portrait gaming */
+    height: 100vh !important;
+    height: 100dvh !important;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .adaptive-fullscreen.fullscreen-active {
+    /* Touch device specific optimizations */
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .adaptive-fullscreen.fullscreen-active {
+    /* High DPI optimizations */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Prevent text selection during gameplay */
+.adaptive-fullscreen.fullscreen-active * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Smooth transitions */
+.adaptive-fullscreen {
+  transition: all 0.3s ease-in-out;
+}
+
+.adaptive-fullscreen .game-content {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Hardware acceleration for all devices */
+.adaptive-fullscreen.fullscreen-active {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.adaptive-fullscreen.fullscreen-active * {
+  transform: translateZ(0);
+}
+
+/* Fullscreen button styles */
+.adaptive-fullscreen-btn {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.adaptive-fullscreen-btn:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: translateY(-1px);
+}
+
+.adaptive-fullscreen-btn.exit {
+  background: rgba(239, 68, 68, 0.8);
+}
+
+.adaptive-fullscreen-btn.exit:hover {
+  background: rgba(239, 68, 68, 0.9);
+}
+
+/* Hide fullscreen button when in fullscreen */
+.adaptive-fullscreen.fullscreen-active .adaptive-fullscreen-btn:not(.exit) {
+  display: none;
+}
+
+/* Show exit button when in fullscreen */
+.adaptive-fullscreen.fullscreen-active .adaptive-fullscreen-btn.exit {
+  display: flex;
+}
+
+/* Mobile-specific button positioning */
+@media (max-width: 768px) {
+  .adaptive-fullscreen-btn {
+    top: 12px;
+    right: 12px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+/* Tablet-specific button positioning */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .adaptive-fullscreen-btn {
+    top: 16px;
+    right: 16px;
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}
+
+/* Desktop-specific button positioning */
+@media (min-width: 1025px) {
+  .adaptive-fullscreen-btn {
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+}

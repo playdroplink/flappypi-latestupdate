@@ -1,0 +1,29 @@
+const approvePayment = async (paymentId: string) => {
+  try {
+    const headers = { Authorization: `key ${process.env.APIKEY}` };
+    const response = await axios.post(`https://api.minepi.com/v2/payments/${paymentId}/approve`, null, { headers });
+    console.log('Payment Approved:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error approving payment:', error);
+  }
+};
+
+const completePayment = async (paymentId: string, txid: string) => {
+  try {
+    const headers = { Authorization: `key ${process.env.APIKEY}` };
+    const payload = { txid };
+    const response = await axios.post(`https://api.minepi.com/v2/payments/${paymentId}/complete`, payload, { headers });
+    console.log('Payment Completed:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error completing payment:', error);
+  }
+};
+
+const accessToken = 'pioneer_access_token';
+getPioneerInfo(accessToken);
+
+const paymentId = 'payment_id_from_client';
+const txid = 'transaction_id_from_client';
+completePayment(paymentId, txid);

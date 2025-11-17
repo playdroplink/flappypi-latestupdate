@@ -1,0 +1,8 @@
+# Security Policy
+Contact: mailto:security@flappypi.fun
+Expires: 2025-12-31T23:59:59.000Z
+Encryption: https://www.flappypi.fun/pgp-key.txt
+Preferred-Languages: en
+Canonical: https://www.flappypi.fun/.well-known/security.txt
+Policy: https://www.flappypi.fun/security-policy
+Hiring: https://www.flappypi.fun/careers 

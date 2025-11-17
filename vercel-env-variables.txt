@@ -1,0 +1,68 @@
+# ========================================
+# VERCEL DEPLOYMENT ENVIRONMENT VARIABLES
+# Copy these to Vercel Dashboard Settings
+# ========================================
+
+# CRITICAL: Copy each variable below to Vercel Dashboard
+# Go to: https://vercel.com/flappypis-projects-d22f665c
+# Settings → Environment Variables → Add
+
+# ========================================
+# SUPABASE (Required)
+# ========================================
+VITE_SUPABASE_URL=https://feiifpwfbfjrjpcvjdfz.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlaWlmcHdmYmZqcmpwY3ZqZGZ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMxODA1MDEsImV4cCI6MjA3ODc1NjUwMX0.TwkSgRYAEwq6GI1tNw4hL-2bVjgO_wM-0qmZK3_iZEQ
+VITE_SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlaWlmcHdmYmZqcmpwY3ZqZGZ6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MzE4MDUwMSwiZXhwIjoyMDc4NzU2NTAxfQ.8UjMqbh3DTR_Dp63FhgtStUunfDojqxsx8ImCKiUtiw
+
+# ========================================
+# PI NETWORK (Required)
+# ========================================
+VITE_PI_APP_ID=flappypi2807
+VITE_PI_SERVER_API_KEY=zrt9rwcjrdaejytlu72ha0yi2czvljx6geuwphzueaeybqsyboixukixy0cmogmo
+VITE_PI_VALIDATION_KEY=94e29cc9c70b87c8fc91e496ac630d23664bff7082cca3ad9d6466bba1aa2902caa46a8eb82a64437d272dbcd329c763679c85cfcba91b95e6fb5b4a6f17b2ce
+VITE_PI_NETWORK=mainnet
+VITE_PI_API_URL=https://api.minepi.com
+
+# ========================================
+# APPLICATION (Required)
+# ========================================
+VITE_BACKEND_URL=https://flappypi.fun/api
+VITE_APP_ENV=production
+VITE_GAME_MODE=mainnet
+VITE_DEBUG_MODE=false
+
+# ========================================
+# BUILD CONFIGURATION (Required)
+# ========================================
+NODE_ENV=production
+BUILD_ENV=production
+
+# ========================================
+# REACT APP VARIABLES (Legacy Support)
+# ========================================
+REACT_APP_PI_APP_ID=flappypi2807
+REACT_APP_PI_NETWORK_MODE=mainnet
+REACT_APP_BASE_URL=https://flappypi.fun
+REACT_APP_BACKEND_URL=https://flappypi.fun/api
+REACT_APP_PI_CURRENCY=PI
+REACT_APP_ENV=production
+REACT_APP_DEBUG_MODE=false
+
+# ========================================
+# ADDITIONAL PI VARIABLES
+# ========================================
+PI_API_KEY=zrt9rwcjrdaejytlu72ha0yi2czvljx6geuwphzueaeybqsyboixukixy0cmogmo
+PI_APP_ID=flappypi2807
+PI_NETWORK=mainnet
+PI_PAYMENTS_ENABLED=true
+
+# ========================================
+# INSTRUCTIONS:
+# 1. Go to Vercel Dashboard
+# 2. Select your project
+# 3. Go to Settings → Environment Variables
+# 4. Add each variable above (name=value)
+# 5. Set Environment: Production
+# 6. Click Save
+# 7. Redeploy your app
+# ========================================

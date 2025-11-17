@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Flappy Pi - Pi Network Game"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+          <!-- Pi Network App Configuration - MAINNET -->
+       <meta name="pi-app-id" content="flappypi2807" />
+          <meta name="pi-network-mode" content="mainnet" />
+     <meta name="pi-validation-key" content="94e29cc9c70b87c8fc91e496ac630d23664bff7082cca3ad9d6466bba1aa2902caa46a8eb82a64437d272dbcd329c763679c85cfcba91b95e6fb5b4a6f17b2ce" />
+     <meta name="pi-api-key" content="rppe8zs82vn2kmksqmkopg1yiqzqxs0vgcmzbo5e6hqc3zfn5qeexzygbjqn3yd3" />
+
+    <script>
+       // Environment variables configuration - MAINNET
+       // This will be automatically templated by react-scripts in development
+       // and by the container's entrypoint script in production
+       window.__ENV = {
+         backendURL: "%REACT_APP_BACKEND_URL%",
+         sandbox: "true",
+         piAppId: "flappypi2807",
+         piApiKey: "rppe8zs82vn2kmksqmkopg1yiqzqxs0vgcmzbo5e6hqc3zfn5qeexzygbjqn3yd3",
+         piValidationKey: "94e29cc9c70b87c8fc91e496ac630d23664bff7082cca3ad9d6466bba1aa2902caa46a8eb82a64437d272dbcd329c763679c85cfcba91b95e6fb5b4a6f17b2ce",
+         networkMode: "sandbox"
+       }
+
+      // Flappy Pi Pay Configuration - MAINNET
+      window.FlappyPiPay = {
+        walletAddress: 'GDSXE723WPHZ5RGIJCSYXTPKSOIGPTSXE4RF5U3JTNGTCHXON7ZVD4LJ',
+        network: 'mainnet',
+        apiUrl: 'https://api.minepi.com/v2',
+        mainnetApiUrl: 'https://api.minepi.com/v2',
+        status: 'active',
+        // Mobile Pi Browser settings
+        mobileOptimized: true,
+        enableTouchEvents: true,
+        enableGestureSupport: true,
+        // Sandbox settings
+        testnetMode: false,
+        sandboxMode: true,
+        mainnetMode: false
+      };
+    </script>
+
+    <!-- Import the Pi Network App Platform SDK: -->
+    <!-- Official Pi SDK from pi-platform-docs: https://github.com/pi-apps/pi-platform-docs.git -->
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <script>Pi.init({ version: "2.0", sandbox: true })</script>
+    
+    <!-- Official Pi SDK Integration Script -->
+    <script>
+      // Official Pi SDK Integration
+      // Based on https://github.com/pi-apps/pi-sdk-integration-guide.git
+      
+      window.PiOfficialSDK = {
+        // Official Pi SDK Configuration
+        config: {
+          version: '2.0',
+          sandbox: true, // Sandbox mode
+          appId: 'flappypi2807',
+          apiKey: 'rppe8zs82vn2kmksqmkopg1yiqzqxs0vgcmzbo5e6hqc3zfn5qeexzygbjqn3yd3',
+          validationKey: '94e29cc9c70b87c8fc91e496ac630d23664bff7082cca3ad9d6466bba1aa2902caa46a8eb82a64437d272dbcd329c763679c85cfcba91b95e6fb5b4a6f17b2ce',
+          network: 'mainnet',
+          // Official Pi SDK settings
+          enablePayments: true,
+          enableAds: true,
+          enableMetadata: true
+        },
+        
+        // Initialize Pi SDK with official configuration
+        async initialize() {
+          try {
+            console.log('🚀 Initializing Official Pi SDK...');
+            
+            if (!window.Pi) {
+              console.error('❌ Pi SDK not available');
+              return false;
+            }
+            
+            await window.Pi.init(this.config);
+            console.log('✅ Official Pi SDK initialized');
+            return true;
+            
+          } catch (error) {
+            console.error('❌ Error initializing Official Pi SDK:', error);
+            return false;
+          }
+        },
+        
+        // Create payment using official Pi SDK
+        async createPayment(paymentData) {
+          try {
+            console.log('💳 Creating payment with official Pi SDK:', paymentData);
+            
+            const payment = await window.Pi.createPayment({
+              amount: paymentData.amount,
+              memo: paymentData.memo,
+              metadata: paymentData.metadata || {},
+              // Official Pi SDK payment options
+              network: 'mainnet',
+              testnet: false,
+              sandbox: true
+            });
+            
+            console.log('✅ Payment created successfully:', payment);
+            return { success: true, payment };
+            
+          } catch (error) {
+            console.error('❌ Error creating payment:', error);
+            return { success: false, error: error.message };
+          }
+        }
+      };
+      
+      // Auto-initialize when Pi SDK is loaded
+      window.addEventListener('load', () => {
+        if (window.Pi) {
+          window.PiOfficialSDK.initialize();
+        }
+      });
+    </script>
+    
+    <script>
+      // Enhanced Pi SDK initialization for Pi Network subdomains
+      (function() {
+        try {
+          console.log('🚀 Initializing Pi SDK for Flappy Pi...');
+          
+           // Detect environment
+           const hostname = window.location.hostname;
+           const isPiNetworkSubdomain = hostname.includes('.pinet.com') || 
+                                      hostname.includes('.minepi.com') ||
+                                      hostname === 'flappypi2807.pinet.com' ||
+                                      hostname === 'flappypi.fun' ||
+                                      hostname === 'flappypi.fun';
+          const isPiBrowser = typeof window !== 'undefined' && 
+                             (window.navigator.userAgent.includes('PiBrowser') || 
+                              window.navigator.userAgent.includes('PiNetwork'));
+          
+          console.log('🌐 Environment detection:', {
+            hostname: hostname,
+            isPiNetworkSubdomain: isPiNetworkSubdomain,
+            isPiBrowser: isPiBrowser,
+            userAgent: window.navigator.userAgent.substring(0, 100)
+          });
+          
+          // FORCE SANDBOX MODE - SANDBOX ENABLED
+          let sandboxMode = true; // ALWAYS SANDBOX - SANDBOX ENABLED
+          
+          // Check if user is accessing via sandbox URL and warn them
+          if (hostname.includes('sandbox.minepi.com')) {
+            console.warn('⚠️ SANDBOX URL DETECTED - Using mainnet mode anyway');
+            console.warn('⚠️ For best experience, use: https://minepi.com/app/flappy-pi-9cdac3f5c9a42c36');
+          }
+          
+          console.log('🔧 FORCED MAINNET MODE - Sandbox detection disabled');
+          
+                     // Initialize Pi SDK with MAINNET configuration
+           const initConfig = {
+             version: "2.0",
+             sandbox: true, // FORCED SANDBOX - SANDBOX ENABLED
+             appId: "flappypi2807",
+             network: "mainnet", // EXPLICIT MAINNET
+             environment: "production" // PRODUCTION ENVIRONMENT
+           };
+          
+          console.log('🔧 Pi SDK initialization config:', initConfig);
+          
+          // Init Pi SDK:
+          Pi.init(initConfig).then(() => {
+            console.log('✅ Pi SDK initialized successfully for MAINNET!');
+            console.log('🔧 Sandbox mode: DISABLED (Mainnet)');
+            console.log('🌐 Environment: MAINNET PRODUCTION');
+            console.log('🔧 Network: mainnet');
+            console.log('🔧 Environment: production');
+            
+            // Make Pi globally available
+            window.Pi = Pi;
+            
+            // Dispatch custom event for app to know SDK is ready
+            window.dispatchEvent(new CustomEvent('pi-sdk-ready', {
+              detail: {
+                sandbox: sandboxMode,
+                isPiNetworkSubdomain: isPiNetworkSubdomain,
+                isPiBrowser: isPiBrowser
+              }
+            }));
+            
+          }).catch((error) => {
+            console.error('❌ Pi SDK initialization failed:', error);
+            
+            // Create fallback for non-Pi environments (MAINNET)
+            if (!isPiNetworkSubdomain && !isPiBrowser) {
+              console.warn('⚠️ Creating fallback Pi SDK for non-Pi environment (MAINNET)');
+              window.Pi = {
+                init: async (config) => {
+                  console.log('✅ Fallback Pi SDK initialized for MAINNET:', config);
+                  return Promise.resolve();
+                },
+                authenticate: async (scopes) => {
+                  console.log('🔐 Fallback authentication called with scopes (MAINNET):', scopes);
+                  return Promise.resolve({ 
+                    user: { uid: 'mainnet-user', username: 'MainnetUser' },
+                    accessToken: 'mainnet-token'
+                  });
+                },
+                currentUser: () => {
+                  return { uid: 'mainnet-user', username: 'MainnetUser' };
+                },
+                isPiBrowser: () => false,
+                isAuthenticated: () => false
+              };
+            }
+          });
+          
+        } catch (error) {
+          console.error('❌ Pi SDK setup failed:', error);
+        }
+      })();
+    </script>
+    
+    <title>Flappy Pi</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>

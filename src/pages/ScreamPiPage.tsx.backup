@@ -1,0 +1,2482 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useWallet } from '../context/WalletContext';
+import { useAuth } from '../context/AuthContext';
+import ScreamPiGameOverModal from '../components/game/ScreamPiGameOverModal';
+import ScreamPiReviveModal from '../components/ScreamPiReviveModal';
+import { useUserProfile } from '../hooks/useUserProfile';
+import { useLanguage } from '../context/LanguageContext';
+
+interface Character {
+  id: string;
+  name: string;
+  image: string;
+  description: string;
+  unlocked: boolean;
+}
+
+interface NPC {
+  x: number;
+  y: number;
+  velocityY: number;
+  isJumping: boolean;
+  emotion: 'happy' | 'scared' | 'excited' | 'annoyed' | 'neutral';
+  reaction: string;
+  reactionTimer: number;
+  character: Character;
+}
+
+interface Obstacle {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  type: 'gap' | 'spike' | 'platform' | 'trap' | 'moving' | 'ceiling' | 'ground' | 'lava' | 'electric' | 'wind' | 'echo' | 'ice' | 'space' | 'rainbow' | 'factory' | 'temple';
+  velocityX?: number;
+  color: string;
+  levelSpecific?: any;
+}
+
+interface Collectible {
+  x: number;
+  y: number;
+  type: 'cherry' | 'coin' | 'powerup';
+  collected: boolean;
+}
+
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  maxLife: number;
+  color: string;
+  size: number;
+}
+
+// Level system constants
+const LEVEL_THEMES = {
+  1: { name: 'Scream Plains', color: '#22c55e', bgGradient: 'from-green-400 to-green-600' },
+  2: { name: 'Lava Rise', color: '#ef4444', bgGradient: 'from-red-500 to-orange-600' },
+  3: { name: 'Electric Zone', color: '#3b82f6', bgGradient: 'from-blue-400 to-purple-600' },
+  4: { name: 'Storm Chase', color: '#8b5cf6', bgGradient: 'from-purple-500 to-indigo-600' },
+  5: { name: 'Echo Labyrinth', color: '#6366f1', bgGradient: 'from-indigo-500 to-purple-700' },
+  6: { name: 'Frost Fall', color: '#06b6d4', bgGradient: 'from-cyan-400 to-blue-500' },
+  7: { name: 'Pi Space', color: '#f59e0b', bgGradient: 'from-yellow-400 to-orange-500' },
+  8: { name: 'Rainbow Rush', color: '#ec4899', bgGradient: 'from-pink-400 to-purple-500' },
+  9: { name: 'Trap Factory', color: '#dc2626', bgGradient: 'from-red-600 to-red-800' },
+  10: { name: 'Silent Temple', color: '#7c3aed', bgGradient: 'from-purple-600 to-purple-800' }
+};
+
+
+
+interface LevelConfig {
+  level: number;
+  theme: string;
+  obstacles: Obstacle[];
+  screamChallenge: string;
+  objective: string;
+  difficulty: number;
+}
+
+// Game constants - matching Flappy Pi physics
+const CANVAS_WIDTH = 480;
+const CANVAS_HEIGHT = 800;
+const NPC_WIDTH = 64; // Match Flappy Pi bird size
+const NPC_HEIGHT = 64; // Match Flappy Pi bird size
+const GRAVITY = 0.6; // Increased gravity for better platformer feel
+const JUMP_STRENGTH = -8;
+const SCROLL_SPEED = 2; // Slower for platformer
+const GROUND_Y = CANVAS_HEIGHT - 100;
+const MIN_JUMP_FORCE = 8;
+const MAX_JUMP_FORCE = 15;
+const MAX_HOLD_TIME = 500;
+const RUN_SPEED = 1; // Character runs forward automatically
+
+const ScreamPiPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { balance } = useWallet();
+  const { isAuthenticated } = useAuth();
+  const { profile } = useUserProfile();
+  const { t } = useLanguage();
+  
+  // Game state
+  const [gameState, setGameState] = useState<'characterSelect' | 'menu' | 'playing' | 'paused' | 'gameOver' | 'tutorial' | 'locked'>('characterSelect');
+  const [controlMode, setControlMode] = useState<'scream' | 'tap'>('tap');
+  const [score, setScore] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [flappyCoins, setFlappyCoins] = useState(0);
+  const [distance, setDistance] = useState(0);
+  const [passedObstacles, setPassedObstacles] = useState<Set<string>>(new Set());
+  const [screamLevel, setScreamLevel] = useState(0);
+  const [screamMeter, setScreamMeter] = useState(0);
+  const [isPressing, setIsPressing] = useState(false);
+  const [pressStart, setPressStart] = useState(0);
+  const [powerUpActive, setPowerUpActive] = useState(false);
+  const [powerUpTimer, setPowerUpTimer] = useState(0);
+  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
+  const [sensitivity, setSensitivity] = useState(50);
+  
+  // Tutorial state
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialStep, setTutorialStep] = useState(0);
+  const [tutorialCompleted, setTutorialCompleted] = useState(false);
+  
+  // Social Challenge Lock System
+  const [socialChallengeCompleted, setSocialChallengeCompleted] = useState(false);
+  const [showLockModal, setShowLockModal] = useState(false);
+  const [lockReason, setLockReason] = useState('');
+  const [showBadgeNotification, setShowBadgeNotification] = useState(false);
+
+  // Tutorial functions
+  const startTutorial = () => {
+    setShowTutorial(true);
+    setTutorialStep(0);
+    setGameState('tutorial');
+  };
+
+  const nextTutorialStep = () => {
+    if (tutorialStep < tutorialSteps.length - 1) {
+      setTutorialStep(tutorialStep + 1);
+    } else {
+      completeTutorial();
+    }
+  };
+
+  const previousTutorialStep = () => {
+    if (tutorialStep > 0) {
+      setTutorialStep(tutorialStep - 1);
+    }
+  };
+
+  const completeTutorial = () => {
+    setShowTutorial(false);
+    setTutorialCompleted(true);
+    setGameState('menu');
+  };
+
+  const skipTutorial = () => {
+    setShowTutorial(false);
+    setTutorialCompleted(true);
+    setGameState('menu');
+  };
+  
+  // Check if Scream Pi is unlocked
+  const isScreamPiUnlocked = () => {
+    // Check if user has received the social challenge badge
+    const hasSocialBadge = localStorage.getItem('socialChallengeBadge') === 'true';
+    const hasSocialChallengeCompleted = localStorage.getItem('socialChallengeCompleted') === 'true';
+    const hasSocialTaskCompleted = localStorage.getItem('socialTaskCompleted') === 'true';
+    const hasSocialChallengeTask = localStorage.getItem('socialChallengeTask') === 'true';
+    
+    // Unlock if user has any social challenge completion indicators
+    const isUnlocked = hasSocialBadge || hasSocialChallengeCompleted || hasSocialTaskCompleted || hasSocialChallengeTask;
+    
+    console.log('Social Challenge Check:', {
+      hasSocialBadge,
+      hasSocialChallengeCompleted,
+      hasSocialTaskCompleted,
+      hasSocialChallengeTask,
+      isUnlocked
+    });
+    
+    return isUnlocked;
+  };
+  
+  // Handle social challenge completion
+  const handleSocialChallengeComplete = () => {
+    localStorage.setItem('socialChallengeCompleted', 'true');
+    setSocialChallengeCompleted(true);
+    setShowLockModal(false);
+    setGameState('characterSelect');
+  };
+  
+  // Handle social challenge badge received
+  const handleSocialChallengeBadgeReceived = () => {
+    localStorage.setItem('socialChallengeBadge', 'true');
+    setSocialChallengeCompleted(true);
+    setShowLockModal(false);
+    setShowBadgeNotification(true);
+    setGameState('characterSelect');
+    
+    // Hide notification after 3 seconds
+    setTimeout(() => {
+      setShowBadgeNotification(false);
+    }, 3000);
+  };
+  
+  // Manual check for social challenge completion
+  const checkAndUnlockSocialChallenge = () => {
+    const isUnlocked = isScreamPiUnlocked();
+    if (isUnlocked && !socialChallengeCompleted) {
+      console.log('Manual unlock check successful - unlocking Scream Pi');
+      handleSocialChallengeBadgeReceived();
+    } else if (!isUnlocked) {
+      console.log('Manual unlock check failed - Scream Pi remains locked');
+    }
+  };
+  
+  // Show lock modal
+  const showLockedModal = () => {
+    setLockReason('Complete the Social Challenge to unlock Scream Pi!');
+    setShowLockModal(true);
+  };
+
+  // Tutorial steps
+  const tutorialSteps = [
+    {
+      title: "Welcome to Scream Pi! 🎤",
+      content: "Scream Pi is a voice-controlled Flappy Pi game where you use your voice to make your character jump!",
+      image: "/npc/nicolas.png"
+    },
+    {
+      title: "Voice Controls 🔊",
+      content: "Speak softly to walk, SCREAM to jump! The louder you scream, the higher your character jumps. Make sure to allow microphone access when prompted.",
+      image: "/npc/chengdiao.png"
+    },
+    {
+      title: "Alternative Controls 👆",
+      content: "Don't want to scream? Use tap mode instead! Tap and hold to jump higher. Perfect for quiet environments.",
+      image: "/npc/nicolas.png"
+    },
+    {
+      title: "Collect Coins 💰",
+      content: "Collect flappy coins to earn rewards! Use the magnet power-up to attract coins from a distance.",
+      image: "/flappycoins.png"
+    },
+    {
+      title: "Power-ups ⚡",
+      content: "Use power-ups to enhance your gameplay: Shield protects from collisions, Magnet attracts coins, Coin Multiplier doubles earnings, Turbo Start increases speed, and Extra Life gives you another chance!",
+      image: "/powerups/Shield.png"
+    },
+    {
+      title: "Character Abilities 🎭",
+      content: "Each character has unique abilities: Nicolas has higher jump force and better shield protection, while Chengdiao has better coin attraction and faster recovery.",
+      image: "/npc/chengdiao.png"
+    },
+    {
+      title: "Scoring System 🏆",
+      content: "Score points by jumping over obstacles! The higher you jump, the more points you earn. Your score increases with distance traveled and coins collected.",
+      image: "/npc/nicolas.png"
+    },
+    {
+      title: "Game Over & Revival 💀",
+      content: "When you crash, you can revive using coins, watch ads, or use extra lives. Premium users get unlimited revives!",
+      image: "/npc/chengdiao.png"
+    },
+    {
+      title: "Ready to Scream! 🎉",
+      content: "You're all set! Choose your character and start screaming your way through obstacles. Remember: the louder you scream, the higher you jump!",
+      image: "/npc/nicolas.png"
+    }
+  ];
+  
+  // Power-ups state
+  const [powerUps, setPowerUps] = useState([
+    { id: 'shield', name: 'Shield', icon: '🛡️', quantity: 2, description: 'Protects from collision' },
+    { id: 'magnet', name: 'Magnet', icon: '🧲', quantity: 1, description: 'Attracts coins nearby' },
+    { id: 'coin_multiplier', name: 'Coin Multiplier', icon: '💰', quantity: 1, description: 'Doubles coin earnings' },
+    { id: 'turbo_start', name: 'Turbo Start', icon: '⚡', quantity: 1, description: 'Increases game speed' },
+    { id: 'extra_life', name: 'Extra Life', icon: '❤️', quantity: 1, description: 'Revives you once' }
+  ]);
+  const [activePowerUps, setActivePowerUps] = useState<{[key: string]: any}>({});
+  const [powerUpTimers, setPowerUpTimers] = useState<{[key: string]: number}>({});
+  
+  // NPC state
+  const [npc, setNpc] = useState({
+    x: 50,
+    y: GROUND_Y - NPC_HEIGHT,
+    velocityY: 0,
+    isJumping: false,
+    character: 'chengdiao', // Default to Chengdiao character
+    emotion: 'neutral',
+    reaction: '',
+    reactionTimer: 0
+  });
+
+  // Character images
+  const characterImages = {
+    chengdiao: '/npc/chengdiao.png',
+    nicolas: '/npc/nicolas.png'
+  };
+  
+  // Obstacles and collectibles
+  const [obstacles, setObstacles] = useState<Obstacle[]>([]);
+  const [collectibles, setCollectibles] = useState<Collectible[]>([]);
+  const [obstacleTimer, setObstacleTimer] = useState(0);
+  
+  // Particles
+  const [particles, setParticles] = useState<Particle[]>([]);
+  
+  // Audio state
+  const [bgMusic, setBgMusic] = useState<HTMLAudioElement | null>(null);
+  const [jumpSound, setJumpSound] = useState<HTMLAudioElement | null>(null);
+  const [screamSound, setScreamSound] = useState<HTMLAudioElement | null>(null);
+  const [gameOverSound, setGameOverSound] = useState<HTMLAudioElement | null>(null);
+  const [collectSound, setCollectSound] = useState<HTMLAudioElement | null>(null);
+  
+  // Microphone state
+  const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
+  const [microphoneError, setMicrophoneError] = useState<string | null>(null);
+  const [showDeviceSelector, setShowDeviceSelector] = useState(false);
+  const [availableDevices, setAvailableDevices] = useState<MediaDeviceInfo[]>([]);
+  const [selectedDevice, setSelectedDevice] = useState<string>('');
+  const [microphonePermission, setMicrophonePermission] = useState<'granted' | 'denied' | 'prompt'>('prompt');
+  
+  // Modal states
+  const [showGameOverModal, setShowGameOverModal] = useState(false);
+  const [showReviveModal, setShowReviveModal] = useState(false);
+  const [reviveUsed, setReviveUsed] = useState(false);
+  const [reviveCount, setReviveCount] = useState(0);
+  const [extraLives, setExtraLives] = useState(0);
+  const [bestScore, setBestScore] = useState(0);
+  
+  // Refs
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number>();
+  const lastTimeRef = useRef<number>(0);
+  const npcImageRef = useRef<HTMLImageElement | null>(null);
+  
+  // Available characters with unique abilities
+  const characters: Character[] = [
+    {
+      id: 'nicolas',
+      name: 'Nicolas',
+      image: '/npc/nicolas.png',
+      description: 'The brave adventurer with a heart of gold - Higher jump force and better shield protection',
+      unlocked: true
+    },
+    {
+      id: 'chengdiao',
+      name: 'Chengdiao',
+      image: '/npc/chengdiao.png',
+      description: 'The wise scholar with quick reflexes - Better coin attraction and faster recovery',
+      unlocked: true
+    }
+  ];
+  
+  // Character-specific abilities
+  const getCharacterAbility = (characterId: string, abilityType: 'jump' | 'shield' | 'magnet' | 'recovery') => {
+    switch (characterId) {
+      case 'nicolas':
+        switch (abilityType) {
+          case 'jump': return 1.2; // 20% higher jumps
+          case 'shield': return 1.5; // 50% better shield protection
+          case 'magnet': return 1.0; // Normal magnet
+          case 'recovery': return 1.0; // Normal recovery
+          default: return 1.0;
+        }
+      case 'chengdiao':
+        switch (abilityType) {
+          case 'jump': return 1.0; // Normal jumps
+          case 'shield': return 1.0; // Normal shield
+          case 'magnet': return 1.3; // 30% better magnet
+          case 'recovery': return 1.2; // 20% faster recovery
+          default: return 1.0;
+        }
+      default:
+        return 1.0;
+    }
+  };
+  
+  // Initialize audio with error handling
+  useEffect(() => {
+    try {
+      // Background music
+      const bgMusicAudio = new Audio('/sounds/background/Flappy Pi Main Theme Song.mp3');
+      bgMusicAudio.loop = true;
+      bgMusicAudio.volume = 0.3;
+      setBgMusic(bgMusicAudio);
+      
+      // Jump sound
+      const jumpAudio = new Audio('/audio/sfx_wing.wav');
+      jumpAudio.volume = 0.5;
+      setJumpSound(jumpAudio);
+      
+      // Scream sound
+      const screamAudio = new Audio('/audio/sfx_point.wav');
+      screamAudio.volume = 0.4;
+      setScreamSound(screamAudio);
+      
+      // Game over sound
+      const gameOverAudio = new Audio('/audio/sfx_die.wav');
+      gameOverAudio.volume = 0.6;
+      setGameOverSound(gameOverAudio);
+      
+      // Collect sound
+      const collectAudio = new Audio('/audio/flappycoins.wav.mp3');
+      collectAudio.volume = 0.4;
+      setCollectSound(collectAudio);
+      
+      return () => {
+        try {
+          bgMusicAudio.pause();
+          jumpAudio.pause();
+          screamAudio.pause();
+          gameOverAudio.pause();
+          collectAudio.pause();
+        } catch (error) {
+          console.warn('Error cleaning up audio:', error);
+        }
+      };
+    } catch (error) {
+      console.error('Error initializing audio:', error);
+    }
+  }, []);
+  
+  // Check unlock status on mount
+  useEffect(() => {
+    const unlocked = isScreamPiUnlocked();
+    setSocialChallengeCompleted(unlocked);
+    
+    // Debug: Log the unlock status
+    console.log('Scream Pi Unlock Check:', {
+      hasSocialBadge: localStorage.getItem('socialChallengeBadge'),
+      hasSocialChallengeCompleted: localStorage.getItem('socialChallengeCompleted'),
+      unlocked: unlocked
+    });
+    
+    if (!unlocked) {
+      setGameState('locked');
+      showLockedModal();
+    } else {
+      setGameState('characterSelect');
+    }
+  }, []);
+  
+  // Listen for social challenge badge events
+  useEffect(() => {
+    const handleBadgeReceived = (event: StorageEvent) => {
+      const badgeKeys = ['socialChallengeBadge', 'socialChallengeCompleted', 'socialTaskCompleted', 'socialChallengeTask'];
+      if (badgeKeys.includes(event.key) && event.newValue === 'true') {
+        handleSocialChallengeBadgeReceived();
+      }
+    };
+    
+    // Listen for storage events (when badge is set from another tab/window)
+    window.addEventListener('storage', handleBadgeReceived);
+    
+    // Also check periodically for badge status
+    const checkBadgeInterval = setInterval(() => {
+      const badgeKeys = ['socialChallengeBadge', 'socialChallengeCompleted', 'socialTaskCompleted', 'socialChallengeTask'];
+      const hasAnyBadge = badgeKeys.some(key => localStorage.getItem(key) === 'true');
+      
+      if (hasAnyBadge && !socialChallengeCompleted) {
+        console.log('Badge detected during periodic check:', { hasAnyBadge, socialChallengeCompleted });
+        handleSocialChallengeBadgeReceived();
+      }
+    }, 500); // Check every 500ms for faster detection
+    
+    return () => {
+      window.removeEventListener('storage', handleBadgeReceived);
+      clearInterval(checkBadgeInterval);
+    };
+  }, [socialChallengeCompleted]);
+  
+  // Auto-detect social challenge completion on mount and when component updates
+  useEffect(() => {
+    const checkForSocialChallengeCompletion = () => {
+      const badgeKeys = ['socialChallengeBadge', 'socialChallengeCompleted', 'socialTaskCompleted', 'socialChallengeTask'];
+      const hasAnyBadge = badgeKeys.some(key => localStorage.getItem(key) === 'true');
+      
+      if (hasAnyBadge && !socialChallengeCompleted) {
+        console.log('Auto-detected social challenge completion:', { hasAnyBadge, socialChallengeCompleted });
+        handleSocialChallengeBadgeReceived();
+      }
+    };
+    
+    // Check immediately on mount
+    checkForSocialChallengeCompletion();
+    
+    // Set up a more frequent check for the first 10 seconds
+    const initialCheckInterval = setInterval(checkForSocialChallengeCompletion, 200);
+    
+    // Clear the frequent check after 10 seconds
+    setTimeout(() => {
+      clearInterval(initialCheckInterval);
+    }, 10000);
+    
+    return () => {
+      clearInterval(initialCheckInterval);
+    };
+  }, [socialChallengeCompleted]);
+  
+  // Get power-up duration for progress bar calculation
+  const getPowerUpDuration = (powerUpId: string): number => {
+    switch (powerUpId) {
+      case 'shield': return 10000;
+      case 'magnet': return 8000;
+      case 'coin_multiplier': return 12000;
+      case 'turbo_start': return 15000;
+      default: return 10000;
+    }
+  };
+  
+  // Power-up activation function with proper stacking and debugging
+  const activatePowerUp = (powerUpId: string) => {
+    const powerUp = powerUps.find(p => p.id === powerUpId);
+    if (!powerUp || powerUp.quantity <= 0) {
+      console.log(`Cannot activate ${powerUpId}: quantity is ${powerUp?.quantity}`);
+      return;
+    }
+    
+    console.log(`Activating ${powerUpId} - current quantity: ${powerUp.quantity}`);
+    
+    // Reduce quantity
+    setPowerUps(prev => {
+      const updated = prev.map(p => 
+        p.id === powerUpId ? { ...p, quantity: p.quantity - 1 } : p
+      );
+      return updated;
+    });
+    
+    // Activate power-up based on type with stacking support
+    switch (powerUpId) {
+      case 'shield':
+        // Shield can stack - multiple shields provide multiple protections
+        setActivePowerUps(prev => {
+          const currentShield = prev.shield || 0;
+          const newActive = { 
+            ...prev, 
+            shield: currentShield + 1 
+          };
+          console.log(`Shield activated: ${currentShield + 1} stacks`);
+          return newActive;
+        });
+        setPowerUpTimers(prev => {
+          const currentTimer = prev.shield || 0;
+          const newTimers = { 
+            ...prev, 
+            shield: currentTimer + 10000 
+          };
+          console.log(`Shield timer extended: ${newTimers.shield}ms`);
+          return newTimers;
+        });
+        break;
+        
+      case 'magnet':
+        // Magnet can stack - increases range and strength
+        setActivePowerUps(prev => {
+          const currentMagnet = prev.magnet || 0;
+          const newActive = { 
+            ...prev, 
+            magnet: currentMagnet + 1 
+          };
+          console.log(`Magnet activated: ${currentMagnet + 1} stacks`);
+          return newActive;
+        });
+        setPowerUpTimers(prev => {
+          const currentTimer = prev.magnet || 0;
+          const newTimers = { 
+            ...prev, 
+            magnet: currentTimer + 8000 
+          };
+          console.log(`Magnet timer extended: ${newTimers.magnet}ms`);
+          return newTimers;
+        });
+        break;
+        
+      case 'coin_multiplier':
+        // Coin multiplier can stack - each stack adds 1x multiplier
+        setActivePowerUps(prev => {
+          const currentMultiplier = prev.coin_multiplier || 0;
+          const newActive = { 
+            ...prev, 
+            coin_multiplier: currentMultiplier + 1 
+          };
+          console.log(`Coin multiplier activated: ${currentMultiplier + 1} stacks`);
+          return newActive;
+        });
+        setPowerUpTimers(prev => {
+          const currentTimer = prev.coin_multiplier || 0;
+          const newTimers = { 
+            ...prev, 
+            coin_multiplier: currentTimer + 12000 
+          };
+          console.log(`Coin multiplier timer extended: ${newTimers.coin_multiplier}ms`);
+          return newTimers;
+        });
+        break;
+        
+      case 'turbo_start':
+        // Turbo can stack - increases speed multiplier
+        setActivePowerUps(prev => {
+          const currentTurbo = prev.turbo_start || 0;
+          const newActive = { 
+            ...prev, 
+            turbo_start: currentTurbo + 1 
+          };
+          console.log(`Turbo activated: ${currentTurbo + 1} stacks`);
+          return newActive;
+        });
+        setPowerUpTimers(prev => {
+          const currentTimer = prev.turbo_start || 0;
+          const newTimers = { 
+            ...prev, 
+            turbo_start: currentTimer + 15000 
+          };
+          console.log(`Turbo timer extended: ${newTimers.turbo_start}ms`);
+          return newTimers;
+        });
+        break;
+        
+      default:
+        console.log(`Unknown power-up: ${powerUpId}`);
+        break;
+    }
+  };
+  
+  // Power-up timer management
+  useEffect(() => {
+    if (gameState !== 'playing') return;
+    
+    const timerInterval = setInterval(() => {
+      setPowerUpTimers(prev => {
+        const newTimers = { ...prev };
+        let hasChanges = false;
+        
+        // Update all power-up timers
+        Object.keys(newTimers).forEach(key => {
+          if (newTimers[key] > 0) {
+            newTimers[key] -= 100; // Reduce by 100ms
+            if (newTimers[key] <= 0) {
+              newTimers[key] = 0;
+              hasChanges = true;
+            }
+          }
+        });
+        
+        // Remove expired power-ups
+        if (hasChanges) {
+          setActivePowerUps(current => {
+            const updated = { ...current };
+            Object.keys(newTimers).forEach(key => {
+              if (newTimers[key] <= 0) {
+                delete updated[key];
+              }
+            });
+            return updated;
+          });
+        }
+        
+        return newTimers;
+      });
+    }, 100);
+    
+    return () => clearInterval(timerInterval);
+  }, [gameState]);
+  
+  // Play sound with error handling
+  const playSound = (type: 'jump' | 'scream' | 'gameOver' | 'bgMusic' | 'collect' | 'levelUp') => {
+    try {
+      switch (type) {
+        case 'jump':
+          if (jumpSound) {
+            jumpSound.currentTime = 0;
+            jumpSound.play().catch(console.error);
+          }
+          break;
+        case 'scream':
+          if (screamSound) {
+            screamSound.currentTime = 0;
+            screamSound.play().catch(console.error);
+          }
+          break;
+        case 'gameOver':
+          if (gameOverSound) {
+            gameOverSound.currentTime = 0;
+            gameOverSound.play().catch(console.error);
+          }
+          break;
+        case 'collect':
+          if (collectSound) {
+            collectSound.currentTime = 0;
+            collectSound.play().catch(console.error);
+          }
+          break;
+        case 'levelUp':
+          if (screamSound) {
+            screamSound.currentTime = 0;
+            screamSound.play().catch(console.error);
+          }
+          break;
+        case 'bgMusic':
+          if (bgMusic) {
+            bgMusic.currentTime = 0;
+            bgMusic.play().catch(console.error);
+          }
+          break;
+      }
+    } catch (error) {
+      console.warn('Error playing sound:', error);
+    }
+  };
+  
+  // Enhanced NPC reaction system with character-specific responses
+  const getNPCReaction = (level: number, characterId: string): { emotion: NPC['emotion'], reaction: string } => {
+    const baseReactions = {
+      nicolas: {
+        low: { emotion: 'neutral' as const, reaction: '😐' },
+        medium: { emotion: 'excited' as const, reaction: '😊' },
+        high: { emotion: 'excited' as const, reaction: '😄' },
+        veryHigh: { emotion: 'scared' as const, reaction: '😱' },
+        extreme: { emotion: 'annoyed' as const, reaction: '😤' }
+      },
+      chengdiao: {
+        low: { emotion: 'neutral' as const, reaction: '🧘' },
+        medium: { emotion: 'excited' as const, reaction: '😌' },
+        high: { emotion: 'excited' as const, reaction: '🤓' },
+        veryHigh: { emotion: 'scared' as const, reaction: '😨' },
+        extreme: { emotion: 'annoyed' as const, reaction: '😵' }
+      }
+    };
+    
+    const character = characterId === 'chengdiao' ? 'chengdiao' : 'nicolas';
+    const reactions = baseReactions[character];
+    
+    if (level < 20) {
+      return reactions.low;
+    } else if (level < 40) {
+      return reactions.medium;
+    } else if (level < 60) {
+      return reactions.high;
+    } else if (level < 80) {
+      return reactions.veryHigh;
+    } else {
+      return reactions.extreme;
+    }
+  };
+  
+  // Generate obstacles function
+  const generateObstacles = (): Obstacle[] => {
+    const obstacles: Obstacle[] = [];
+    const baseX = CANVAS_WIDTH + 300;
+    
+    // Generate 3-4 platforms for jumping
+    for (let i = 0; i < 3 + Math.floor(Math.random() * 2); i++) {
+      const x = baseX + (i * 250) + Math.random() * 100; // Closer spacing for jumping
+      const platformWidth = 80 + Math.random() * 60; // Wider platforms
+      const platformHeight = 20; // Thinner platforms
+      const y = GROUND_Y - 60 - (Math.random() * 200); // Varying heights
+      
+      // Create platform
+      obstacles.push({
+        x,
+        y,
+        width: platformWidth,
+        height: platformHeight,
+        type: 'platform',
+        color: '#000000'
+      });
+    }
+    
+    // Add some ground platforms for safety
+    obstacles.push({
+      x: baseX + 100,
+      y: GROUND_Y - 40,
+      width: 100,
+      height: 40,
+      type: 'ground',
+      color: '#000000'
+    });
+    
+    return obstacles;
+  };
+
+  // Generate collectibles function
+  const generateCollectibles = (): Collectible[] => {
+    const collectibles: Collectible[] = [];
+    
+    // Generate 2-3 coins
+    for (let i = 0; i < 2 + Math.floor(Math.random() * 2); i++) {
+      collectibles.push({
+        x: CANVAS_WIDTH + 200 + (i * 200) + Math.random() * 150,
+        y: GROUND_Y - 150 + Math.random() * 100, // Better positioning for larger character
+        type: 'coin', // Changed from cherry to coin
+        collected: false
+      });
+    }
+    
+    return collectibles;
+  };
+  
+  // Add particles
+  const addParticles = (x: number, y: number, color: string, count: number = 5) => {
+    const newParticles: Particle[] = [];
+    
+    for (let i = 0; i < count; i++) {
+      newParticles.push({
+        x: x + Math.random() * 20 - 10,
+        y: y + Math.random() * 20 - 10,
+        vx: (Math.random() - 0.5) * 4,
+        vy: (Math.random() - 0.5) * 4,
+        life: 30,
+        maxLife: 30,
+        color,
+        size: Math.random() * 3 + 1
+      });
+    }
+    
+    setParticles(prev => [...prev, ...newParticles]);
+  };
+  
+  // Handle touch/click start
+  const handleTouchStart = useCallback(() => {
+    if (gameState !== 'playing') return;
+    
+    if (controlMode === 'tap') {
+      setIsPressing(true);
+      setPressStart(Date.now());
+    }
+  }, [gameState, controlMode]);
+  
+  // Handle touch/click end
+  const handleTouchEnd = useCallback(() => {
+    if (controlMode === 'tap' && gameState === 'playing' && isPressing) {
+      const holdTime = Date.now() - pressStart;
+      const jumpForce = Math.min(MAX_JUMP_FORCE, MIN_JUMP_FORCE + (holdTime / MAX_HOLD_TIME) * (MAX_JUMP_FORCE - MIN_JUMP_FORCE));
+      
+      setNpc(prev => ({
+        ...prev,
+        velocityY: -jumpForce,
+        isJumping: true
+      }));
+      
+      playSound('jump');
+      addParticles(npc.x + 32, npc.y + 32, '#FFD700', 8);
+      
+      setIsPressing(false);
+    }
+  }, [gameState, controlMode, pressStart, npc.isJumping, npc.x, npc.y]);
+  
+  // Get available devices
+  const getAvailableDevices = async () => {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const audioDevices = devices.filter(device => device.kind === 'audioinput');
+      setAvailableDevices(audioDevices);
+      return audioDevices;
+    } catch (error) {
+      console.error('Error getting available devices:', error);
+      return [];
+    }
+  };
+
+  // Check microphone permission
+  const checkMicrophonePermission = async () => {
+    try {
+      const result = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      setMicrophonePermission(result.state);
+      return result.state;
+    } catch (error) {
+      console.error('Error checking microphone permission:', error);
+      return 'prompt';
+    }
+  };
+
+  // Initialize microphone with error handling
+  const initializeMicrophone = async (deviceId?: string) => {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        console.error('Microphone not supported in this browser');
+        setMicrophoneError('Microphone not supported in this browser');
+        return;
+      }
+
+      const constraints = {
+        audio: {
+          deviceId: deviceId ? { exact: deviceId } : undefined,
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        }
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      
+      // Optimize analyser settings for better performance
+      analyser.fftSize = 256; // Reduced from 512 for better performance
+      analyser.smoothingTimeConstant = 0.8;
+      analyser.minDecibels = -90;
+      analyser.maxDecibels = -10;
+      
+      source.connect(analyser);
+      setAnalyser(analyser);
+      setMicrophoneError(null);
+      console.log('Microphone initialized successfully');
+    } catch (error) {
+      console.error('Microphone initialization failed:', error);
+      let errorMessage = 'Failed to access microphone';
+      
+      if (error instanceof DOMException) {
+        switch (error.name) {
+          case 'NotFoundError':
+            errorMessage = 'No microphone found';
+            break;
+          case 'NotAllowedError':
+            errorMessage = 'Microphone access denied';
+            break;
+          case 'NotReadableError':
+            errorMessage = 'Microphone is already in use';
+            break;
+          default:
+            errorMessage = `Microphone error: ${error.message}`;
+        }
+      }
+      
+      setMicrophoneError(errorMessage);
+    }
+  };
+
+  // Handle device selection
+  const handleDeviceSelect = async (deviceId: string) => {
+    try {
+      setSelectedDevice(deviceId);
+      await initializeMicrophone(deviceId);
+      setShowDeviceSelector(false);
+    } catch (error) {
+      console.error('Error selecting device:', error);
+    }
+  };
+  
+  // Start game with error handling
+  const startGame = async (mode: 'scream' | 'tap') => {
+    try {
+      setControlMode(mode);
+      setGameState('playing');
+      setScore(0);
+      setDistance(0);
+      setLevel(1);
+      setFlappyCoins(0);
+      
+      // Reset NPC position
+      setNpc(prev => ({
+        ...prev,
+        x: 50,
+        y: GROUND_Y - NPC_HEIGHT,
+        velocityY: 0,
+        isJumping: false,
+        emotion: 'neutral',
+        reaction: '',
+        reactionTimer: 0
+      }));
+      
+      // Initialize obstacles and collectibles
+      const initialObstacles = generateObstacles();
+      const initialCollectibles = generateCollectibles();
+      
+      setObstacles(initialObstacles);
+      setCollectibles(initialCollectibles);
+      setParticles([]);
+      
+      // Initialize microphone if scream mode
+      if (mode === 'scream') {
+        await initializeMicrophone();
+      }
+      
+      // Start background music
+      playSound('bgMusic');
+      
+      console.log('Game started with mode:', mode);
+    } catch (error) {
+      console.error('Error starting game:', error);
+    }
+  };
+  
+  // Toggle pause
+  const togglePause = () => {
+    if (gameState === 'playing') {
+      setGameState('paused');
+      if (bgMusic) bgMusic.pause();
+    } else if (gameState === 'paused') {
+      setGameState('playing');
+      if (bgMusic) bgMusic.play().catch(() => {});
+    }
+  };
+  
+  // Return to menu with cleanup
+  const returnToMenu = () => {
+    if (bgMusic) bgMusic.pause();
+    
+    // Cleanup microphone
+    if (analyser) {
+      setAnalyser(null);
+    }
+    
+    setShowGameOverModal(false);
+    setShowReviveModal(false);
+    setReviveUsed(false);
+    setReviveCount(0);
+  };
+
+  // Modal handlers
+  const handleGameOver = () => {
+    playSound('gameOver');
+    setGameState('gameOver');
+    setShowGameOverModal(true);
+    
+    // Stop background music
+    if (bgMusic) {
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+    }
+  };
+
+  const handleRevive = (reviveType?: 'coin' | 'ad' | 'premium' | 'extra_life') => {
+    setShowReviveModal(false);
+    setReviveUsed(true);
+    setReviveCount(prev => prev + 1);
+    
+    // Reset NPC position and continue game
+    setNpc(prev => ({
+      ...prev,
+      x: 100,
+      y: 400,
+      velocityY: 0,
+      isJumping: false,
+      emotion: 'neutral',
+      reaction: '',
+      reactionTimer: 0
+    }));
+    
+    setGameState('playing');
+  };
+
+  const handleReviveDecline = () => {
+    setShowReviveModal(false);
+    setGameState('gameOver');
+    setShowGameOverModal(true);
+  };
+
+  const handleUseExtraLife = () => {
+    setExtraLives(prev => Math.max(0, prev - 1));
+    handleRevive('extra_life');
+  };
+
+  const handleRestart = () => {
+    setShowGameOverModal(false);
+    setReviveUsed(false);
+    setReviveCount(0);
+    startGame(controlMode);
+  };
+
+  const handleShare = () => {
+    // Share functionality
+    console.log('Share score:', score);
+  };
+
+  const handleHome = () => {
+    setShowGameOverModal(false);
+    returnToMenu();
+  };
+
+  // Tap controls
+  const handleTapStart = () => {
+    if (controlMode === 'tap' && gameState === 'playing') {
+      setIsPressing(true);
+      setPressStart(Date.now());
+    }
+  };
+
+  const handleTapEnd = () => {
+    if (controlMode === 'tap' && gameState === 'playing' && isPressing) {
+      const holdTime = Date.now() - pressStart;
+      const jumpForce = Math.min(MAX_JUMP_FORCE, MIN_JUMP_FORCE + (holdTime / MAX_HOLD_TIME) * (MAX_JUMP_FORCE - MIN_JUMP_FORCE));
+      
+      setNpc(prev => ({
+        ...prev,
+        velocityY: -jumpForce,
+        isJumping: true
+      }));
+      
+      playSound('jump');
+      addParticles(npc.x + 32, npc.y + 32, '#FFD700', 8);
+      
+      setIsPressing(false);
+    }
+  };
+
+  // Scream-based jumping
+  useEffect(() => {
+    if (controlMode === 'scream' && gameState === 'playing' && analyser) {
+      const checkScream = () => {
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(dataArray);
+        
+        const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+        const normalizedLevel = (average / 255) * 100;
+        
+        setScreamLevel(normalizedLevel);
+        setScreamMeter(Math.min(100, normalizedLevel * (sensitivity / 50)));
+        
+        const jumpThreshold = 20;
+        if (normalizedLevel > jumpThreshold && !npc.isJumping) {
+          const jumpForce = Math.min(MAX_JUMP_FORCE, MIN_JUMP_FORCE + (normalizedLevel / 100) * (MAX_JUMP_FORCE - MIN_JUMP_FORCE));
+          
+          setNpc(prev => ({
+            ...prev,
+            velocityY: -jumpForce,
+            isJumping: true
+          }));
+          
+          playSound('jump');
+          addParticles(npc.x + 32, npc.y + 32, '#FFD700', 8);
+        }
+      };
+      
+      const interval = setInterval(checkScream, 100);
+      return () => clearInterval(interval);
+    }
+  }, [controlMode, gameState, analyser, sensitivity, npc.isJumping, npc.x, npc.y]);
+  
+  const handleSubmitScore = async (): Promise<boolean> => {
+    // Submit score to backend
+    console.log('Submitting score:', score);
+    return true;
+  };
+  
+  // Game loop
+  useEffect(() => {
+    if (gameState !== 'playing') return;
+    
+    const gameLoop = () => {
+      if (gameState !== 'playing') return;
+      
+      // Update NPC physics using platformer mechanics
+      setNpc(prev => {
+        const newVelocityY = prev.velocityY + GRAVITY;
+        const newY = prev.y + newVelocityY;
+        const newX = prev.x + RUN_SPEED; // Character runs forward
+        
+        // Check if character fell off the screen (game over)
+        if (newY > CANVAS_HEIGHT) {
+          handleGameOver();
+          return prev;
+        }
+        
+        // Ground collision
+        if (newY + NPC_HEIGHT > GROUND_Y) {
+          return {
+            ...prev,
+            x: newX,
+            y: GROUND_Y - NPC_HEIGHT,
+            velocityY: 0,
+            isJumping: false
+          };
+        }
+        
+        // Ceiling collision
+        if (newY < 0) {
+          return {
+            ...prev,
+            x: newX,
+            y: 0,
+            velocityY: 0
+          };
+        }
+        
+        return {
+          ...prev,
+          x: newX,
+          y: newY,
+          velocityY: newVelocityY
+        };
+      });
+      
+      // Update obstacles (scroll left to create movement effect)
+      setObstacles(prev => {
+        const updated = prev.map(obstacle => ({
+          ...obstacle,
+          x: obstacle.x - SCROLL_SPEED
+        })).filter(obstacle => obstacle.x + obstacle.width > 0);
+        
+        // Generate new obstacles if needed
+        if (updated.length === 0 || updated[updated.length - 1].x < CANVAS_WIDTH - 300) {
+          const newObstacles = generateObstacles();
+          return [...updated, ...newObstacles];
+        }
+        
+        return updated;
+      });
+      
+      // Update collectibles (scroll left)
+      setCollectibles(prev => {
+        const updated = prev.map(collectible => {
+          if (!collectible.collected) {
+            return { ...collectible, x: collectible.x - SCROLL_SPEED };
+          }
+          return collectible;
+        }).filter(collectible => collectible.x > -50);
+        
+        // Generate new collectibles if needed
+        if (updated.length < 3 && Math.random() < 0.02) {
+          const newCollectibles = generateCollectibles();
+          return [...updated, ...newCollectibles];
+        }
+        
+        return updated;
+      });
+      
+      // Update particles
+      setParticles(prev => {
+        const updated = prev.map(particle => ({
+          ...particle,
+          x: particle.x + particle.vx,
+          y: particle.y + particle.vy,
+          life: particle.life - 0.02
+        })).filter(particle => particle.life > 0);
+        
+        return updated;
+      });
+      
+      // Update distance/score
+      setDistance(prev => prev + SCROLL_SPEED);
+      setScore(prev => Math.floor((prev + SCROLL_SPEED) / 100));
+      
+      // Level progression
+      setLevel(prev => {
+        const newLevel = Math.floor((distance + SCROLL_SPEED) / 2000) + 1;
+        if (newLevel !== prev) {
+          playSound('levelUp');
+          return newLevel;
+        }
+        return prev;
+      });
+      
+      // Continue game loop
+      if (gameState === 'playing') {
+        requestAnimationFrame(gameLoop);
+      }
+    };
+    
+    // Start the game loop
+    requestAnimationFrame(gameLoop);
+    
+    return () => {
+      // Cleanup will be handled by the game loop itself
+    };
+  }, [gameState]);
+  
+  // Optimized render loop with preloaded images
+  const [coinImage, setCoinImage] = useState<HTMLImageElement | null>(null);
+  
+  // Load coin image
+  useEffect(() => {
+    const img = new Image();
+    img.src = '/flappycoins.png';
+    img.onload = () => {
+      setCoinImage(img);
+    };
+  }, []);
+  
+  // Render loop
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    const renderLoop = () => {
+      // Clear canvas with white background
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      
+      // Draw black ground platform
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, GROUND_Y, CANVAS_WIDTH, CANVAS_HEIGHT - GROUND_Y);
+      
+      // Draw obstacles in minimalist black style
+      obstacles.forEach(obstacle => {
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        
+        // Add spikes for spike obstacles
+        if (obstacle.type === 'spike') {
+          ctx.fillStyle = '#FF0000';
+          ctx.beginPath();
+          ctx.moveTo(obstacle.x, obstacle.y + obstacle.height);
+          ctx.lineTo(obstacle.x + obstacle.width / 2, obstacle.y);
+          ctx.lineTo(obstacle.x + obstacle.width, obstacle.y + obstacle.height);
+          ctx.closePath();
+          ctx.fill();
+        }
+      });
+      
+      // Draw collectibles as Flappy Pi coins
+      collectibles.forEach(collectible => {
+        if (!collectible.collected) {
+          if (collectible.type === 'coin') {
+            // Draw Flappy Pi coin image
+            if (coinImage) {
+              ctx.drawImage(coinImage, collectible.x, collectible.y, 32, 32);
+            } else {
+              // Fallback: draw gold circle
+              ctx.fillStyle = '#FFD700';
+              ctx.beginPath();
+              ctx.arc(collectible.x + 16, collectible.y + 16, 16, 0, Math.PI * 2);
+              ctx.fill();
+              
+              // Add coin shine effect
+              ctx.fillStyle = '#FFFFFF';
+              ctx.globalAlpha = 0.6;
+              ctx.beginPath();
+              ctx.arc(collectible.x + 12, collectible.y + 12, 6, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.globalAlpha = 1;
+            }
+          } else {
+            // Draw cherry for other types
+            ctx.fillStyle = '#FF0000';
+            ctx.beginPath();
+            ctx.arc(collectible.x + 8, collectible.y + 8, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Draw cherry stem
+            ctx.fillStyle = '#00FF00';
+            ctx.fillRect(collectible.x + 6, collectible.y, 4, 4);
+          }
+        }
+      });
+      
+      // Draw particles in minimalist style
+      particles.forEach(particle => {
+        ctx.fillStyle = '#CCCCCC';
+        ctx.globalAlpha = particle.life / particle.maxLife;
+        ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
+        ctx.globalAlpha = 1;
+      });
+      
+      // Draw NPC character (pixel art character)
+      const characterImage = characterImages[npc.character as keyof typeof characterImages];
+      if (npcImageRef.current && characterImage) {
+        ctx.drawImage(npcImageRef.current, npc.x, npc.y, NPC_WIDTH, NPC_HEIGHT);
+      } else {
+        // Fallback: black square with orange details
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(npc.x, npc.y, NPC_WIDTH, NPC_HEIGHT);
+        
+        // Orange details (eyes and feet)
+        ctx.fillStyle = '#FFA500';
+        ctx.fillRect(npc.x + 12, npc.y + 16, 8, 8); // Left eye
+        ctx.fillRect(npc.x + 44, npc.y + 16, 8, 8); // Right eye
+        ctx.fillRect(npc.x + 16, npc.y + 56, 12, 8); // Left foot
+        ctx.fillRect(npc.x + 36, npc.y + 56, 12, 8); // Right foot
+        
+        // White mouth
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.moveTo(npc.x + 24, npc.y + 32);
+        ctx.lineTo(npc.x + 32, npc.y + 40);
+        ctx.lineTo(npc.x + 40, npc.y + 32);
+        ctx.fill();
+      }
+      
+      // Draw movement trail
+      if (npc.velocityY < 0) {
+        ctx.fillStyle = '#CCCCCC';
+        ctx.globalAlpha = 0.5;
+        ctx.fillRect(npc.x + 8, npc.y + NPC_HEIGHT, NPC_WIDTH - 16, 12);
+        ctx.globalAlpha = 1;
+      }
+      
+      // Draw shield effect if active
+      if (activePowerUps.shield && activePowerUps.shield > 0) {
+        ctx.strokeStyle = '#00FFFF';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(npc.x + NPC_WIDTH/2, npc.y + NPC_HEIGHT/2, NPC_WIDTH/2 + 8, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      
+      // Draw NPC reaction
+      if (npc.reactionTimer > 0) {
+        ctx.fillStyle = '#000000';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(npc.reaction, npc.x + NPC_WIDTH/2, npc.y - 15);
+      }
+      
+      // Draw level info and theme
+      if (gameState === 'playing') {
+        const levelTheme = getLevelTheme(level);
+        const levelChallenge = getLevelChallenge(level);
+        
+        // Level display
+        ctx.fillStyle = levelTheme.color;
+        ctx.font = 'bold 24px Arial';
+        ctx.textAlign = 'left';
+        ctx.fillText(`Level ${level}: ${levelTheme.name}`, 20, 40);
+        
+        // Challenge display
+        ctx.fillStyle = '#666666';
+        ctx.font = '12px Arial';
+        ctx.fillText(`Challenge: ${levelChallenge.challenge}`, 20, 60);
+        ctx.fillText(`Objective: ${levelChallenge.objective}`, 20, 80);
+      }
+      
+      // Draw scream meter (for scream mode)
+      if (controlMode === 'scream' && gameState === 'playing') {
+        const meterWidth = 200;
+        const meterHeight = 20;
+        const meterX = (CANVAS_WIDTH - meterWidth) / 2;
+        const meterY = 50;
+        
+        // Background
+        ctx.fillStyle = '#CCCCCC';
+        ctx.fillRect(meterX, meterY, meterWidth, meterHeight);
+        
+        // Fill
+        ctx.fillStyle = screamMeter > 50 ? '#FF0000' : '#00FF00';
+        ctx.fillRect(meterX, meterY, (screamMeter / 100) * meterWidth, meterHeight);
+        
+        // Border
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(meterX, meterY, meterWidth, meterHeight);
+        
+        // Text
+        ctx.fillStyle = '#000000';
+        ctx.font = '16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Scream Level: ${Math.round(screamMeter)}%`, CANVAS_WIDTH / 2, meterY - 10);
+      }
+      
+      requestAnimationFrame(renderLoop);
+    };
+    
+    renderLoop();
+  }, [obstacles, collectibles, particles, npc, controlMode, gameState, screamMeter, coinImage]);
+  
+  // Check microphone permission on mount
+  useEffect(() => {
+    checkMicrophonePermission();
+    
+    // Cleanup on unmount
+    return () => {
+      if (analyser) {
+        setAnalyser(null);
+      }
+    };
+  }, []);
+
+  // Load NPC image
+  useEffect(() => {
+    const characterImage = characterImages[npc.character as keyof typeof characterImages];
+    if (characterImage) {
+      const img = new Image();
+      img.src = characterImage;
+      img.onload = () => {
+        npcImageRef.current = img;
+      };
+    }
+  }, [npc.character]);
+  
+  // Level-specific obstacle generation
+  const generateLevelObstacles = (currentLevel: number): Obstacle[] => {
+    const obstacles: Obstacle[] = [];
+    const baseX = CANVAS_WIDTH + 300; // Increased spacing from 200 to 300
+    
+    switch (currentLevel) {
+      case 1: // Scream Plains - Basic pipes and gaps
+        for (let i = 0; i < 2; i++) { // Reduced from 3 to 2 obstacles
+          const x = baseX + (i * 400) + Math.random() * 150; // Increased spacing from 300 to 400
+          const gapWidth = 100 + Math.random() * 60; // Increased gap width for easier passage
+          
+          // Left platform
+          obstacles.push({
+            x: x - gapWidth/2 - 40,
+            y: GROUND_Y - 40,
+            width: 40,
+            height: 40,
+            type: 'ground',
+            color: '#22c55e'
+          });
+          
+          // Right platform
+          obstacles.push({
+            x: x + gapWidth/2,
+            y: GROUND_Y - 40,
+            width: 40,
+            height: 40,
+            type: 'ground',
+            color: '#22c55e'
+          });
+        }
+        break;
+        
+      case 2: // Lava Rise - Rising lava with platforms
+        for (let i = 0; i < 3; i++) { // Reduced from 4 to 3
+          const x = baseX + (i * 350) + Math.random() * 100; // Increased spacing
+          const lavaHeight = 15 + Math.random() * 25; // Reduced lava height
+          
+          // Lava
+          obstacles.push({
+            x,
+            y: GROUND_Y - lavaHeight,
+            width: 50,
+            height: lavaHeight,
+            type: 'lava',
+            color: '#ef4444',
+            levelSpecific: { rising: true, speed: 0.3 } // Reduced speed
+          });
+          
+          // Floating platform
+          obstacles.push({
+            x: x + 120,
+            y: GROUND_Y - 100 - Math.random() * 30,
+            width: 50,
+            height: 25,
+            type: 'platform',
+            color: '#f97316',
+            levelSpecific: { floating: true }
+          });
+        }
+        break;
+        
+      case 3: // Electric Zone - Timed electric walls
+        for (let i = 0; i < 2; i++) { // Reduced from 3 to 2
+          const x = baseX + (i * 450) + Math.random() * 150; // Increased spacing
+          
+          obstacles.push({
+            x,
+            y: 0,
+            width: 30,
+            height: CANVAS_HEIGHT,
+            type: 'electric',
+            color: '#3b82f6',
+            levelSpecific: { 
+              active: i % 2 === 0, 
+              timer: 0, 
+              interval: 4000, // Increased interval for easier timing
+              safeWindow: 1500 // Increased safe window
+            }
+          });
+        }
+        break;
+        
+      case 4: // Storm Chase - Wind and lightning
+        for (let i = 0; i < 2; i++) { // Reduced from 3 to 2
+          const x = baseX + (i * 400) + Math.random() * 150;
+          
+          // Wind zone
+          obstacles.push({
+            x,
+            y: 0,
+            width: 80,
+            height: CANVAS_HEIGHT,
+            type: 'wind',
+            color: '#8b5cf6',
+            levelSpecific: { 
+              windForce: -1.5, // Reduced wind force
+              lightningActive: false,
+              lightningTimer: 0
+            }
+          });
+        }
+        break;
+        
+      case 5: // Echo Labyrinth - Echo-based maze walls
+        for (let i = 0; i < 3; i++) { // Reduced from 4 to 3
+          const x = baseX + (i * 300) + Math.random() * 100;
+          const echoStrength = Math.random() * 0.5; // Reduced echo strength
+          
+          obstacles.push({
+            x,
+            y: GROUND_Y - 50,
+            width: 25,
+            height: 50,
+            type: 'echo',
+            color: '#6366f1',
+            levelSpecific: { 
+              echoStrength,
+              shiftDirection: Math.random() > 0.5 ? 1 : -1,
+              delay: 800 + Math.random() * 1200 // Increased delay
+            }
+          });
+        }
+        break;
+        
+      case 6: // Frost Fall - Slippery platforms and icicles
+        for (let i = 0; i < 2; i++) { // Reduced from 3 to 2
+          const x = baseX + (i * 400) + Math.random() * 120;
+          
+          // Slippery platform
+          obstacles.push({
+            x,
+            y: GROUND_Y - 50,
+            width: 70,
+            height: 50,
+            type: 'ice',
+            color: '#06b6d4',
+            levelSpecific: { slippery: true, freezeTimer: 0 }
+          });
+          
+          // Falling icicle
+          obstacles.push({
+            x: x + 40,
+            y: 0,
+            width: 15,
+            height: 50,
+            type: 'ice',
+            color: '#0ea5e9',
+            levelSpecific: { falling: true, fallSpeed: 1.5 } // Reduced fall speed
+          });
+        }
+        break;
+        
+      case 7: // Pi Space - Zero gravity with asteroids
+        for (let i = 0; i < 3; i++) { // Reduced from 4 to 3
+          const x = baseX + (i * 300) + Math.random() * 120;
+          const y = 80 + Math.random() * (CANVAS_HEIGHT - 200); // Better positioning
+          
+          obstacles.push({
+            x,
+            y,
+            width: 35,
+            height: 35,
+            type: 'space',
+            color: '#f59e0b',
+            levelSpecific: { 
+              asteroid: true, 
+              gravity: 0.08, // Reduced gravity
+              floatForce: 0.3 // Reduced float force
+            }
+          });
+        }
+        break;
+        
+      case 8: // Rainbow Rush - Pitch-based gates
+        for (let i = 0; i < 2; i++) { // Reduced from 3 to 2
+          const x = baseX + (i * 450) + Math.random() * 150;
+          const requiredPitch = 150 + Math.random() * 300; // Lower pitch range
+          
+          obstacles.push({
+            x,
+            y: 0,
+            width: 50,
+            height: CANVAS_HEIGHT,
+            type: 'rainbow',
+            color: '#ec4899',
+            levelSpecific: { 
+              requiredPitch,
+              gateOpen: false,
+              pitchTolerance: 80 // Increased tolerance
+            }
+          });
+        }
+        break;
+        
+      case 9: // Trap Factory - Moving walls and crushers
+        for (let i = 0; i < 2; i++) { // Reduced from 3 to 2
+          const x = baseX + (i * 400) + Math.random() * 120;
+          
+          // Moving wall
+          obstacles.push({
+            x,
+            y: GROUND_Y - 70,
+            width: 35,
+            height: 70,
+            type: 'factory',
+            color: '#dc2626',
+            levelSpecific: { 
+              moving: true, 
+              direction: 1,
+              speed: 0.8, // Reduced speed
+              pauseTimer: 0
+            }
+          });
+          
+          // Crusher
+          obstacles.push({
+            x: x + 180,
+            y: 0,
+            width: 50,
+            height: 35,
+            type: 'factory',
+            color: '#b91c1c',
+            levelSpecific: { 
+              crushing: true, 
+              crushTimer: 0,
+              crushInterval: 3000 // Increased interval
+            }
+          });
+        }
+        break;
+        
+      case 10: // Silent Temple - Stealth zones and sound detectors
+        for (let i = 0; i < 3; i++) { // Reduced from 4 to 3
+          const x = baseX + (i * 300) + Math.random() * 100;
+          
+          // Stealth zone
+          obstacles.push({
+            x,
+            y: 0,
+            width: 70,
+            height: CANVAS_HEIGHT,
+            type: 'temple',
+            color: '#7c3aed',
+            levelSpecific: { 
+              stealthZone: true,
+              soundThreshold: 0.4, // Increased threshold (easier)
+              laserActive: false
+            }
+          });
+        }
+        break;
+    }
+    
+    return obstacles;
+  };
+
+  // Get level theme and configuration
+  const getLevelTheme = (currentLevel: number) => {
+    return LEVEL_THEMES[currentLevel] || LEVEL_THEMES[1];
+  };
+
+  // Get level challenge description
+  const getLevelChallenge = (currentLevel: number) => {
+    const challenges = {
+      1: { challenge: 'Low scream = low jump, High scream = high jump', objective: 'Teach basic scream jump timing' },
+      2: { challenge: 'Maintain scream to keep jumping, Cool down between screams', objective: 'Practice controlled screaming to hover' },
+      3: { challenge: 'Scream only during safe window', objective: 'Train precision voice timing' },
+      4: { challenge: 'Use medium volume to jump safely', objective: 'Balance voice power' },
+      5: { challenge: 'Short shout triggers one block, Long echo moves wall', objective: 'Solve puzzle with different scream lengths' },
+      6: { challenge: 'Screams freeze platforms temporarily', objective: 'Use scream to create timing-safe zones' },
+      7: { challenge: 'Short bursts = levitate, Silent = slowly fall', objective: 'Master scream thrusting' },
+      8: { challenge: 'High-pitch = gate opens, Low-pitch = trap', objective: 'Explore advanced scream types' },
+      9: { challenge: 'Scream to stop traps temporarily', objective: 'Tactical scream pausing' },
+      10: { challenge: 'Switch between silence and scream', objective: 'Control your scream power like a true master' }
+    };
+    
+    return challenges[currentLevel] || challenges[1];
+  };
+  
+  // Collision detection system
+  useEffect(() => {
+    if (gameState !== 'playing') return;
+    
+    const collisionLoop = () => {
+      if (gameState !== 'playing') return;
+      
+      // Get current NPC position
+      const currentNpc = npc;
+      const npcBounds = {
+        x: currentNpc.x + 8,
+        y: currentNpc.y + 8,
+        width: NPC_WIDTH - 16,
+        height: NPC_HEIGHT - 16
+      };
+      
+      // Check platform collisions (landing on platforms)
+      let onPlatform = false;
+      obstacles.forEach(obstacle => {
+        if (obstacle.type === 'ground' || obstacle.type === 'platform') {
+          // Check if NPC is landing on this platform
+          if (npcBounds.x < obstacle.x + obstacle.width &&
+              npcBounds.x + npcBounds.width > obstacle.x &&
+              npcBounds.y + npcBounds.height >= obstacle.y &&
+              npcBounds.y + npcBounds.height <= obstacle.y + 10) { // Small landing zone
+            
+            onPlatform = true;
+            // Land on platform
+            setNpc(prev => ({
+              ...prev,
+              y: obstacle.y - NPC_HEIGHT,
+              velocityY: 0,
+              isJumping: false
+            }));
+          }
+        }
+      });
+      
+      // Check if character fell off all platforms
+      if (!onPlatform && currentNpc.y + NPC_HEIGHT > GROUND_Y) {
+        // Character is falling and not on any platform
+        if (currentNpc.y > CANVAS_HEIGHT) {
+          handleGameOver();
+          return;
+        }
+      }
+      
+      // Check obstacle collisions (hitting walls/obstacles)
+      obstacles.forEach(obstacle => {
+        if (obstacle.type !== 'ground' && obstacle.type !== 'platform') {
+          if (npcBounds.x < obstacle.x + obstacle.width &&
+              npcBounds.x + npcBounds.width > obstacle.x &&
+              npcBounds.y < obstacle.y + obstacle.height &&
+              npcBounds.y + npcBounds.height > obstacle.y) {
+            
+            // Check for shield protection
+            if (activePowerUps.shield && activePowerUps.shield > 0) {
+              setActivePowerUps(prev => ({ ...prev, shield: prev.shield - 1 }));
+              playSound('collect');
+              addParticles(currentNpc.x + 32, currentNpc.y + 32, '#00FFFF', 10);
+            } else {
+              handleGameOver();
+              return;
+            }
+          }
+        }
+      });
+      
+      // Check collectible collisions
+      collectibles.forEach(collectible => {
+        if (!collectible.collected &&
+            npcBounds.x < collectible.x + 16 &&
+            npcBounds.x + npcBounds.width > collectible.x &&
+            npcBounds.y < collectible.y + 16 &&
+            npcBounds.y + npcBounds.height > collectible.y) {
+          
+          // Mark as collected
+          setCollectibles(prev => 
+            prev.map(c => 
+              c === collectible ? { ...c, collected: true } : c
+            )
+          );
+          
+          setFlappyCoins(prev => prev + 1);
+          playSound('collect');
+          addParticles(collectible.x + 8, collectible.y + 8, '#FFD700', 8);
+        }
+      });
+      
+      // Update power-up timers
+      Object.keys(activePowerUps).forEach(powerUpId => {
+        if (activePowerUps[powerUpId] > 0 && powerUpTimers[powerUpId]) {
+          const remaining = powerUpTimers[powerUpId] - Date.now();
+          if (remaining <= 0) {
+            setActivePowerUps(prev => ({ ...prev, [powerUpId]: 0 }));
+            setPowerUpTimers(prev => ({ ...prev, [powerUpId]: 0 }));
+          }
+        }
+      });
+      
+      // Continue collision detection
+      if (gameState === 'playing') {
+        requestAnimationFrame(collisionLoop);
+      }
+    };
+    
+    // Start collision detection
+    requestAnimationFrame(collisionLoop);
+    
+    return () => {
+      // Cleanup handled by the loop itself
+    };
+  }, [gameState, npc, obstacles, collectibles, activePowerUps, powerUpTimers]);
+  
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Game Container */}
+      <div className="flex-1 flex flex-col">
+        {/* Locked State */}
+        {gameState === 'locked' && (
+          <div className="flex-1 flex flex-col items-center justify-center p-8">
+            <div className="text-center max-w-md">
+              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-full flex items-center justify-center mb-6">
+                <span className="text-5xl">🔒</span>
+              </div>
+              <h1 className="text-4xl font-bold text-gray-800 mb-4">Scream Pi is Locked!</h1>
+              <p className="text-lg text-gray-600 mb-6">
+                Complete the Social Challenge and earn your badge to unlock this exciting voice-controlled game!
+              </p>
+              
+              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-6 mb-6">
+                <h3 className="font-semibold text-gray-800 mb-3">🎯 Why Complete the Social Challenge?</h3>
+                <ul className="text-sm text-gray-700 space-y-2">
+                  <li className="flex items-center">
+                    <span className="mr-2">•</span>
+                    Connect with the Pi Network community
+                  </li>
+                  <li className="flex items-center">
+                    <span className="mr-2">•</span>
+                    Share your gaming achievements
+                  </li>
+                  <li className="flex items-center">
+                    <span className="mr-2">•</span>
+                    Build your social presence
+                  </li>
+                  <li className="flex items-center">
+                    <span className="mr-2">•</span>
+                    Earn exclusive badges and rewards
+                  </li>
+                  <li className="flex items-center">
+                    <span className="mr-2">•</span>
+                    Unlock exclusive gaming features
+                  </li>
+                </ul>
+              </div>
+              
+                              <div className="space-y-4">
+                  <button
+                    onClick={() => navigate('/social-challenge')}
+                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-xl transition-all transform hover:scale-105 shadow-lg"
+                  >
+                    🚀 Start Social Challenge
+                  </button>
+                  
+                  <button
+                    onClick={() => navigate('/')}
+                    className="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-all"
+                  >
+                    ← Back to Home
+                  </button>
+                  
+                  {/* Enter Scream Pi button - auto-detects completion */}
+                  <button
+                    onClick={() => {
+                      const badgeKeys = ['socialChallengeBadge', 'socialChallengeCompleted', 'socialTaskCompleted', 'socialChallengeTask'];
+                      const hasAnyBadge = badgeKeys.some(key => localStorage.getItem(key) === 'true');
+                      
+                      if (hasAnyBadge) {
+                        console.log('Enter button clicked - badge detected, unlocking Scream Pi');
+                        handleSocialChallengeBadgeReceived();
+                      } else {
+                        console.log('Enter button clicked - no badge found, showing error');
+                        alert('Please complete the Social Challenge first to unlock Scream Pi!');
+                      }
+                    }}
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-6 rounded-xl transition-all transform hover:scale-105"
+                  >
+                    🎮 Enter Scream Pi
+                  </button>
+                  
+                  {/* Manual check button */}
+                  <button
+                    onClick={checkAndUnlockSocialChallenge}
+                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-xl transition-all text-sm"
+                  >
+                    🔍 Check Social Challenge Status
+                  </button>
+                  
+                  {/* Debug: Manual unlock button for testing */}
+                  <button
+                    onClick={() => {
+                      localStorage.setItem('socialChallengeBadge', 'true');
+                      localStorage.setItem('socialChallengeCompleted', 'true');
+                      setSocialChallengeCompleted(true);
+                      setShowLockModal(false);
+                      setGameState('characterSelect');
+                    }}
+                    className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl transition-all text-sm"
+                  >
+                    🔓 Debug: Unlock Scream Pi
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Character Selection */}
+        {gameState === 'characterSelect' && (
+          <div className="flex-1 flex flex-col items-center justify-center p-8">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-black mb-2">🎤 Scream Pi!</h1>
+              <p className="text-lg text-gray-600">Choose your character and start screaming!</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl">
+              {characters.map((character) => (
+                <div
+                  key={character.id}
+                  onClick={() => setSelectedCharacter(character)}
+                  className={`relative cursor-pointer transition-all duration-300 transform hover:scale-105 ${
+                    selectedCharacter?.id === character.id
+                      ? 'ring-4 ring-blue-500 shadow-lg'
+                      : 'hover:shadow-md'
+                  }`}
+                >
+                  <div className="bg-white border-2 border-gray-300 rounded-2xl p-6">
+                    <div className="flex justify-center mb-4">
+                      <img
+                        src={character.image}
+                        alt={character.name}
+                        className="w-32 h-32 object-contain rounded-lg"
+                      />
+                    </div>
+                    <h3 className="text-xl font-bold text-black mb-2">{character.name}</h3>
+                    <p className="text-gray-600 text-sm">{character.description}</p>
+                    {selectedCharacter?.id === character.id && (
+                      <div className="absolute top-2 right-2 bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                        ✓
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {selectedCharacter && (
+              <div className="mt-8 flex flex-col sm:flex-row gap-4">
+                <button
+                  onClick={() => {
+                    setNpc(prev => ({ ...prev, character: selectedCharacter?.id || 'chengdiao' }));
+                    setGameState('menu');
+                  }}
+                  className="bg-blue-500 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                >
+                  Continue with {selectedCharacter.name}
+                </button>
+                
+                {!tutorialCompleted && (
+                  <button
+                    onClick={startTutorial}
+                    className="bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                  >
+                    �� Learn How to Play
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+        
+        {/* Game Menu */}
+        {gameState === 'menu' && (
+          <div className="flex-1 flex flex-col items-center justify-center p-8">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-black mb-2">🎤 Scream Pi!</h1>
+              <p className="text-lg text-gray-600">Use soft voice to walk, Scream to jump!</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl">
+              {/* Scream Mode */}
+              <button
+                onClick={() => startGame('scream')}
+                className="bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold py-8 px-8 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+              >
+                <div className="text-4xl mb-4">🔊</div>
+                <div className="text-2xl font-bold">Scream Jump</div>
+                <div className="text-sm opacity-90">Use your voice to jump!</div>
+              </button>
+              
+              {/* Tap Mode */}
+              <button
+                onClick={() => startGame('tap')}
+                className="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold py-8 px-8 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+              >
+                <div className="text-4xl mb-4">👆</div>
+                <div className="text-2xl font-bold">Tap Jump</div>
+                <div className="text-sm opacity-90">Tap and hold for higher jumps!</div>
+              </button>
+            </div>
+            
+            {/* Tutorial Button */}
+            <div className="mt-8">
+              <button
+                onClick={startTutorial}
+                className="bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+              >
+                <div className="text-2xl mb-2">📚</div>
+                <div className="text-lg font-bold">How to Play</div>
+                <div className="text-sm opacity-90">Learn the controls and features</div>
+              </button>
+            </div>
+          </div>
+        )}
+        
+        {/* Game Canvas */}
+        {gameState === 'playing' && (
+          <div className="flex-1 flex flex-col bg-white">
+            {/* Game UI - Minimalist Design */}
+            <div className="flex justify-between items-center px-4 py-2 bg-white border-b border-gray-200">
+              <div className="flex items-center space-x-2">
+                <div className="text-lg font-bold text-black">LV {level}</div>
+                <button onClick={togglePause} className="text-xl text-black">⏸️</button>
+                <div className="text-lg text-black">👁️</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-black">{score}</div>
+                <div className="text-xs text-gray-600">Distance: {Math.floor(distance)}m</div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className="text-lg text-black">{flappyCoins}</span>
+                <span className="text-xl">💰</span>
+              </div>
+            </div>
+            
+            {/* Game Instructions */}
+            <div className="px-4 py-2 bg-white text-center">
+              <p className="text-sm text-gray-700">Use soft voice to walk, Scream to jump!</p>
+            </div>
+            
+            {/* Game Canvas - Minimalist */}
+            <div className="flex-1 flex justify-center items-center bg-white relative">
+              <div className="relative">
+                <canvas
+                  ref={canvasRef}
+                  width={CANVAS_WIDTH}
+                  height={CANVAS_HEIGHT}
+                  className="border border-gray-300 rounded-lg"
+                  onTouchStart={handleTapStart}
+                  onTouchEnd={handleTouchEnd}
+                  onMouseDown={controlMode === 'tap' ? handleTapStart : undefined}
+                  onMouseUp={controlMode === 'tap' ? handleTouchEnd : undefined}
+                />
+                
+                {/* Scream Meter Overlay - Minimalist */}
+                {controlMode === 'scream' && (
+                  <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black/20 backdrop-blur-sm rounded-lg px-3 py-2">
+                    <div className="flex items-center space-x-2">
+                      <span className={`text-sm ${microphonePermission === 'granted' ? 'text-green-600' : 'text-red-600'}`}>
+                        {microphonePermission === 'granted' ? '🎤' : '🔇'}
+                      </span>
+                      <span className="text-xs text-black">
+                        {Math.round(screamMeter)}%
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Power-ups Bar - Minimalist */}
+            <div className="px-4 py-2 bg-gray-50 border-t border-gray-200">
+              <div className="flex items-center justify-center space-x-2">
+                {powerUps.filter(p => p.quantity > 0).slice(0, 5).map((powerup) => (
+                  <button
+                    key={powerup.id}
+                    onClick={() => activatePowerUp(powerup.id)}
+                    className={`relative rounded-lg p-2 shadow-sm hover:shadow-md transition-all transform hover:scale-105 ${
+                      activePowerUps[powerup.id] ? 'bg-blue-100 ring-2 ring-blue-400' : 'bg-white'
+                    }`}
+                    title={`${powerup.name}: ${powerup.description}`}
+                  >
+                    <span className="text-lg">{powerup.icon}</span>
+                    {powerup.quantity > 1 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        {powerup.quantity}
+                      </span>
+                    )}
+                    {activePowerUps[powerup.id] && powerUpTimers[powerup.id] && (
+                      <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gray-200 rounded">
+                        <div 
+                          className="h-full bg-blue-500 rounded transition-all duration-100"
+                          style={{ 
+                            width: `${(powerUpTimers[powerup.id] / getPowerUpDuration(powerup.id)) * 100}%` 
+                          }}
+                        />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+              
+              {/* Active Power-ups Info */}
+              <div className="mt-2 text-xs text-gray-600 text-center">
+                Active: {Object.keys(activePowerUps).filter(key => activePowerUps[key] > 0).join(', ') || 'None'}
+              </div>
+            </div>
+            
+            {/* Sensitivity Slider - Minimalist */}
+            <div className="px-4 py-3 bg-gray-50 border-t border-gray-200">
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-gray-700">Adjust Sensitivity</span>
+                <input
+                  type="range"
+                  min="1"
+                  max="100"
+                  value={sensitivity}
+                  onChange={(e) => setSensitivity(Number(e.target.value))}
+                  className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                />
+                <span className="text-xl">🎤</span>
+                {controlMode === 'scream' && availableDevices.length > 1 && (
+                  <button
+                    onClick={() => setShowDeviceSelector(true)}
+                    className="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition-all"
+                    title="Change Microphone Device"
+                  >
+                    Change Device
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Game Over and Revive Modals */}
+        <ScreamPiGameOverModal
+          isVisible={showGameOverModal}
+          score={score}
+          coins={flappyCoins}
+          onRestart={handleRestart}
+          onShare={handleShare}
+          onHome={handleHome}
+          onRevive={() => setShowReviveModal(true)}
+          reviveUsed={reviveUsed}
+          level={level}
+          bestScore={bestScore}
+          extraLives={extraLives}
+          onUseExtraLife={handleUseExtraLife}
+          characterImage={selectedCharacter?.image}
+          characterName={selectedCharacter?.name}
+          onSubmitScore={handleSubmitScore}
+          isPiUser={isAuthenticated}
+        />
+        
+        <ScreamPiReviveModal
+          isVisible={showReviveModal}
+          score={score}
+          onRevive={handleRevive}
+          onDecline={handleReviveDecline}
+          reviveCount={reviveCount}
+          characterImage={selectedCharacter?.image}
+          characterName={selectedCharacter?.name}
+          extraLives={extraLives}
+          onUseExtraLife={handleUseExtraLife}
+        />
+        
+        {/* Device Selector */}
+        {showDeviceSelector && (
+          <div className="flex-1 flex flex-col items-center justify-center p-8">
+            <div className="text-center max-w-md w-full">
+              <h2 className="text-3xl font-bold text-gray-700 mb-4">🎤 Select Microphone</h2>
+              <p className="text-gray-600 mb-6">Choose your microphone device for scream detection:</p>
+              
+              <div className="space-y-3 mb-6">
+                {availableDevices.map((device) => (
+                  <button
+                    key={device.deviceId}
+                    onClick={() => handleDeviceSelect(device.deviceId)}
+                    className={`w-full p-4 text-left rounded-lg border-2 transition-all ${
+                      selectedDevice === device.deviceId
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                  >
+                    <div className="font-semibold text-gray-800">
+                      {device.label || `Microphone ${device.deviceId.slice(0, 8)}...`}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      Device ID: {device.deviceId.slice(0, 20)}...
+                    </div>
+                  </button>
+                ))}
+              </div>
+              
+              <button
+                onClick={() => setShowDeviceSelector(false)}
+                className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+        
+        {/* Badge Notification */}
+        {showBadgeNotification && (
+          <div className="fixed top-4 right-4 z-50 bg-gradient-to-r from-green-500 to-teal-500 text-white p-4 rounded-xl shadow-2xl transform transition-all duration-500 animate-bounce">
+            <div className="flex items-center space-x-3">
+              <div className="text-2xl">🏆</div>
+              <div>
+                <h3 className="font-bold text-lg">Badge Earned!</h3>
+                <p className="text-sm opacity-90">Social Challenge Badge unlocked Scream Pi!</p>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Lock Modal */}
+        {showLockModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+              <div className="p-6">
+                {/* Header */}
+                <div className="text-center mb-6">
+                  <div className="w-20 h-20 mx-auto bg-gradient-to-br from-red-500 to-pink-500 rounded-full flex items-center justify-center mb-4">
+                    <span className="text-3xl">🔒</span>
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                    Scream Pi is Locked!
+                  </h2>
+                  <p className="text-gray-600">
+                    Complete the Social Challenge and earn your badge to unlock this exciting voice-controlled game!
+                  </p>
+                </div>
+                
+                {/* Content */}
+                <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 mb-6">
+                  <h3 className="font-semibold text-gray-800 mb-2">🎯 Why Complete the Social Challenge?</h3>
+                  <ul className="text-sm text-gray-700 space-y-1">
+                    <li>• Connect with the Pi Network community</li>
+                    <li>• Share your gaming achievements</li>
+                    <li>• Build your social presence</li>
+                    <li>• Earn exclusive badges and rewards</li>
+                    <li>• Unlock exclusive gaming features</li>
+                  </ul>
+                </div>
+                
+                {/* Action Buttons */}
+                <div className="space-y-3">
+                  <button
+                    onClick={() => navigate('/social-challenge')}
+                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-xl transition-all transform hover:scale-105"
+                  >
+                    🚀 Start Social Challenge
+                  </button>
+                  
+                  <button
+                    onClick={() => navigate('/')}
+                    className="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-all"
+                  >
+                    ← Back to Home
+                  </button>
+                  
+                  {/* Enter Scream Pi button - auto-detects completion */}
+                  <button
+                    onClick={() => {
+                      const badgeKeys = ['socialChallengeBadge', 'socialChallengeCompleted', 'socialTaskCompleted', 'socialChallengeTask'];
+                      const hasAnyBadge = badgeKeys.some(key => localStorage.getItem(key) === 'true');
+                      
+                      if (hasAnyBadge) {
+                        console.log('Enter button clicked - badge detected, unlocking Scream Pi');
+                        handleSocialChallengeBadgeReceived();
+                      } else {
+                        console.log('Enter button clicked - no badge found, showing error');
+                        alert('Please complete the Social Challenge first to unlock Scream Pi!');
+                      }
+                    }}
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-6 rounded-xl transition-all transform hover:scale-105"
+                  >
+                    🎮 Enter Scream Pi
+                  </button>
+                  
+                  {/* Manual check button */}
+                  <button
+                    onClick={checkAndUnlockSocialChallenge}
+                    className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-xl transition-all text-sm"
+                  >
+                    🔍 Check Social Challenge Status
+                  </button>
+                  
+                  {/* Debug: Manual unlock button for testing */}
+                  <button
+                    onClick={() => {
+                      localStorage.setItem('socialChallengeBadge', 'true');
+                      localStorage.setItem('socialChallengeCompleted', 'true');
+                      setSocialChallengeCompleted(true);
+                      setShowLockModal(false);
+                      setGameState('characterSelect');
+                    }}
+                    className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl transition-all text-sm"
+                  >
+                    🔓 Debug: Unlock Scream Pi
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Tutorial Modal */}
+        {showTutorial && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
+              <div className="p-6">
+                {/* Header */}
+                <div className="text-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                    {tutorialSteps[tutorialStep].title}
+                  </h2>
+                  <div className="flex justify-center mb-4">
+                    <img
+                      src={tutorialSteps[tutorialStep].image}
+                      alt="Tutorial"
+                      className="w-24 h-24 object-contain rounded-lg"
+                      onError={(e) => {
+                        e.currentTarget.src = '/npc/nicolas.png';
+                      }}
+                    />
+                  </div>
+                </div>
+                
+                {/* Content */}
+                <div className="text-gray-700 text-center mb-6 leading-relaxed">
+                  {tutorialSteps[tutorialStep].content}
+                </div>
+                
+                {/* Progress */}
+                <div className="mb-6">
+                  <div className="flex justify-between text-sm text-gray-500 mb-2">
+                    <span>Step {tutorialStep + 1} of {tutorialSteps.length}</span>
+                    <span>{Math.round(((tutorialStep + 1) / tutorialSteps.length) * 100)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-gradient-to-r from-green-500 to-teal-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${((tutorialStep + 1) / tutorialSteps.length) * 100}%` }}
+                    />
+                  </div>
+                </div>
+                
+                {/* Navigation */}
+                <div className="flex justify-between items-center">
+                  <button
+                    onClick={previousTutorialStep}
+                    disabled={tutorialStep === 0}
+                    className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                      tutorialStep === 0
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'bg-gray-500 hover:bg-gray-600 text-white'
+                    }`}
+                  >
+                    ← Previous
+                  </button>
+                  
+                  <button
+                    onClick={skipTutorial}
+                    className="px-4 py-2 text-gray-500 hover:text-gray-700 font-semibold transition-all"
+                  >
+                    Skip Tutorial
+                  </button>
+                  
+                  <button
+                    onClick={nextTutorialStep}
+                    className="px-4 py-2 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-semibold rounded-lg transition-all"
+                  >
+                    {tutorialStep === tutorialSteps.length - 1 ? 'Finish' : 'Next →'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Paused */}
+        {gameState === 'paused' && (
+          <div className="flex-1 flex flex-col items-center justify-center p-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-gray-700 mb-4">Game Paused</h2>
+              <button
+                onClick={togglePause}
+                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl transition-all"
+              >
+                Resume
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+      
+      {/* Back Button */}
+      <div className="p-4 bg-gray-100">
+        <button
+          onClick={() => navigate('/')}
+          className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-xl transition-all"
+        >
+          ← Back to Home
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default ScreamPiPage;

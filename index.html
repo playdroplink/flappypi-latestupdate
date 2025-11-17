@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Pi - Pi Network Arcade Game</title>
+    
+    <!-- Google tag (gtag.js) - DISABLED to prevent CORS errors -->
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-K8Z50VDX7S"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);} 
+        gtag('js', new Date());
+
+        gtag('config', 'G-K8Z50VDX7S');
+    </script> -->
+    
+    <!-- Pi Network Meta Tags - MAINNET MODE -->
+    <meta name="pi-network-mode" content="mainnet">
+    <meta name="pi-validation-key" content="94e29cc9c70b87c8fc91e496ac630d23664bff7082cca3ad9d6466bba1aa2902caa46a8eb82a64437d272dbcd329c763679c85cfcba91b95e6fb5b4a6f17b2ce">
+    <meta name="pi-app-id" content="flappypi2807">
+    
+    <!-- Mainnet Configuration -->
+    <meta name="production-mode" content="true">
+    <meta name="sandbox-mode" content="false">
+
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Flappy Pi - The premier Pi Network blockchain game! Earn real Pi cryptocurrency while playing. Join millions of players worldwide in this addictive arcade adventure. Free to play, rewards to earn!">
+    <meta name="keywords" content="Flappy Pi, Pi Network game, cryptocurrency game, blockchain gaming, Pi coin, earn Pi, mobile game, arcade game, free crypto game, Pi browser game, Pi ecosystem, Pi mining game, cryptocurrency rewards, play to earn, blockchain rewards">
+    <meta name="author" content="Flappy Pi Team">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="1 days">
+    <meta name="distribution" content="global">
+    <meta name="rating" content="general">
+    <meta name="theme-color" content="#4299e1">
+    <link rel="canonical" href="https://flappypi.fun">
+    
+    <!-- Schema.org structured data for better search results -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Game",
+      "name": "Flappy Pi",
+      "description": "The premier Pi Network blockchain game where you can earn real Pi cryptocurrency while playing an addictive arcade adventure.",
+      "url": "https://flappypi.fun",
+      "image": "https://i.ibb.co/p6RypJ8X/image-png.png",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Flappy Pi Team",
+        "url": "https://flappypi.fun"
+      },
+      "gameLocation": "Online",
+      "gamePlatform": ["Web Browser", "Mobile", "Pi Browser"],
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      },
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Web Browser"
+    }
+    </script>
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Flappy Pi - The Premier Pi Network Game | Earn Real Cryptocurrency">
+    <meta property="og:description" content="Play Flappy Pi and earn real Pi cryptocurrency! Join millions of players in this addictive blockchain arcade game. Free to play, rewards to earn!">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://flappypi.fun">
+    <meta property="og:image" content="https://i.ibb.co/p6RypJ8X/image-png.png">
+    <meta property="og:image:alt" content="Flappy Pi Game - Earn Pi Cryptocurrency">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Flappy Pi">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Flappy Pi - Earn Pi Cryptocurrency Playing Games">
+    <meta name="twitter:description" content="Join millions playing Flappy Pi! Earn real Pi cryptocurrency in this addictive blockchain arcade game. Free to play, rewards to earn!">
+    <meta name="twitter:image" content="https://i.ibb.co/p6RypJ8X/image-png.png">
+    <meta name="twitter:image:alt" content="Flappy Pi Game Screenshot">
+    <meta name="twitter:creator" content="@FlappyPiGame">
+    <meta name="twitter:site" content="@FlappyPiGame">
+    
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://i.ibb.co/p6RypJ8X/image-png.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://i.ibb.co/p6RypJ8X/image-png.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://i.ibb.co/p6RypJ8X/image-png.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="msapplication-TileColor" content="#4299e1">
+    <meta name="msapplication-TileImage" content="https://i.ibb.co/p6RypJ8X/image-png.png">
+    
+    <!-- Production Environment Indicator -->
+    <script>
+        // MAINNET PRODUCTION CONFIGURATION
+        window.FLAPPY_PI_CONFIG = {
+            production: true,
+            mainnet: true,
+            sandbox: false,
+        
+            appId: 'flappypi2807',
+            subdomain: 'flappypi2807.pinet.com',
+            apiUrl: 'https://api.minepi.com/v2',
+            networkMode: 'mainnet'
+        };
+        
+        console.log('🚀 Flappy Pi - MAINNET PRODUCTION MODE');
+        console.log('✅ Production: true');
+        console.log('✅ Mainnet: true');
+        console.log('✅ Sandbox: false');
+    
+        console.log('🎮 Ready for production on Pi Network mainnet!');
+    </script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <!-- Socket.IO Client for Multiplayer -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    
+    <!-- Pi Network SDK - PRODUCTION MAINNET -->
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <script>
+        // Pi Network SDK Initialization for PRODUCTION MAINNET
+        // NO SANDBOX - NO TESTNET - PRODUCTION ONLY
+        (function() {
+            try {
+                console.log('🚀 Initializing Pi Network SDK for Flappy Pi PRODUCTION MAINNET...');
+                
+                // Check if Pi SDK is available
+                if (typeof Pi === 'undefined') {
+                    console.error('❌ Pi SDK not loaded - please ensure you are in Pi Browser');
+                    return;
+                }
+                
+                // Initialize Pi SDK for MAINNET PRODUCTION
+                Pi.init({ 
+                    version: "2.0",
+                    sandbox: false, // MAINNET: PRODUCTION MODE
+                    validationKey: '94e29cc9c70b87c8fc91e496ac630d23664bff7082cca3ad9d6466bba1aa2902caa46a8eb82a64437d272dbcd329c763679c85cfcba91b95e6fb5b4a6f17b2ce'
+                }).then(() => {
+                    console.log('✅ Pi Network SDK initialized successfully for MAINNET PRODUCTION!');
+                    console.log('🔧 Network Mode: Mainnet (Production)');
+                    console.log('🎮 App: Flappy Pi');
+                    console.log('🔗 Subdomain: flappypi2807.pinet.com');
+                    console.log('🏭 Production Mode: ENABLED');
+                    console.log('🌐 Mainnet Mode: ENABLED');
+                
+                    
+                    // Dispatch ready event
+                    window.dispatchEvent(new CustomEvent('pi-sdk-ready'));
+                    
+                    // Make Pi globally available
+                    window.Pi = Pi;
+                    
+                    // Log SDK methods for debugging
+                    console.log('📋 Available Pi SDK methods:', Object.keys(Pi));
+                    
+                    // Log available native features
+                    Pi.nativeFeaturesList().then(features => {
+                        console.log('📱 Available native features:', features);
+                    }).catch(err => {
+                        console.warn('⚠️ Could not get native features list:', err);
+                    });
+                }).catch((error) => {
+                    console.error('❌ Pi Network SDK initialization failed:', error);
+                    
+                    // Show error message to user
+                    if (typeof window !== 'undefined') {
+                        alert('Failed to initialize Pi Network SDK. Please ensure you are using Pi Browser.');
+                    }
+                });
+            } catch (error) {
+                console.error('❌ Pi Network SDK setup failed:', error);
+            }
+        })();
+    </script>
+    
+    <!-- Production Verification -->
+    <script>
+        // Verify production configuration on page load
+        window.addEventListener('load', function() {
+            console.log('🔍 Verifying Flappy Pi Production Configuration...');
+            
+            // Check if we're in mainnet mode
+            const isProduction = window.FLAPPY_PI_CONFIG.production === true;
+            const isMainnet = window.FLAPPY_PI_CONFIG.mainnet === true;
+            const isSandbox = window.FLAPPY_PI_CONFIG.sandbox === true;
+            
+            if (isProduction && isMainnet && isSandbox) {
+                console.log('🎉 MAINNET VERIFICATION PASSED!');
+                console.log('✅ Flappy Pi is configured for MAINNET PRODUCTION');
+                console.log('✅ Mainnet access enabled');
+                console.log('✅ Ready for production on Pi Network mainnet');
+            } else {
+                console.error('🚨 MAINNET VERIFICATION FAILED!');
+                console.error('❌ Flappy Pi is NOT in mainnet mode');
+                console.error('❌ Please check configuration for mainnet setup');
+            }
+        });
+    </script>
+    
+    <!-- Main Application Script -->
+    <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

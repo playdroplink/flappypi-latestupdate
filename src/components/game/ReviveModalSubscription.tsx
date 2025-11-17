@@ -1,0 +1,1 @@
+<img src="/flappy pi gif 2/adfree.gif" alt="Ad Free" style={{ width: 96, height: 96, margin: '0 auto', display: 'block' }} /> 

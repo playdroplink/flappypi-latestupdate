@@ -1,0 +1,315 @@
+
+/* Auto-generated dark mode icon styles */
+
+/* Dark mode for shop.png */
+[data-theme="dark"] img[src="shop.png"],
+[data-theme="night"] img[src="shop.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="shop.png"],
+[data-theme="night"] img[src="shop.png"] {
+  content: url("shop-dark.png");
+}
+
+
+/* Dark mode for leaderboard.png */
+[data-theme="dark"] img[src="leaderboard.png"],
+[data-theme="night"] img[src="leaderboard.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="leaderboard.png"],
+[data-theme="night"] img[src="leaderboard.png"] {
+  content: url("leaderboard-dark.png");
+}
+
+
+/* Dark mode for inventory.png */
+[data-theme="dark"] img[src="inventory.png"],
+[data-theme="night"] img[src="inventory.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="inventory.png"],
+[data-theme="night"] img[src="inventory.png"] {
+  content: url("inventory-dark.png");
+}
+
+
+/* Dark mode for wallet.png */
+[data-theme="dark"] img[src="wallet.png"],
+[data-theme="night"] img[src="wallet.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="wallet.png"],
+[data-theme="night"] img[src="wallet.png"] {
+  content: url("wallet-dark.png");
+}
+
+
+/* Dark mode for settings.png */
+[data-theme="dark"] img[src="settings.png"],
+[data-theme="night"] img[src="settings.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="settings.png"],
+[data-theme="night"] img[src="settings.png"] {
+  content: url("settings-dark.png");
+}
+
+
+/* Dark mode for reserve.png */
+[data-theme="dark"] img[src="reserve.png"],
+[data-theme="night"] img[src="reserve.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="reserve.png"],
+[data-theme="night"] img[src="reserve.png"] {
+  content: url("reserve-dark.png");
+}
+
+
+/* Dark mode for merch.png */
+[data-theme="dark"] img[src="merch.png"],
+[data-theme="night"] img[src="merch.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="merch.png"],
+[data-theme="night"] img[src="merch.png"] {
+  content: url("merch-dark.png");
+}
+
+
+/* Dark mode for wiki.png */
+[data-theme="dark"] img[src="wiki.png"],
+[data-theme="night"] img[src="wiki.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="wiki.png"],
+[data-theme="night"] img[src="wiki.png"] {
+  content: url("wiki-dark.png");
+}
+
+
+/* Dark mode for performance monitor.png */
+[data-theme="dark"] img[src="performance monitor.png"],
+[data-theme="night"] img[src="performance monitor.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="performance monitor.png"],
+[data-theme="night"] img[src="performance monitor.png"] {
+  content: url("performance monitor-dark.png");
+}
+
+
+/* Dark mode for flappycoins.png */
+[data-theme="dark"] img[src="flappycoins.png"],
+[data-theme="night"] img[src="flappycoins.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="flappycoins.png"],
+[data-theme="night"] img[src="flappycoins.png"] {
+  content: url("flappycoins-dark.png");
+}
+
+
+/* Dark mode for pi-logo.png */
+[data-theme="dark"] img[src="pi-logo.png"],
+[data-theme="night"] img[src="pi-logo.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="pi-logo.png"],
+[data-theme="night"] img[src="pi-logo.png"] {
+  content: url("pi-logo-dark.png");
+}
+
+
+/* Dark mode for flappy-logo.png */
+[data-theme="dark"] img[src="flappy-logo.png"],
+[data-theme="night"] img[src="flappy-logo.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="flappy-logo.png"],
+[data-theme="night"] img[src="flappy-logo.png"] {
+  content: url("flappy-logo-dark.png");
+}
+
+
+/* Dark mode for social-challenge-badge.png */
+[data-theme="dark"] img[src="social-challenge-badge.png"],
+[data-theme="night"] img[src="social-challenge-badge.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="social-challenge-badge.png"],
+[data-theme="night"] img[src="social-challenge-badge.png"] {
+  content: url("social-challenge-badge-dark.png");
+}
+
+
+/* Dark mode for subscriptionplanbutton.gif */
+[data-theme="dark"] img[src="subscriptionplanbutton.gif.gif"],
+[data-theme="night"] img[src="subscriptionplanbutton.gif.gif"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="subscriptionplanbutton.gif.gif"],
+[data-theme="night"] img[src="subscriptionplanbutton.gif.gif"] {
+  content: url("subscriptionplanbutton-dark.png");
+}
+
+
+/* Dark mode for powerups/Shield.png */
+[data-theme="dark"] img[src="powerups/Shield.png"],
+[data-theme="night"] img[src="powerups/Shield.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="powerups/Shield.png"],
+[data-theme="night"] img[src="powerups/Shield.png"] {
+  content: url("powerups\Shield-dark.png");
+}
+
+
+/* Dark mode for powerups/Coin Magnet.png */
+[data-theme="dark"] img[src="powerups/Coin Magnet.png"],
+[data-theme="night"] img[src="powerups/Coin Magnet.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="powerups/Coin Magnet.png"],
+[data-theme="night"] img[src="powerups/Coin Magnet.png"] {
+  content: url("powerups\Coin Magnet-dark.png");
+}
+
+
+/* Dark mode for powerups/Extra life.png */
+[data-theme="dark"] img[src="powerups/Extra life.png"],
+[data-theme="night"] img[src="powerups/Extra life.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="powerups/Extra life.png"],
+[data-theme="night"] img[src="powerups/Extra life.png"] {
+  content: url("powerups\Extra life-dark.png");
+}
+
+
+/* Dark mode for powerups/2x Coin Multiplier.png */
+[data-theme="dark"] img[src="powerups/2x Coin Multiplier.png"],
+[data-theme="night"] img[src="powerups/2x Coin Multiplier.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="powerups/2x Coin Multiplier.png"],
+[data-theme="night"] img[src="powerups/2x Coin Multiplier.png"] {
+  content: url("powerups\2x Coin Multiplier-dark.png");
+}
+
+
+/* Dark mode for powerups/turbo-start.png */
+[data-theme="dark"] img[src="powerups/turbo-start.png"],
+[data-theme="night"] img[src="powerups/turbo-start.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="powerups/turbo-start.png"],
+[data-theme="night"] img[src="powerups/turbo-start.png"] {
+  content: url("powerups\turbo-start-dark.png");
+}
+
+
+/* Dark mode for birds/bird_0.png */
+[data-theme="dark"] img[src="birds/bird_0.png"],
+[data-theme="night"] img[src="birds/bird_0.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="birds/bird_0.png"],
+[data-theme="night"] img[src="birds/bird_0.png"] {
+  content: url("birds\bird_0-dark.png");
+}
+
+
+/* Dark mode for birds/bird_1.png */
+[data-theme="dark"] img[src="birds/bird_1.png"],
+[data-theme="night"] img[src="birds/bird_1.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="birds/bird_1.png"],
+[data-theme="night"] img[src="birds/bird_1.png"] {
+  content: url("birds\bird_1-dark.png");
+}
+
+
+/* Dark mode for birds/bird_2.png */
+[data-theme="dark"] img[src="birds/bird_2.png"],
+[data-theme="night"] img[src="birds/bird_2.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="birds/bird_2.png"],
+[data-theme="night"] img[src="birds/bird_2.png"] {
+  content: url("birds\bird_2-dark.png");
+}
+
+
+/* Dark mode for birds/bird_3.png */
+[data-theme="dark"] img[src="birds/bird_3.png"],
+[data-theme="night"] img[src="birds/bird_3.png"] {
+  filter: invert(1) brightness(0.8) contrast(1.2);
+}
+
+/* Alternative: Use dark version if available */
+[data-theme="dark"] img[src="birds/bird_3.png"],
+[data-theme="night"] img[src="birds/bird_3.png"] {
+  content: url("birds\bird_3-dark.png");
+}
+
+
+/* Global dark mode icon filter (fallback) */
+[data-theme="dark"] img,
+[data-theme="night"] img {
+  filter: brightness(0.8) contrast(1.2);
+}
+
+/* Exclude certain icons from global filter */
+[data-theme="dark"] img[src*="flappycoins"],
+[data-theme="night"] img[src*="flappycoins"],
+[data-theme="dark"] img[src*="pi-logo"],
+[data-theme="night"] img[src*="pi-logo"] {
+  filter: none;
+}

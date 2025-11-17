@@ -1,0 +1,8 @@
+
+project_id = "fwfefplvruawsbspwpxh"
+
+[functions.pi-approve-payment]
+verify_jwt = false
+
+[functions.pi-complete-payment]
+verify_jwt = false

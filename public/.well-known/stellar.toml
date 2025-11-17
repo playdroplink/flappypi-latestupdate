@@ -1,0 +1,61 @@
+# Flappy Pi Stellar.toml
+# This file provides metadata for FLPY token on the Stellar network
+
+VERSION="2.5.0"
+
+[DOCUMENTATION]
+ORG_NAME="Flappy Pi"
+ORG_DBA="Flappy Pi"
+ORG_URL="https://flappypi.fun"
+ORG_LOGO="https://i.ibb.co/p6RypJ8X/image-png.png"
+ORG_DESCRIPTION="Flappy Pi is a blockchain-powered gaming platform on Pi Network, offering engaging gameplay with cryptocurrency rewards and FLPY token integration."
+ORG_PHYSICAL_ADDRESS=""
+ORG_PHYSICAL_ADDRESS_ATTESTATION=""
+ORG_PHONE_NUMBER=""
+ORG_PHONE_NUMBER_ATTESTATION=""
+ORG_KEYBASE=""
+ORG_TWITTER="@FlappyPiGame"
+ORG_GITHUB="playdroplink"
+ORG_OFFICIAL_EMAIL="support@flappypi.fun"
+ORG_SUPPORT_EMAIL="support@flappypi.fun"
+ORG_LICENSING_AUTHORITY=""
+ORG_LICENSE_TYPE=""
+ORG_LICENSE_NUMBER=""
+
+[[PRINCIPALS]]
+name="Flappy Pi Team"
+email="support@flappypi.fun"
+
+[CURRENCIES.FLPY]
+code="FLPY"
+issuer="GBVTV77XFMDYSSVIG6ZGSRAGZ3S7KA4275YYLOLIROOD3Y3F3TH5U3EI"
+name="Flappy Pi Team"
+desc="This is a test token that is created as an example and has no value."
+conditions="This token is used within the Flappy Pi gaming ecosystem for rewards and in-game transactions. It has no monetary value outside the game."
+image="https://i.ibb.co/p6RypJ8X/image-png.png"
+fixed_number=21000000
+max_number=21000000
+display_decimals=7
+status="live"
+
+[[CURRENCIES]]
+code="FLPY"
+issuer="GBVTV77XFMDYSSVIG6ZGSRAGZ3S7KA4275YYLOLIROOD3Y3F3TH5U3EI"
+name="Flappy Pi Team"
+desc="This is a test token that is created as an example and has no value."
+conditions="This token is used within the Flappy Pi gaming ecosystem for rewards and in-game transactions. It has no monetary value outside the game."
+image="https://i.ibb.co/p6RypJ8X/image-png.png"
+fixed_number=21000000
+max_number=21000000
+display_decimals=7
+is_asset_anchored=false
+anchor_asset=""
+anchor_asset_type=""
+redemption_instructions=""
+
+[[VALIDATORS]]
+ALIAS="flappypi"
+DISPLAY_NAME="Flappy Pi Validator"
+HOST="flappypi.fun:11625"
+PUBLIC_KEY="GBVTV77XFMDYSSVIG6ZGSRAGZ3S7KA4275YYLOLIROOD3Y3F3TH5U3EI"
+HISTORY="https://flappypi.fun"

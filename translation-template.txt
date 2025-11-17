@@ -1,0 +1,203 @@
+// Translation Template for Flappy Pi
+// Generated automatically
+
+// English (English)
+// Language Code: en
+// Status: Complete
+
+// Spanish (Español)
+// Language Code: es
+// Status: Needs Translation
+
+// Tagalog (Tagalog)
+// Language Code: tl
+// Status: Needs Translation
+
+// Hindi (हिन्दी)
+// Language Code: hi
+// Status: Needs Translation
+
+// Chinese (中文)
+// Language Code: zh
+// Status: Needs Translation
+
+// Indonesian (Bahasa Indonesia)
+// Language Code: id
+// Status: Needs Translation
+
+// Portuguese (Português)
+// Language Code: pt
+// Status: Needs Translation
+
+// French (Français)
+// Language Code: fr
+// Status: Needs Translation
+
+// Russian (Русский)
+// Language Code: ru
+// Status: Needs Translation
+
+// Turkish (Türkçe)
+// Language Code: tr
+// Status: Needs Translation
+
+// Vietnamese (Tiếng Việt)
+// Language Code: vi
+// Status: Needs Translation
+
+// Thai (ไทย)
+// Language Code: th
+// Status: Needs Translation
+
+// German (Deutsch)
+// Language Code: de
+// Status: Needs Translation
+
+// Persian (فارسی)
+// Language Code: fa
+// Status: Needs Translation
+
+// Korean (한국어)
+// Language Code: ko
+// Status: Needs Translation
+
+// Japanese (日本語)
+// Language Code: ja
+// Status: Needs Translation
+
+// Arabic (العربية)
+// Language Code: ar
+// Status: Needs Translation
+
+// Ukrainian (Українська)
+// Language Code: uk
+// Status: Needs Translation
+
+// Italian (Italiano)
+// Language Code: it
+// Status: Needs Translation
+
+// Polish (Polski)
+// Language Code: pl
+// Status: Needs Translation
+
+// Bengali (বাংলা)
+// Language Code: bn
+// Status: Needs Translation
+
+// Punjabi (ਪੰਜਾਬੀ)
+// Language Code: pa
+// Status: Needs Translation
+
+// Javanese (Basa Jawa)
+// Language Code: jv
+// Status: Needs Translation
+
+// Telugu (తెలుగు)
+// Language Code: te
+// Status: Needs Translation
+
+// Marathi (मराठी)
+// Language Code: mr
+// Status: Needs Translation
+
+// Tamil (தமிழ்)
+// Language Code: ta
+// Status: Needs Translation
+
+// Urdu (اردو)
+// Language Code: ur
+// Status: Needs Translation
+
+// Hausa (Hausa)
+// Language Code: ha
+// Status: Needs Translation
+
+// Gujarati (ગુજરાતી)
+// Language Code: gu
+// Status: Needs Translation
+
+// Kannada (ಕನ್ನಡ)
+// Language Code: kn
+// Status: Needs Translation
+
+// Malayalam (മലയാളം)
+// Language Code: ml
+// Status: Needs Translation
+
+// Burmese (မြန်မာ)
+// Language Code: my
+// Status: Needs Translation
+
+// Romanian (Română)
+// Language Code: ro
+// Status: Needs Translation
+
+// Pashto (پښتو)
+// Language Code: ps
+// Status: Needs Translation
+
+// Sindhi (سنڌي)
+// Language Code: sd
+// Status: Needs Translation
+
+// Dutch (Nederlands)
+// Language Code: nl
+// Status: Needs Translation
+
+// Swahili (Kiswahili)
+// Language Code: sw
+// Status: Needs Translation
+
+// Nepali (नेपाली)
+// Language Code: ne
+// Status: Needs Translation
+
+// Serbian (Српски)
+// Language Code: sr
+// Status: Needs Translation
+
+// Malay (Bahasa Melayu)
+// Language Code: ms
+// Status: Needs Translation
+
+// Czech (Čeština)
+// Language Code: cs
+// Status: Needs Translation
+
+// Greek (Ελληνικά)
+// Language Code: el
+// Status: Needs Translation
+
+// Slovak (Slovenčina)
+// Language Code: sk
+// Status: Needs Translation
+
+// Hungarian (Magyar)
+// Language Code: hu
+// Status: Needs Translation
+
+// Swedish (Svenska)
+// Language Code: sv
+// Status: Needs Translation
+
+// Finnish (Suomi)
+// Language Code: fi
+// Status: Needs Translation
+
+// Hebrew (עברית)
+// Language Code: he
+// Status: Needs Translation
+
+// Norwegian (Norsk)
+// Language Code: no
+// Status: Needs Translation
+
+// Amharic (አማርኛ)
+// Language Code: am
+// Status: Needs Translation
+
+// Bulgarian (Български)
+// Language Code: bg
+// Status: Needs Translation
+

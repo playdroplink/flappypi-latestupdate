@@ -1,0 +1,3 @@
+window.addEventListener('click', () => {
+  // Close modal logic
+});

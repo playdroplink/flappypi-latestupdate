@@ -1,0 +1,51 @@
+@keyframes glow {
+  0% { box-shadow: 0 0 16px 4px #ffd70066, 0 0 0 0 #ffd70000; }
+  50% { box-shadow: 0 0 32px 8px #ffd700cc, 0 0 0 0 #ffd70000; }
+  100% { box-shadow: 0 0 16px 4px #ffd70066, 0 0 0 0 #ffd70000; }
+}
+.animate-glow {
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes flapcoin-fly {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  80% { opacity: 1; transform: translate(180px, -120px) scale(1.2); }
+  100% { opacity: 0; transform: translate(220px, -160px) scale(0.7); }
+}
+.animate-flapcoin-fly {
+  animation: flapcoin-fly 0.9s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+.animate-twinkle {
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-1000 {
+  animation-delay: 1s;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-3000 {
+  animation-delay: 3s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+} 

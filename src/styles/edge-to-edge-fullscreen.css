@@ -1,0 +1,234 @@
+/* Edge-to-Edge Fullscreen Styles for Mobile */
+
+/* Base edge-to-edge styles */
+.edge-to-edge-fullscreen {
+  /* Remove ALL spacing */
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+.edge-to-edge-fullscreen * {
+  /* Remove any inherited spacing */
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* Hide ALL possible header elements */
+.edge-to-edge-fullscreen .header,
+.edge-to-edge-fullscreen [class*="header"],
+.edge-to-edge-fullscreen nav,
+.edge-to-edge-fullscreen [class*="navigation"],
+.edge-to-edge-fullscreen [class*="navbar"],
+.edge-to-edge-fullscreen [class*="top-bar"],
+.edge-to-edge-fullscreen [class*="app-bar"],
+.edge-to-edge-fullscreen header,
+.edge-to-edge-fullscreen [role="banner"],
+.edge-to-edge-fullscreen .fixed.top-0,
+.edge-to-edge-fullscreen [class*="fixed"][class*="top"],
+.edge-to-edge-fullscreen [class*="sticky"][class*="top"],
+.edge-to-edge-fullscreen .navbar,
+.edge-to-edge-fullscreen .navigation,
+.edge-to-edge-fullscreen .topbar,
+.edge-to-edge-fullscreen .appbar {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+}
+
+/* Remove ALL body and HTML spacing */
+.edge-to-edge-fullscreen body {
+  padding: 0 !important;
+  margin: 0 !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+  overflow: hidden !important;
+}
+
+.edge-to-edge-fullscreen html {
+  padding: 0 !important;
+  margin: 0 !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Hide any fixed positioned elements at the top */
+.edge-to-edge-fullscreen [style*="position: fixed"],
+.edge-to-edge-fullscreen [style*="position:fixed"] {
+  display: none !important;
+}
+
+/* Edge-to-edge container */
+.edge-to-edge-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.edge-to-edge-container.edge-to-edge-active {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  z-index: 99999 !important;
+  background: #000 !important;
+  overflow: hidden !important;
+  /* Remove any borders or outlines */
+  border: none !important;
+  outline: none !important;
+}
+
+/* Game content */
+.edge-to-edge-container .game-content {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.edge-to-edge-container .game-content.edge-to-edge-content {
+  background: #000;
+  overflow: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
+  /* Remove any borders or outlines */
+  border: none !important;
+  outline: none !important;
+}
+
+/* Game mode specific backgrounds */
+.edge-to-edge-container.classic .game-content.edge-to-edge-content {
+  background: linear-gradient(to bottom, #aeefff, #fffbe0);
+}
+
+.edge-to-edge-container.endless .game-content.edge-to-edge-content {
+  background: linear-gradient(to bottom, #667eea, #764ba2);
+}
+
+.edge-to-edge-container.challenge .game-content.edge-to-edge-content {
+  background: linear-gradient(to bottom, #ff512f, #dd2476);
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  .edge-to-edge-container {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .edge-to-edge-container .game-content {
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+  }
+
+  .edge-to-edge-container.edge-to-edge-active {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* Remove any browser chrome */
+    border: none !important;
+    outline: none !important;
+  }
+
+  /* Hide browser UI elements */
+  .edge-to-edge-container.edge-to-edge-active .header,
+  .edge-to-edge-container.edge-to-edge-active [class*="header"],
+  .edge-to-edge-container.edge-to-edge-active nav,
+  .edge-to-edge-container.edge-to-edge-active [class*="navigation"] {
+    display: none !important;
+  }
+}
+
+/* Landscape orientation optimizations */
+@media (max-width: 768px) and (orientation: landscape) {
+  .edge-to-edge-container.edge-to-edge-active {
+    height: 100vh !important;
+    height: 100dvh !important;
+  }
+}
+
+/* Portrait orientation optimizations */
+@media (max-width: 768px) and (orientation: portrait) {
+  .edge-to-edge-container.edge-to-edge-active {
+    height: 100vh !important;
+    height: 100dvh !important;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .edge-to-edge-container.edge-to-edge-active {
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+}
+
+/* Prevent text selection during gameplay */
+.edge-to-edge-container.edge-to-edge-active * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Smooth transitions */
+.edge-to-edge-container {
+  transition: all 0.3s ease-in-out;
+}
+
+.edge-to-edge-container .game-content {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Hardware acceleration */
+.edge-to-edge-container.edge-to-edge-active {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.edge-to-edge-container.edge-to-edge-active * {
+  transform: translateZ(0);
+}
+
+/* Remove any potential borders or outlines from all elements */
+.edge-to-edge-container.edge-to-edge-active * {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure no scrollbars */
+.edge-to-edge-container.edge-to-edge-active {
+  overflow: hidden !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.edge-to-edge-container.edge-to-edge-active body {
+  overflow: hidden !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.edge-to-edge-container.edge-to-edge-active html {
+  overflow: hidden !important;
+  -webkit-overflow-scrolling: touch;
+}

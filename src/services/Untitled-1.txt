@@ -1,0 +1,7 @@
+// Example browser detection code
+const isBrowserSupported = () => {
+  const userAgent = navigator.userAgent;
+  return userAgent.includes("Chrome") || userAgent.includes("Firefox");
+};
+
+// Remove this code entirely

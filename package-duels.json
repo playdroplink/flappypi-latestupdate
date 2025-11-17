@@ -1,0 +1,32 @@
+{
+  "name": "flappypi-duels-server",
+  "version": "1.0.0",
+  "description": "Real-time multiplayer duels server for Flappy Pi using Socket.IO",
+  "main": "server-duels.js",
+  "scripts": {
+    "start": "node server-duels.js",
+    "dev": "nodemon server-duels.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "socket.io",
+    "multiplayer",
+    "real-time",
+    "flappy-pi",
+    "duels",
+    "game"
+  ],
+  "author": "Flappy Pi Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.5",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

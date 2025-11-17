@@ -1,0 +1,35 @@
+# Allow all search engines to crawl everything
+User-agent: *
+Allow: /
+Allow: /play
+Allow: /leaderboard
+Allow: /faq
+Allow: /assets/
+Allow: /images/
+Allow: /sitemap.xml
+
+# Optimize crawling
+Crawl-delay: 1
+
+# Sitemaps
+Sitemap: https://www.flappypi.fun/sitemap.xml
+
+# Block sensitive directories
+Disallow: /admin/
+Disallow: /private/
+Disallow: /api/
+Disallow: /internal/
+
+# Block specific file types
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /*.txt$
+
+# Allow social media verification files
+Allow: /pinterest-*.html
+Allow: /google*.html
+Allow: /yandex*.html
+Allow: /brave-rewards-verification.txt
+Allow: /validation-key.txt
+
+Host: https://www.flappypi.fun
