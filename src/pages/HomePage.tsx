@@ -1936,95 +1936,76 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
 
       {/* FLPY Token Notification Modal */}
       <Dialog open={showFLPYModal} onOpenChange={setShowFLPYModal}>
-        <DialogContent className="max-w-lg w-full rounded-2xl shadow-2xl bg-gradient-to-br from-purple-50 via-white to-blue-50 p-0 overflow-hidden border-2 border-purple-200">
-          <DialogHeader className="bg-gradient-to-r from-purple-600 via-blue-600 to-purple-700 px-8 pt-8 pb-6 flex flex-col items-center relative">
-            <div className="absolute inset-0 bg-black/10"></div>
-            <div className="relative z-10 flex flex-col items-center">
-              <div className="text-6xl mb-4 animate-bounce">🪙</div>
-              <DialogTitle className="text-3xl font-bold text-white mb-2 text-center">
-                FLPY Token is Here!
-              </DialogTitle>
-              <DialogDescription className="text-purple-100 text-center text-lg leading-relaxed">
-                Flappy Pi has launched the <strong>FLPY DeFi Token</strong>!<br/>
-                Test it now and earn future rewards.
-              </DialogDescription>
+        <DialogContent className="max-w-2xl w-full rounded-2xl shadow-2xl bg-white p-0 overflow-hidden">
+          <DialogHeader className="bg-gradient-to-r from-purple-50 via-white to-blue-50 px-8 pt-8 pb-4 flex flex-col items-center">
+            <img src="/image-png.png" alt="FLPY Token" className="w-16 h-16 mb-2 rounded-full" onError={(e) => { e.currentTarget.src = '/flappycoins.png'; }} />
+            <DialogTitle className="text-2xl font-bold text-purple-700 mb-1 text-center">
+              FLPY Token is Here!
+            </DialogTitle>
+            <DialogDescription className="text-gray-500 text-center mb-2">
+              Flappy Pi has launched the <strong>FLPY DeFi Token</strong>!<br/>
+              Test it now and earn future rewards.
+            </DialogDescription>
+            <div className="flex items-center gap-1 px-3 py-1 text-green-700 bg-green-100 border-green-200 rounded mb-2 text-xs font-semibold">
+              🪙 FLPY Token Launch
             </div>
           </DialogHeader>
-          
-          <div className="px-8 pb-8 pt-6">
-            <div className="space-y-6">
-              {/* Testnet Section */}
-              <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-200">
-                <div className="flex items-center mb-4">
-                  <span className="text-3xl mr-3">🧪</span>
-                  <h3 className="text-xl font-bold text-blue-800">Test on Pi Testnet</h3>
-                </div>
-                <p className="text-blue-700 mb-4 leading-relaxed">
+          <div className="px-8 pb-8 max-h-[60vh] overflow-y-auto text-gray-700 text-sm space-y-6">
+            <div>
+              <h3 className="font-semibold text-blue-800 mb-2">Test on Pi Testnet</h3>
+              <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 mb-2">
+                <p className="text-blue-700 mb-2">
                   Check your <strong>Pi Wallet (Testnet mode)</strong> for the FLPY token.<br/>
                   Test transactions and explore DeFi features now!
                 </p>
-                <div className="bg-blue-100 rounded-lg p-3 text-sm text-blue-800">
+                <div className="bg-blue-100 rounded-lg p-2 text-xs text-blue-800">
                   <strong>Token Symbol:</strong> FLPY<br/>
                   <strong>Network:</strong> Pi Testnet<br/>
                   <strong>Status:</strong> Active & Testing
                 </div>
               </div>
-
-              {/* Mainnet Rewards Section */}
-              <div className="bg-purple-50 rounded-xl p-6 border-2 border-purple-200">
-                <div className="flex items-center mb-4">
-                  <span className="text-3xl mr-3">🎁</span>
-                  <h3 className="text-xl font-bold text-purple-800">Mainnet Launch Rewards</h3>
-                </div>
-                <p className="text-purple-700 mb-4 leading-relaxed">
+            </div>
+            <div>
+              <h3 className="font-semibold text-purple-800 mb-2">Mainnet Launch Rewards</h3>
+              <div className="bg-purple-50 rounded-xl p-4 border border-purple-200 mb-2">
+                <p className="text-purple-700 mb-2">
                   When FLPY launches on Pi Mainnet, <strong>skin purchasers will receive exclusive token airdrops and NFT rewards!</strong>
                 </p>
-                <div className="bg-purple-100 rounded-lg p-3">
-                  <p className="text-sm text-purple-800 mb-2">
-                    <strong>💎 Buy skins now to secure your spot for:</strong>
-                  </p>
-                  <ul className="text-sm text-purple-800 space-y-1 ml-4">
-                    <li>• Exclusive FLPY token airdrops</li>
-                    <li>• Limited edition Pi NFT rewards</li>
-                    <li>• Early access to DeFi features</li>
-                    <li>• VIP gaming benefits</li>
-                  </ul>
-                </div>
+                <ul className="text-xs text-purple-800 space-y-1 ml-4">
+                  <li>• Exclusive FLPY token airdrops</li>
+                  <li>• Limited edition Pi NFT rewards</li>
+                  <li>• Early access to DeFi features</li>
+                  <li>• VIP gaming benefits</li>
+                </ul>
               </div>
-
-              {/* Call to Action */}
-              <div className="text-center space-y-4">
-                <p className="text-gray-700 text-lg font-medium">
-                  🚀 The future of Pi gaming and DeFi starts here!
-                </p>
-                
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button 
-                    onClick={() => {
-                      handleFLPYNotificationDismiss('dismiss');
-                      navigate('/shop');
-                    }}
-                    className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-3 text-lg font-semibold shadow-lg"
-                  >
-                    🛒 Shop Skins Now
-                  </Button>
-                  <Button 
-                    onClick={() => handleFLPYNotificationDismiss('remind-later')}
-                    variant="outline" 
-                    className="flex-1 border-purple-300 text-purple-700 hover:bg-purple-50 py-3 text-lg font-semibold"
-                  >
-                    ⏰ Remind Later
-                  </Button>
-                </div>
-                
-                <Button 
-                  onClick={() => handleFLPYNotificationDismiss('dismiss')}
-                  variant="ghost" 
-                  className="text-gray-500 hover:text-gray-700 text-sm"
-                >
-                  Don't show again
-                </Button>
-              </div>
+            </div>
+            <div className="text-center space-y-3">
+              <p className="text-gray-700 text-base font-medium">
+                🚀 The future of Pi gaming and DeFi starts here!
+              </p>
+              <Button 
+                onClick={() => {
+                  handleFLPYNotificationDismiss('dismiss');
+                  navigate('/shop');
+                }}
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-3 text-lg font-semibold shadow-lg"
+              >
+                🛒 Shop Skins Now
+              </Button>
+              <Button 
+                onClick={() => handleFLPYNotificationDismiss('remind-later')}
+                variant="outline" 
+                className="w-full border-purple-300 text-purple-700 hover:bg-purple-50 py-3 text-lg font-semibold"
+              >
+                ⏰ Remind Later
+              </Button>
+              <Button 
+                onClick={() => handleFLPYNotificationDismiss('dismiss')}
+                variant="ghost" 
+                className="w-full text-gray-500 hover:text-gray-700 text-sm"
+              >
+                Don't show again
+              </Button>
             </div>
           </div>
         </DialogContent>

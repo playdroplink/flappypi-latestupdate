@@ -155,7 +155,8 @@ export class DataRecoveryService {
 
       // 2. Restore wallet balance
       if (data.walletBalance > 0) {
-        saveWalletBalance(data.walletBalance);
+        const savedUsername = localStorage.getItem('flappypi-username');
+        saveWalletBalance(data.walletBalance, savedUsername);
         console.log('💰 Restored wallet balance:', data.walletBalance);
       }
 
@@ -229,7 +230,8 @@ export class DataRecoveryService {
 
         // Apply merged data
         localStorage.setItem('flappypi-inventory', JSON.stringify(mergedInventory));
-        saveWalletBalance(mergedWallet);
+        const savedUsername = localStorage.getItem('flappypi-username');
+        saveWalletBalance(mergedWallet, savedUsername);
 
         console.log('✅ Smart recovery completed - merged data applied');
 

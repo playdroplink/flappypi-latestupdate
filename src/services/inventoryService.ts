@@ -2362,9 +2362,10 @@ class InventoryService {
       planRewards.rewards.forEach(reward => {
         // CRITICAL FIX: Handle coins separately - add to wallet balance, not inventory
         if (reward.type === 'coins') {
-          const currentBalance = loadWalletBalance();
+          const savedUsername = localStorage.getItem('flappypi-username');
+          const currentBalance = loadWalletBalance(savedUsername);
           const newBalance = currentBalance + reward.quantity;
-          saveWalletBalance(newBalance);
+          saveWalletBalance(newBalance, savedUsername);
           totalCoinsAwarded += reward.quantity;
           console.log(`💰 Added ${reward.quantity} coins to wallet. New balance: ${newBalance}`);
           
@@ -2514,10 +2515,20 @@ class InventoryService {
       
       if (error) {
         console.error('❌ Inventory sync failed:', error);
+        toast({
+          title: 'Cloud Sync Failed',
+          description: 'Could not sync inventory to cloud. Your data is safe locally.',
+          variant: 'destructive',
+        });
         return false;
       }
       
       console.log('✅ Inventory + wallet synced to Supabase:', inventory.length, 'items,', walletBalance, 'coins');
+      toast({
+        title: 'Cloud Sync Success',
+        description: 'Inventory and wallet successfully synced to cloud.',
+        variant: 'default',
+      });
       return true;
     } catch (error) {
       console.error('❌ Error syncing inventory to cloud:', error);
@@ -2554,10 +2565,20 @@ class InventoryService {
       
       if (error) {
         console.error('❌ Wallet sync failed:', error);
+        toast({
+          title: 'Wallet Sync Failed',
+          description: 'Could not sync wallet balance to cloud. Your balance is safe locally.',
+          variant: 'destructive',
+        });
         return false;
       }
       
       console.log('✅ Wallet balance synced to cloud:', balance, 'coins');
+      toast({
+        title: 'Wallet Sync Success',
+        description: 'Wallet balance successfully synced to cloud.',
+        variant: 'default',
+      });
       return true;
     } catch (error) {
       console.error('❌ Error syncing wallet to cloud:', error);
@@ -2643,7 +2664,8 @@ class InventoryService {
       // Restore wallet balance from cloud if available
       if (data.wallet_balance !== undefined && data.wallet_balance !== null) {
         const { saveWalletBalance } = require('@/utils/walletUtils');
-        saveWalletBalance(data.wallet_balance);
+        const savedUsername = localStorage.getItem('flappypi-username');
+        saveWalletBalance(data.wallet_balance, savedUsername);
         console.log('💰 Restored wallet balance from cloud:', data.wallet_balance, 'coins');
         
         // Dispatch event to update UI

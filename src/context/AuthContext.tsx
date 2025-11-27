@@ -222,18 +222,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         console.log('🔄 Pre-login cloud sync for user:', user.uid);
         const { inventoryService } = await import('../services/inventoryService');
-        
         // Load cloud data first
         const cloudInventory = await inventoryService.loadInventoryFromCloud(user.uid);
         console.log('☁️ Pre-login cloud data loaded:', cloudInventory.length, 'items');
-        
+
+        // Restore wallet balance from cloud if available
+        if (typeof cloudInventory === 'object' && cloudInventory !== null && 'wallet_balance' in cloudInventory) {
+          const { saveWalletBalance } = await import('../utils/walletUtils');
+          const savedUsername = user.username;
+          saveWalletBalance(cloudInventory.wallet_balance, savedUsername);
+          console.log('💰 Pre-login wallet balance restored from cloud:', cloudInventory.wallet_balance);
+        }
+
         // If cloud data exists, immediately update localStorage before auth state changes
         if (cloudInventory.length > 0) {
           const localInventory = inventoryService.getInventory();
           const mergedInventory = inventoryService.mergeInventoryData(localInventory, cloudInventory);
           localStorage.setItem('flappypi-inventory', JSON.stringify(mergedInventory));
           console.log('💾 Pre-login inventory merged and saved to localStorage:', mergedInventory.length, 'items');
-          
           // Dispatch event to update UI immediately
           window.dispatchEvent(new CustomEvent('inventory-restored-from-cloud', { 
             detail: { 
