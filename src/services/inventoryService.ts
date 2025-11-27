@@ -1,3 +1,4 @@
+// ...existing code...
 import { toast } from '@/hooks/use-toast';
 import { powerUpItems } from '../constants/powerUpItems';
 import { getSkinNameById } from '@/utils/getSkinName';
@@ -58,7 +59,52 @@ export interface UnclaimedSubscriptionReward {
   expiresAt?: string;
 }
 
+
 class InventoryService {
+  // Save all user game data under a username-specific key (for mobile/PC sync)
+  saveAllUserGameDataToLocal(username: string): void {
+    try {
+      const user = localStorage.getItem('flappypi-pi-user');
+      const inventory = localStorage.getItem('flappypi-inventory');
+      const coins = localStorage.getItem('flappypi-coins');
+      const purchaseHistory = localStorage.getItem('flappypi-purchase-history');
+      const gameModes = localStorage.getItem('flappypi-gamemodes');
+      const data = {
+        user: user ? JSON.parse(user) : null,
+        inventory: inventory ? JSON.parse(inventory) : [],
+        coins: coins ? parseInt(coins, 10) : 0,
+        purchaseHistory: purchaseHistory ? JSON.parse(purchaseHistory) : [],
+        gameModes: gameModes ? JSON.parse(gameModes) : {},
+        lastSaved: new Date().toISOString()
+      };
+      localStorage.setItem(`flappypi-data-${username}`, JSON.stringify(data));
+      console.log(`✅ Saved all game data for user ${username} to localStorage`);
+    } catch (error) {
+      console.error('❌ Failed to save all user game data:', error);
+    }
+  }
+
+  // Load all user game data from a username-specific key
+  loadAllUserGameDataFromLocal(username: string): void {
+    try {
+      const dataStr = localStorage.getItem(`flappypi-data-${username}`);
+      if (!dataStr) {
+        console.warn(`⚠️ No saved game data found for user ${username}`);
+        return;
+      }
+      const data = JSON.parse(dataStr);
+      if (data.user) localStorage.setItem('flappypi-pi-user', JSON.stringify(data.user));
+      if (data.inventory) localStorage.setItem('flappypi-inventory', JSON.stringify(data.inventory));
+      if (typeof data.coins === 'number') localStorage.setItem('flappypi-coins', data.coins.toString());
+      if (data.purchaseHistory) localStorage.setItem('flappypi-purchase-history', JSON.stringify(data.purchaseHistory));
+      if (data.gameModes) localStorage.setItem('flappypi-gamemodes', JSON.stringify(data.gameModes));
+      console.log(`✅ Loaded all game data for user ${username} from localStorage`);
+    } catch (error) {
+      console.error('❌ Failed to load all user game data:', error);
+    }
+  }
+
+    // ...existing code...
   private static instance: InventoryService;
   private expirationCheckInterval: NodeJS.Timeout | null = null;
   private cleanupTimeout: NodeJS.Timeout | null = null;

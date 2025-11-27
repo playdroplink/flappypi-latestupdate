@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import RewardModal from './RewardModal';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { getIncompletePayments, cancelPayment } from '@/services/piA2UPaymentService';
 
 interface PaymentItem {
   id: string;
@@ -34,6 +36,7 @@ const NewPiPaymentModal: React.FC<NewPiPaymentModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [piUser, setPiUser] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showRewardModal, setShowRewardModal] = useState(false);
 
   // Reset state when modal opens
   useEffect(() => {
@@ -158,11 +161,14 @@ const NewPiPaymentModal: React.FC<NewPiPaymentModalProps> = ({
           console.log("✅ Payment completed:", paymentId, txid);
           setPaymentStep('success');
           setIsProcessing(false);
-          
+
           toast({
             title: "Payment Successful! 🎉",
             description: `${item.name} has been purchased successfully.`
           });
+
+          // Show reward modal after payment success
+          setShowRewardModal(true);
 
           // Call success handler
           onPaymentSuccess(item);
@@ -173,19 +179,50 @@ const NewPiPaymentModal: React.FC<NewPiPaymentModalProps> = ({
           setError('Payment was cancelled');
           setIsProcessing(false);
         },
-        onError: (error: any, payment?: any) => {
+        onError: async (error: any, payment?: any) => {
           console.log("❌ Payment error:", error);
-          setPaymentStep('error');
-          setError(error.message || 'Payment failed');
-          setIsProcessing(false);
-          
-          toast({
-            title: "Payment Failed",
-            description: error.message || "An error occurred while processing your payment.",
-            variant: "destructive"
-          });
-
-          onPaymentError(error.message || 'Payment failed');
+          let handled = false;
+          // Auto-cancel if stuck pending payment error
+          if (error?.message && error.message.includes('already have a pending payment')) {
+            setError('Resolving stuck payment... Please wait.');
+            setIsProcessing(true);
+            try {
+              const resp = await getIncompletePayments();
+              if (resp.success && Array.isArray(resp.data) && resp.data.length > 0) {
+                // Cancel all incomplete payments
+                for (const pending of resp.data) {
+                  await cancelPayment(pending.identifier);
+                }
+                setError('Previous stuck payment was auto-cancelled. Please try again.');
+                handled = true;
+              } else {
+                setError('No pending payment found to cancel. Please try again.');
+                handled = true;
+              }
+            } catch (cancelErr) {
+              setError('Failed to auto-cancel pending payment. Please try again later.');
+              handled = true;
+            }
+            setIsProcessing(false);
+            setPaymentStep('error');
+            toast({
+              title: 'Stuck Payment Resolved',
+              description: 'Previous stuck payment was auto-cancelled. Please try again.',
+              variant: 'default'
+            });
+            onPaymentError('Stuck payment auto-cancelled. Please retry.');
+          }
+          if (!handled) {
+            setPaymentStep('error');
+            setError(error.message || 'Payment failed');
+            setIsProcessing(false);
+            toast({
+              title: "Payment Failed",
+              description: error.message || "An error occurred while processing your payment.",
+              variant: "destructive"
+            });
+            onPaymentError(error.message || 'Payment failed');
+          }
         }
       });
 
@@ -211,11 +248,24 @@ const NewPiPaymentModal: React.FC<NewPiPaymentModalProps> = ({
     }
   };
 
+
+  // Prepare reward for modal (single item as array)
+  const rewardItems = item ? [{
+    id: item.id,
+    name: item.name,
+    type: item.type as 'skin' | 'powerup' | 'subscription' | 'mystery-box' | 'bundle',
+    quantity: item.quantity || 1,
+    rarity: 'Common' as 'Common', // Default, can be improved if item has rarity
+    image: item.image,
+    description: ''
+  }] : [];
+
   if (!item) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+    <>
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold text-purple-600">
             Pi Payment
@@ -331,8 +381,15 @@ const NewPiPaymentModal: React.FC<NewPiPaymentModalProps> = ({
             </div>
           )}
         </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+      {/* Reward Modal after successful payment */}
+      <RewardModal
+        open={showRewardModal}
+        onClose={() => setShowRewardModal(false)}
+        rewards={rewardItems}
+      />
+    </>
   );
 };
 

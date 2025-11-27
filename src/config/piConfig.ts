@@ -40,7 +40,7 @@ export const DEMO_PI_CONFIG = {
   PI_NETWORK_VALIDATION_KEY: '94e29cc9c70b87c8fc91e496ac630d23664bff7082cca3ad9d6466bba1aa2902caa46a8eb82a64437d272dbcd329c763679c85cfcba91b95e6fb5b4a6f17b2ce',
   
   // Pi Network Environment Settings - MAINNET
-  PI_SANDBOX_MODE: false,
+  PI_SANDBOX_MODE: true,
   PI_NETWORK: 'mainnet',
   VITE_PI_NETWORK: 'mainnet',
   
@@ -71,8 +71,8 @@ export const DEMO_PI_CONFIG = {
   ALLOWED_ORIGINS: 'https://flappypi.fun,https://flappypi2807.pinet.com,https://*.pinet.com,https://*.minepi.com',
   
   // Pi Network Security - PRODUCTION
-  PI_REQUIRE_BROWSER: true,
-  PI_REQUIRE_AUTH: true,
+  PI_REQUIRE_BROWSER: false,
+  PI_REQUIRE_AUTH: false,
   PI_VALIDATE_PAYMENTS: true,
   
   // Debug Settings - MAINNET (Disabled)
@@ -90,7 +90,7 @@ export const DEMO_PI_CONFIG = {
   GAME_MODE: 'mainnet',
   TESTNET_MODE: false,
   MAINNET_MODE: true,
-  SANDBOX_MODE: false,
+  SANDBOX_MODE: true,
   
   // Analytics Configuration
   ANALYTICS_ENABLED: true,

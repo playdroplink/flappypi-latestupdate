@@ -33,7 +33,7 @@ class DatabaseService {
         .from('payments')
         .insert([{
           payment_id: paymentData.paymentId,
-          user_uid: paymentData.uid,
+          user_id: paymentData.user_id,
           amount: paymentData.amount,
           memo: paymentData.memo,
           metadata: paymentData.metadata,

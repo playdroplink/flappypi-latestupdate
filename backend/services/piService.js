@@ -29,25 +29,24 @@ class PiService {
    */
   async createPayment(paymentData) {
     try {
-      const { amount, memo, metadata, uid } = paymentData;
-      
+      const { amount, memo, metadata, user_id } = paymentData;
       // Validate required fields
-      if (!amount || !memo || !uid) {
-        throw new Error('Amount, memo, and uid are required');
+      if (!amount || !memo || !user_id) {
+        throw new Error('Amount, memo, and user_id are required');
       }
 
       const paymentId = await this.pi.createPayment({
         amount,
         memo,
         metadata: metadata || {},
-        uid
+        user_id
       });
 
       // Store payment in database
       try {
         await this.db.storePayment({
           paymentId,
-          uid,
+          user_id,
           amount,
           memo,
           metadata: metadata || {}

@@ -16,12 +16,12 @@ function getPiService() {
 // POST /api/payments/create - Create A2U payment (App -> User)
 router.post('/create', async (req, res) => {
 	try {
-		const { amount, memo, metadata, uid } = req.body || {};
-		if (!amount || !memo || !uid) {
-			return res.status(400).json({ error: 'amount, memo and uid are required' });
+		const { amount, memo, metadata, user_id } = req.body || {};
+		if (!amount || !memo || !user_id) {
+			return res.status(400).json({ error: 'amount, memo and user_id are required' });
 		}
 		const pi = getPiService();
-		const paymentId = await pi.createPayment({ amount, memo, metadata, uid });
+		const paymentId = await pi.createPayment({ amount, memo, metadata, user_id });
 		return res.json({ success: true, paymentId });
 	} catch (error) {
 		return res.status(400).json({ success: false, error: error.message || 'Failed to create payment' });
@@ -61,12 +61,12 @@ router.post('/complete', async (req, res) => {
 // POST /api/payments/process-a2u - Create, submit and complete in one call
 router.post('/process-a2u', async (req, res) => {
 	try {
-		const { amount, memo, metadata, uid } = req.body || {};
-		if (!amount || !memo || !uid) {
-			return res.status(400).json({ error: 'amount, memo and uid are required' });
+		const { amount, memo, metadata, user_id } = req.body || {};
+		if (!amount || !memo || !user_id) {
+			return res.status(400).json({ error: 'amount, memo and user_id are required' });
 		}
 		const pi = getPiService();
-		const result = await pi.processA2UPayment({ amount, memo, metadata, uid });
+		const result = await pi.processA2UPayment({ amount, memo, metadata, user_id });
 		return res.json(result);
 	} catch (error) {
 		return res.status(400).json({ success: false, error: error.message || 'Failed to process payment' });

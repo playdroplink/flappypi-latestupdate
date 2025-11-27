@@ -170,7 +170,7 @@ const RewardModal: React.FC<RewardModalProps> = ({ open, onClose, rewards, onCla
           )}
         </div>
       </div>
-      <style jsx>{`
+      <style>{`
         @keyframes slideInUp {
           from {
             opacity: 0;

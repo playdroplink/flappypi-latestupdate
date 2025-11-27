@@ -41,8 +41,9 @@ Flappy Pi is a next-generation Flappy Bird-style game with deep integration into
 
 ---
 
+
 ## 6. Pi Network Integration
-- **Authentication**: Pi OAuth, secure user data
+- **Authentication**: Pi OAuth, secure user data (supports sandbox mode for development/testing)
 - **Payments**: 3-step A2U flow (create, submit, complete)
 - **Ad Network**: Pi Ad SDK for monetization
 
