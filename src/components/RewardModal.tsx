@@ -61,7 +61,7 @@ const RewardModal: React.FC<RewardModalProps> = ({ open, onClose, rewards, onCla
     }
   }, [open, rewards]);
 
-  const handleClaim = () => {
+  const handleClaim = async () => {
     try {
       rewards.forEach(reward => {
         inventoryService.saveToInventory({
@@ -74,6 +74,33 @@ const RewardModal: React.FC<RewardModalProps> = ({ open, onClose, rewards, onCla
           description: reward.description
         });
       });
+
+      // Supabase sync: get user_id from localStorage (from user_profiles.uid or pi user)
+      let user_id = null;
+      try {
+        const piUser = localStorage.getItem('flappypi-pi-user');
+        if (piUser) {
+          const parsed = JSON.parse(piUser);
+          user_id = parsed.uid || parsed.user_id || parsed.username;
+        }
+      } catch {}
+
+      if (user_id) {
+        try {
+          await fetch('/api/inventory/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id, items: rewards })
+          });
+        } catch (err) {
+          toast({
+            title: 'Cloud Sync Failed',
+            description: 'Could not sync rewards to cloud. Try again later.',
+            variant: 'destructive'
+          });
+        }
+      }
+
       setClaimed(true);
       if (onClaim) onClaim();
       toast({

@@ -8,6 +8,8 @@ const helmet = require('helmet');
 const piRoutes = require('./routes/pi.cjs');
 const paymentRoutes = require('./routes/payments.cjs');
 const cloudStorageRoutes = require('./routes/cloudStorageSimple.cjs');
+const inventoryRoutes = require('./routes/inventory.cjs');
+const userRoutes = require('./routes/user.cjs');
 
 // Import leaderboard functions (not router)
 const leaderboardAPI = require('./leaderboard-api.cjs');
@@ -66,6 +68,8 @@ app.use((req, res, next) => {
 app.use('/api/pi', piRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/cloud', cloudStorageRoutes);
+app.use('/api/inventory', inventoryRoutes);
+app.use('/api/user', userRoutes);
 
 // Leaderboard endpoints (individual route handlers)
 app.post('/api/leaderboard/submit', leaderboardAPI.submitScore);

@@ -19,19 +19,17 @@
      <meta name="pi-api-key" content="rppe8zs82vn2kmksqmkopg1yiqzqxs0vgcmzbo5e6hqc3zfn5qeexzygbjqn3yd3" />
 
     <script>
-       // Environment variables configuration - MAINNET
-       // This will be automatically templated by react-scripts in development
-       // and by the container's entrypoint script in production
+       // Environment variables configuration - MAINNET ONLY
        window.__ENV = {
          backendURL: "%REACT_APP_BACKEND_URL%",
-         sandbox: "true",
+         sandbox: "false",
          piAppId: "flappypi2807",
          piApiKey: "rppe8zs82vn2kmksqmkopg1yiqzqxs0vgcmzbo5e6hqc3zfn5qeexzygbjqn3yd3",
          piValidationKey: "94e29cc9c70b87c8fc91e496ac630d23664bff7082cca3ad9d6466bba1aa2902caa46a8eb82a64437d272dbcd329c763679c85cfcba91b95e6fb5b4a6f17b2ce",
-         networkMode: "sandbox"
+         networkMode: "mainnet"
        }
 
-      // Flappy Pi Pay Configuration - MAINNET
+      // Flappy Pi Pay Configuration - MAINNET ONLY
       window.FlappyPiPay = {
         walletAddress: 'GDSXE723WPHZ5RGIJCSYXTPKSOIGPTSXE4RF5U3JTNGTCHXON7ZVD4LJ',
         network: 'mainnet',
@@ -42,17 +40,17 @@
         mobileOptimized: true,
         enableTouchEvents: true,
         enableGestureSupport: true,
-        // Sandbox settings
+        // Mainnet only
         testnetMode: false,
-        sandboxMode: true,
-        mainnetMode: false
+        sandboxMode: false,
+        mainnetMode: true
       };
     </script>
 
     <!-- Import the Pi Network App Platform SDK: -->
     <!-- Official Pi SDK from pi-platform-docs: https://github.com/pi-apps/pi-platform-docs.git -->
     <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-    <script>Pi.init({ version: "2.0", sandbox: true })</script>
+    <script>Pi.init({ version: "2.0", sandbox: false })</script>
     
     <!-- Official Pi SDK Integration Script -->
     <script>

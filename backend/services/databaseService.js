@@ -30,7 +30,7 @@ class DatabaseService {
 
     try {
       const { data, error } = await this.supabase
-        .from('payments')
+        .from('payment_records')
         .insert([{
           payment_id: paymentData.paymentId,
           user_id: paymentData.user_id,
@@ -84,7 +84,7 @@ class DatabaseService {
       }
 
       const { data, error } = await this.supabase
-        .from('payments')
+        .from('payment_records')
         .update(updateData)
         .eq('payment_id', paymentId)
         .select()
