@@ -37,40 +37,67 @@ const NewPiPaymentModal: React.FC<NewPiPaymentModalProps> = ({
   const [piUser, setPiUser] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showRewardModal, setShowRewardModal] = useState(false);
+  const [pendingPaymentDetected, setPendingPaymentDetected] = useState(false);
+  const [resolvingPending, setResolvingPending] = useState(false);
 
   // Reset state when modal opens
   useEffect(() => {
-    if (isOpen && item) {
-      setPaymentStep('confirm');
-      setError(null);
-      setIsProcessing(false);
-      checkPiAuthentication();
-    }
+    const autoResolvePending = async () => {
+      setPendingPaymentDetected(false);
+      if (isOpen && item) {
+        setPaymentStep('confirm');
+        setError(null);
+        setIsProcessing(false);
+        checkPiAuthentication();
+        // Auto-check for stuck payments
+        try {
+          const resp = await getIncompletePayments();
+          if (resp.success && Array.isArray(resp.data) && resp.data.length > 0) {
+            // Cancel all incomplete payments
+            for (const pending of resp.data) {
+              await cancelPayment(pending.identifier);
+            }
+            setPendingPaymentDetected(true);
+            setError('Previous stuck payment was auto-cancelled. Please try again.');
+          }
+        } catch (e) {
+          // If error, just continue
+        }
+      }
+    };
+    autoResolvePending();
   }, [isOpen, item]);
 
-  // Check Pi authentication status
+  // Check Pi authentication status and required scopes
   const checkPiAuthentication = () => {
     try {
-      // Check if Pi SDK is available
       if (typeof window === 'undefined' || !window.Pi) {
-        console.log('❌ Pi SDK not available');
         setIsAuthenticated(false);
         return;
       }
-
-      // Check if user is already authenticated
       const storedUser = localStorage.getItem('flappypi-pi-user');
+      const accessToken = localStorage.getItem('pi_access_token');
+      let hasPaymentsScope = false;
+      if (accessToken) {
+        // Try to decode JWT and check scopes
+        try {
+          const payload = JSON.parse(atob(accessToken.split('.')[1]));
+          if (payload.scope && (Array.isArray(payload.scope) ? payload.scope.includes('payments') : payload.scope.indexOf('payments') !== -1)) {
+            hasPaymentsScope = true;
+          }
+        } catch {}
+      }
       if (storedUser) {
         const user = JSON.parse(storedUser);
         setPiUser(user);
-        setIsAuthenticated(true);
-        console.log('✅ Pi user authenticated:', user.username);
+        setIsAuthenticated(hasPaymentsScope);
+        if (!hasPaymentsScope) {
+          setError('You must re-authenticate and grant the "payments" scope to make payments.');
+        }
       } else {
         setIsAuthenticated(false);
-        console.log('❌ No Pi user found');
       }
     } catch (error) {
-      console.error('❌ Error checking Pi authentication:', error);
       setIsAuthenticated(false);
     }
   };
@@ -126,15 +153,30 @@ const NewPiPaymentModal: React.FC<NewPiPaymentModalProps> = ({
 
   // Handle payment processing
   const handlePayment = async () => {
-    if (!item || !isAuthenticated) return;
+    if (!item) return;
+    // Check for payments scope before proceeding
+    const accessToken = localStorage.getItem('pi_access_token');
+    let hasPaymentsScope = false;
+    if (accessToken) {
+      try {
+        const payload = JSON.parse(atob(accessToken.split('.')[1]));
+        if (payload.scope && (Array.isArray(payload.scope) ? payload.scope.includes('payments') : payload.scope.indexOf('payments') !== -1)) {
+          hasPaymentsScope = true;
+        }
+      } catch {}
+    }
+    if (!hasPaymentsScope) {
+      setError('You must re-authenticate and grant the "payments" scope to make payments.');
+      setIsAuthenticated(false);
+      return;
+    }
 
     setIsProcessing(true);
     setPaymentStep('processing');
     setError(null);
 
     try {
-      console.log('💰 Processing payment for:', item);
-
+      // ...existing code for payment creation and callbacks...
       // Create payment data
       const paymentData = {
         amount: item.price,
@@ -148,59 +190,47 @@ const NewPiPaymentModal: React.FC<NewPiPaymentModalProps> = ({
         }
       };
 
-      console.log('🚀 Creating Pi payment:', paymentData);
-
-      // Create payment using Pi SDK (callback-based)
       window.Pi.createPayment(paymentData, {
         onReadyForServerApproval: (paymentId: string) => {
-          console.log("✅ Payment ready for server approval:", paymentId);
-          // For testnet/sandbox, approve immediately
           return true;
         },
         onReadyForServerCompletion: (paymentId: string, txid: string) => {
-          console.log("✅ Payment completed:", paymentId, txid);
           setPaymentStep('success');
           setIsProcessing(false);
-
           toast({
             title: "Payment Successful! 🎉",
             description: `${item.name} has been purchased successfully.`
           });
-
-          // Show reward modal after payment success
           setShowRewardModal(true);
-
-          // Call success handler
           onPaymentSuccess(item);
         },
         onCancel: (paymentId: string) => {
-          console.log("❌ Payment cancelled:", paymentId);
           setPaymentStep('error');
           setError('Payment was cancelled');
           setIsProcessing(false);
         },
         onError: async (error: any, payment?: any) => {
-          console.log("❌ Payment error:", error);
           let handled = false;
-          // Auto-cancel if stuck pending payment error
           if (error?.message && error.message.includes('already have a pending payment')) {
             setError('Resolving stuck payment... Please wait.');
             setIsProcessing(true);
             try {
               const resp = await getIncompletePayments();
               if (resp.success && Array.isArray(resp.data) && resp.data.length > 0) {
-                // Cancel all incomplete payments
                 for (const pending of resp.data) {
                   await cancelPayment(pending.identifier);
                 }
                 setError('Previous stuck payment was auto-cancelled. Please try again.');
+                setPendingPaymentDetected(true);
                 handled = true;
               } else {
                 setError('No pending payment found to cancel. Please try again.');
+                setPendingPaymentDetected(true);
                 handled = true;
               }
             } catch (cancelErr) {
               setError('Failed to auto-cancel pending payment. Please try again later.');
+              setPendingPaymentDetected(true);
               handled = true;
             }
             setIsProcessing(false);
@@ -225,19 +255,15 @@ const NewPiPaymentModal: React.FC<NewPiPaymentModalProps> = ({
           }
         }
       });
-
     } catch (error: any) {
-      console.error('❌ Payment error:', error);
       setPaymentStep('error');
       setError(error.message || 'Payment failed');
       setIsProcessing(false);
-      
       toast({
         title: "Payment Failed",
         description: error.message || "An error occurred while processing your payment.",
         variant: "destructive"
       });
-
       onPaymentError(error.message || 'Payment failed');
     }
   };
@@ -366,6 +392,7 @@ const NewPiPaymentModal: React.FC<NewPiPaymentModalProps> = ({
                       onClick={() => setPaymentStep('confirm')}
                       variant="outline"
                       className="flex-1"
+                      disabled={resolvingPending}
                     >
                       Try Again
                     </Button>
@@ -376,6 +403,32 @@ const NewPiPaymentModal: React.FC<NewPiPaymentModalProps> = ({
                       Close
                     </Button>
                   </div>
+                  {pendingPaymentDetected && (
+                    <Button
+                      onClick={async () => {
+                        setResolvingPending(true);
+                        setError('Resolving pending payment...');
+                        try {
+                          const resp = await getIncompletePayments();
+                          if (resp.success && Array.isArray(resp.data) && resp.data.length > 0) {
+                            for (const pending of resp.data) {
+                              await cancelPayment(pending.identifier);
+                            }
+                            setError('Pending payment was cancelled. Please try again.');
+                          } else {
+                            setError('No pending payment found. Please try again.');
+                          }
+                        } catch (e) {
+                          setError('Failed to resolve pending payment. Please try again later.');
+                        }
+                        setResolvingPending(false);
+                      }}
+                      className="w-full bg-yellow-500 hover:bg-yellow-600 text-white mt-2"
+                      disabled={resolvingPending}
+                    >
+                      {resolvingPending ? 'Resolving...' : 'Resolve Pending Payment'}
+                    </Button>
+                  )}
                 </div>
               )}
             </div>

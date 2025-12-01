@@ -20,23 +20,7 @@ import AboutModal from '../components/AboutModal';
 import { Button } from '@/components/ui/button';
 import BackgroundDecoration from '../components/home/BackgroundDecoration';
 import { User, Shirt, Settings, FlaskConical, BookOpen, ChevronDown, Bell } from 'lucide-react';
-  // Notification state
-  const [showAnnouncement, setShowAnnouncement] = useState(false);
-  const [announcementRead, setAnnouncementRead] = useState(() => localStorage.getItem('flappypi-announcement-read') === 'true');
-
-  // Example announcement (replace with dynamic fetch if needed)
-  const importantAnnouncement = {
-    title: '🚨 Important Update: New Features!',
-    message: 'Flappy Pi just launched a major update! Check out the new subscription plans, seasonal weather, and DeFi features. Stay tuned for more events this month! 🎉',
-    date: 'December 2, 2025'
-  };
-
-  const handleOpenAnnouncement = () => {
-    setShowAnnouncement(true);
-    setAnnouncementRead(true);
-    localStorage.setItem('flappypi-announcement-read', 'true');
-  };
-  const handleCloseAnnouncement = () => setShowAnnouncement(false);
+// ...existing code...
 import TutorialModal from '../components/game/TutorialModal';
 import ComingSoonModal from '../components/ComingSoonModal';
 import NextSeasonModal from '../components/NextSeasonModal';
@@ -102,9 +86,27 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
   const { getFooterBg, getFooterBorder } = useTheme();
   const { smartNavigate, navigateToProtected, navigateToPublic } = useSmartNavigation();
   
+  // Notification state (moved from top-level)
+  const [showAnnouncement, setShowAnnouncement] = useState(false);
+  const [announcementRead, setAnnouncementRead] = useState(() => localStorage.getItem('flappypi-announcement-read') === 'true');
+
+  // Example announcement (replace with dynamic fetch if needed)
+  const importantAnnouncement = {
+    title: '🚨 Important Update: New Features!',
+    message: 'Flappy Pi just launched a major update! Check out the new subscription plans, seasonal weather, and DeFi features. Stay tuned for more events this month! 🎉',
+    date: 'December 2, 2025'
+  };
+
+  const handleOpenAnnouncement = () => {
+    setShowAnnouncement(true);
+    setAnnouncementRead(true);
+    localStorage.setItem('flappypi-announcement-read', 'true');
+  };
+  const handleCloseAnnouncement = () => setShowAnnouncement(false);
+
   // Add state to force re-renders when auth changes
   const [authUpdateTrigger, setAuthUpdateTrigger] = useState(0);
-  
+
   // Seasonal weather state using custom hook
   const { currentSeason, seasonProgress, timeUntilNext } = useSeasonManager();
   const [seasonalWeather, setSeasonalWeather] = useState(seasonManager.getSeasonConfig());
@@ -160,9 +162,7 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
   ];
   const theme = settings.theme === 'night' ? 'night' : 'light';
   const handleThemeChange = (newTheme: 'light' | 'night') => {
-    console.log('🎨 Theme change requested:', newTheme);
     updateSettings({ theme: newTheme });
-    console.log('🎨 Settings updated, current theme:', settings.theme);
   };
 
   // Modal states
@@ -287,7 +287,6 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     // Set the special key
     localStorage.setItem('SOCIAL_CHALLENGE_KEY', '1');
     
-    console.log('🎤 Scream Pi: Always unlocked - all keys set');
   }, []);
 
   // Listen for authentication state changes
@@ -321,7 +320,6 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
 
   // Get user display information - optimized for Pi authentication
   const getUserDisplay = () => {
-    console.log('🔍 HomePage getUserDisplay - Starting user display check...');
     
     // Helper function to extract username from user object
     const extractUsername = (user: any) => {
@@ -360,40 +358,12 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     const isPiNet = window.location.hostname.includes('pinet.com');
     const isPiBrowser = typeof window !== 'undefined' && !!window.Pi;
     
-    console.log('🧪 HomePage - Environment check:', {
-      isSandbox,
-      isPiNet,
-      isPiBrowser,
-      hostname: window.location.hostname,
-      windowPiExists: !!window.Pi,
-      windowPiType: typeof window.Pi,
-      windowPiKeys: window.Pi ? Object.keys(window.Pi) : []
-    });
     
     // Enhanced debugging
-    console.log('🔍 HomePage getUserDisplay - Current state:', {
-      authPiUser,
-      isPiAuth,
-      piUser,
-      profile,
-      isSandbox,
-      isPiNet,
-      isPiBrowser,
-      windowPi: typeof window !== 'undefined' ? !!window.Pi : false
-    });
     
     // ENHANCED SANDBOX SUPPORT - Check window.Pi directly first for sandbox
     if (isSandbox && typeof window !== 'undefined' && window.Pi) {
       try {
-        console.log('🧪 HomePage - Checking sandbox window.Pi directly...');
-        console.log('🔍 HomePage - window.Pi inspection:', {
-          currentUserType: typeof window.Pi.currentUser,
-          currentUserIsFunction: typeof window.Pi.currentUser === 'function',
-          currentUserIsObject: typeof window.Pi.currentUser === 'object',
-          userExists: !!window.Pi.user,
-          userType: typeof window.Pi.user,
-          allKeys: Object.keys(window.Pi)
-        });
         
         // Try multiple methods to get user from window.Pi
         let sandboxUser = null;
@@ -401,9 +371,7 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
         // Method 1: window.Pi.currentUser() function
         if (typeof window.Pi.currentUser === 'function') {
           try {
-            console.log('🔍 HomePage - Trying window.Pi.currentUser() function...');
             sandboxUser = window.Pi.currentUser();
-            console.log('🧪 window.Pi.currentUser() result:', sandboxUser);
           } catch (error) {
             console.warn('⚠️ window.Pi.currentUser() failed:', error);
           }
@@ -411,25 +379,19 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
         
         // Method 2: window.Pi.currentUser property
         if (!sandboxUser && window.Pi.currentUser && typeof window.Pi.currentUser === 'object') {
-          console.log('🔍 HomePage - Trying window.Pi.currentUser property...');
           sandboxUser = window.Pi.currentUser;
-          console.log('🧪 window.Pi.currentUser property result:', sandboxUser);
         }
         
         // Method 3: Check if user is already authenticated in window.Pi
         if (!sandboxUser && window.Pi.user) {
-          console.log('🔍 HomePage - Trying window.Pi.user...');
           sandboxUser = window.Pi.user;
-          console.log('🧪 window.Pi.user result:', sandboxUser);
         }
         
         // Method 4: Check for other possible user properties
         if (!sandboxUser) {
-          console.log('🔍 HomePage - Checking other possible user properties...');
           const possibleUserKeys = ['user', 'currentUser', 'authenticatedUser', 'me', 'profile'];
           for (const key of possibleUserKeys) {
             if (window.Pi[key] && typeof window.Pi[key] === 'object') {
-              console.log(`🔍 HomePage - Found potential user at window.Pi.${key}:`, window.Pi[key]);
               sandboxUser = window.Pi[key];
               break;
             }
@@ -438,15 +400,11 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
         
         if (sandboxUser && sandboxUser.uid) {
           const username = extractUsername(sandboxUser);
-          console.log('🧪 Sandbox user found:', { username, uid: sandboxUser.uid });
-          
           if (username !== 'Pi User') {
             // Store in localStorage for consistency
             localStorage.setItem('flappypi-username', username);
             localStorage.setItem('flappypi-pi-user', JSON.stringify(sandboxUser));
             localStorage.setItem('flappypi-pi-auth', 'true');
-            
-            console.log('✅ HomePage - Using sandbox direct user:', username);
             return {
               username: username,
               avatar: sandboxUser.avatar || 'flappy-logo.png',
@@ -455,14 +413,13 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
           }
         }
       } catch (error) {
-        console.warn('⚠️ HomePage - Sandbox direct check failed:', error);
+        //
       }
     }
     
     // ENHANCED PINET SUPPORT - Check window.Pi directly for PiNet
     if (isPiNet && typeof window !== 'undefined' && window.Pi) {
       try {
-        console.log('🌐 Checking PiNet window.Pi directly...');
         
         let pinetUser = null;
         
@@ -470,7 +427,6 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
         if (typeof window.Pi.currentUser === 'function') {
           try {
             pinetUser = window.Pi.currentUser();
-            console.log('🌐 window.Pi.currentUser() result:', pinetUser);
           } catch (error) {
             console.warn('⚠️ window.Pi.currentUser() failed:', error);
           }
@@ -478,20 +434,15 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
         
         if (!pinetUser && window.Pi.currentUser && typeof window.Pi.currentUser === 'object') {
           pinetUser = window.Pi.currentUser;
-          console.log('🌐 window.Pi.currentUser property result:', pinetUser);
         }
         
         if (pinetUser && pinetUser.uid) {
           const username = extractUsername(pinetUser);
-          console.log('🌐 PiNet user found:', { username, uid: pinetUser.uid });
-          
           if (username !== 'Pi User') {
             // Store in localStorage for consistency
             localStorage.setItem('flappypi-username', username);
             localStorage.setItem('flappypi-pi-user', JSON.stringify(pinetUser));
             localStorage.setItem('flappypi-pi-auth', 'true');
-            
-            console.log('✅ HomePage - Using PiNet direct user:', username);
             return {
               username: username,
               avatar: pinetUser.avatar || 'flappy-logo.png',
@@ -500,7 +451,7 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
           }
         }
       } catch (error) {
-        console.warn('⚠️ HomePage - PiNet direct check failed:', error);
+        //
       }
     }
     
