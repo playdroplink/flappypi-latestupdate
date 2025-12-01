@@ -170,7 +170,10 @@ export class SeasonManager {
   private getRealSeason(): Season {
     const now = new Date();
     const month = now.getMonth() + 1; // 1-12
-    
+    // December is Christmas, January is New Year, October is Halloween
+    if (month === 12) return 'christmas';
+    if (month === 1) return 'newyear';
+    if (month === 10) return 'halloween';
     if (month >= 3 && month <= 5) return 'spring';
     if (month >= 6 && month <= 8) return 'summer';
     if (month >= 9 && month <= 11) return 'autumn';

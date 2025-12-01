@@ -19,7 +19,24 @@ import EnhancedFooter from '../components/EnhancedFooter';
 import AboutModal from '../components/AboutModal';
 import { Button } from '@/components/ui/button';
 import BackgroundDecoration from '../components/home/BackgroundDecoration';
-import { User, Shirt, Settings, FlaskConical, BookOpen, ChevronDown } from 'lucide-react';
+import { User, Shirt, Settings, FlaskConical, BookOpen, ChevronDown, Bell } from 'lucide-react';
+  // Notification state
+  const [showAnnouncement, setShowAnnouncement] = useState(false);
+  const [announcementRead, setAnnouncementRead] = useState(() => localStorage.getItem('flappypi-announcement-read') === 'true');
+
+  // Example announcement (replace with dynamic fetch if needed)
+  const importantAnnouncement = {
+    title: '🚨 Important Update: New Features!',
+    message: 'Flappy Pi just launched a major update! Check out the new subscription plans, seasonal weather, and DeFi features. Stay tuned for more events this month! 🎉',
+    date: 'December 2, 2025'
+  };
+
+  const handleOpenAnnouncement = () => {
+    setShowAnnouncement(true);
+    setAnnouncementRead(true);
+    localStorage.setItem('flappypi-announcement-read', 'true');
+  };
+  const handleCloseAnnouncement = () => setShowAnnouncement(false);
 import TutorialModal from '../components/game/TutorialModal';
 import ComingSoonModal from '../components/ComingSoonModal';
 import NextSeasonModal from '../components/NextSeasonModal';
@@ -1310,22 +1327,52 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
                 </div>
               </div>
               
-                                            {/* Right side - Wallet, Music Toggle, and Profile Button */}
-                <div className="flex items-center gap-2 sm:gap-3">
-                 <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-xl px-4 py-2 shadow-md">
-                   <div className="flex items-center gap-2">
-                     <img src="/flappycoins.png" alt="Flappy Coins" className="w-5 h-5" />
-                     <span className="font-bold text-gray-800 text-lg wallet-balance">{balance}</span>
-                   </div>
-                 </div>
-                 <button
-                   className={`${theme === 'night' ? 'bg-gray-800 hover:bg-gray-700 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'} rounded-full p-3 transition-all duration-200 hover:scale-105 shadow-md`}
-                   onClick={() => navigateToPublic('/profile')}
-                   aria-label={t('profile')}
-                 >
-                   <User className="w-5 h-5" />
-                 </button>
-               </div>
+                                            {/* Right side - Wallet, Notification Bell, and Profile Button */}
+                                            <div className="flex items-center gap-2 sm:gap-3">
+                                              <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-xl px-4 py-2 shadow-md">
+                                                <div className="flex items-center gap-2">
+                                                  <img src="/flappycoins.png" alt="Flappy Coins" className="w-5 h-5" />
+                                                  <span className="font-bold text-gray-800 text-lg wallet-balance">{balance}</span>
+                                                </div>
+                                              </div>
+                                              {/* Notification Bell */}
+                                              <button
+                                                className={`${theme === 'night' ? 'bg-gray-800 hover:bg-gray-700 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'} relative rounded-full p-3 transition-all duration-200 hover:scale-105 shadow-md`}
+                                                onClick={handleOpenAnnouncement}
+                                                aria-label="Notifications"
+                                              >
+                                                <Bell className="w-5 h-5" />
+                                                {!announcementRead && (
+                                                  <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse" />
+                                                )}
+                                              </button>
+                                              <button
+                                                className={`${theme === 'night' ? 'bg-gray-800 hover:bg-gray-700 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'} rounded-full p-3 transition-all duration-200 hover:scale-105 shadow-md`}
+                                                onClick={() => navigateToPublic('/profile')}
+                                                aria-label={t('profile')}
+                                              >
+                                                <User className="w-5 h-5" />
+                                              </button>
+                                            </div>
+                  {/* Announcement Modal */}
+                  <Dialog open={showAnnouncement} onOpenChange={handleCloseAnnouncement}>
+                    <DialogContent className="max-w-md w-full rounded-2xl shadow-2xl bg-white p-0 overflow-hidden">
+                      <DialogHeader className="bg-gradient-to-r from-yellow-50 via-white to-blue-50 px-8 pt-8 pb-4 flex flex-col items-center">
+                        <DialogTitle className="text-2xl font-bold text-blue-700 mb-1 text-center">
+                          {importantAnnouncement.title}
+                        </DialogTitle>
+                        <DialogDescription className="text-gray-500 text-center mb-2">
+                          {importantAnnouncement.date}
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="px-8 pb-8 max-h-[60vh] overflow-y-auto text-gray-700 text-base text-center">
+                        {importantAnnouncement.message}
+                      </div>
+                      <div className="flex justify-center pb-6">
+                        <Button onClick={handleCloseAnnouncement} className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-lg mt-4">Close</Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
             </div>
           </div>
         </div>

@@ -1,6 +1,8 @@
 import { useToast } from '@/components/ui/use-toast';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useGameState } from '@/hooks/useGameState';
+
+import { PiOfficialSDKService } from './piOfficialSDKService';
 import { useWallet } from '@/context/WalletContext';
 
 export interface PaymentItem {
@@ -155,8 +157,23 @@ export class UnifiedShopPaymentService {
             reject(new Error('Payment was cancelled'));
           },
 
-          onError: (error: any, payment?: any) => {
+          onError: async (error: any, payment?: any) => {
             console.error('❌ Shop payment error:', error, payment);
+            // Auto-cancel logic for pending payment error
+            const pendingPaymentMsg = 'You already have a pending payment on this app. Please complete or cancel it before starting a new one.';
+            if (error && typeof error.message === 'string' && error.message.includes(pendingPaymentMsg)) {
+              try {
+                if (payment && payment.identifier) {
+                  const piSdk = PiOfficialSDKService.getInstance();
+                  await piSdk.cancelPayment(payment.identifier);
+                  console.warn('⚠️ Auto-cancelled pending Pi payment:', payment.identifier);
+                }
+              } catch (cancelErr) {
+                console.error('❌ Failed to auto-cancel pending payment:', cancelErr);
+              }
+              reject(new Error('A previous Pi payment was pending and has been auto-cancelled. Please try again.'));
+              return;
+            }
             reject(new Error(error.message || 'Payment failed'));
           }
         };

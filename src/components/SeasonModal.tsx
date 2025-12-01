@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { useTheme } from '../hooks/useTheme';
 import { seasonManager, Season, SEASON_CONFIGS } from '../utils/seasonManager';
+import inventoryService from '../services/inventoryService';
 import { useSeasonManager } from '../hooks/useSeasonManager';
 
 interface SeasonModalProps {
@@ -17,6 +18,13 @@ const SeasonModal: React.FC<SeasonModalProps> = ({ isOpen, onClose }) => {
   const { currentSeason, seasonProgress, timeUntilNext, changeSeason, resetToRealSeason } = useSeasonManager();
   const [seasonError, setSeasonError] = useState<string | null>(null);
   const [isChangingSeason, setIsChangingSeason] = useState(false);
+  const [subscriptionType, setSubscriptionType] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Get subscription type on mount
+    const status = inventoryService.getSubscriptionStatus();
+    setSubscriptionType(status.subscriptionType ? status.subscriptionType.toLowerCase() : null);
+  }, []);
 
   // Cleanup when modal closes
   useEffect(() => {
@@ -52,11 +60,45 @@ const SeasonModal: React.FC<SeasonModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
+  // Subscription gating logic
+  // Plan: starter = 2 seasons, premium = 4, ultimate = all 11
+  const plan = subscriptionType;
+  let allowedSeasons: Season[] = [];
+  if (plan === 'ultimate') {
+    allowedSeasons = [
+      'spring', 'summer', 'autumn', 'winter',
+      'thunder', 'rain', 'fog', 'storm',
+      'christmas', 'newyear', 'halloween'
+    ];
+  } else if (plan === 'premium') {
+    allowedSeasons = ['spring', 'summer', 'autumn', 'winter', 'thunder', 'rain'];
+  } else if (plan === 'starter') {
+    allowedSeasons = ['spring', 'summer'];
+  }
+
+  // If no subscription, block modal
+  if (!plan) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-md w-full p-6 text-center">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-red-600">Subscription Required</DialogTitle>
+          </DialogHeader>
+          <div className="my-6 text-lg">You need an active subscription plan to change the season.<br/>Subscribe to unlock seasonal weather features!</div>
+          <Button onClick={onClose} className="w-full h-12 text-base font-semibold bg-gray-600 hover:bg-gray-700 text-white">Close</Button>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`max-w-2xl w-full backdrop-blur-md rounded-xl p-6 ${
-        isDark ? 'bg-gray-800/95 text-white' : 'bg-white/95 text-gray-900'
-      }`}>
+      <DialogContent
+        className={`max-w-2xl w-full max-h-[90vh] overflow-y-auto backdrop-blur-md rounded-xl p-6 ${
+          isDark ? 'bg-gray-800/95 text-white' : 'bg-white/95 text-gray-900'
+        }`}
+        style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
+      >
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className={`text-3xl font-bold ${isDark ? 'text-blue-300' : 'text-blue-700'}`}>
@@ -134,11 +176,11 @@ const SeasonModal: React.FC<SeasonModalProps> = ({ isOpen, onClose }) => {
 
           {/* Season Selection */}
           <div className="space-y-6">
-            {/* Basic Seasons */}
+            {/* Season Selection - Gated by Subscription */}
             <div>
-              <h4 className="text-lg font-semibold mb-4 text-gray-700">🌱 Basic Seasons</h4>
+              <h4 className="text-lg font-semibold mb-4 text-gray-700">🌱 Unlocked Seasons</h4>
               <div className="grid grid-cols-2 gap-3">
-                {['spring', 'summer', 'autumn', 'winter'].map((seasonId) => {
+                {allowedSeasons.map((seasonId) => {
                   const season = SEASON_CONFIGS[seasonId as Season];
                   return (
                     <Button
@@ -159,59 +201,9 @@ const SeasonModal: React.FC<SeasonModalProps> = ({ isOpen, onClose }) => {
                   );
                 })}
               </div>
-            </div>
-
-            {/* Weather Seasons */}
-            <div>
-              <h4 className="text-lg font-semibold mb-4 text-gray-700">⛈️ Weather Effects</h4>
-              <div className="grid grid-cols-2 gap-3">
-                {['thunder', 'rain', 'fog', 'storm'].map((seasonId) => {
-                  const season = SEASON_CONFIGS[seasonId as Season];
-                  return (
-                    <Button
-                      key={season.id}
-                      variant={currentSeason === season.id ? "default" : "outline"}
-                      size="lg"
-                      onClick={() => handleSeasonChange(season.id)}
-                      disabled={isChangingSeason}
-                      className={`h-16 text-base font-semibold ${
-                        currentSeason === season.id 
-                          ? 'bg-blue-500 text-white shadow-lg' 
-                          : isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-white text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      <span className="text-2xl mr-2">{season.emoji}</span>
-                      {season.name}
-                    </Button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Holiday Seasons */}
-            <div>
-              <h4 className="text-lg font-semibold mb-4 text-gray-700">🎉 Special Events</h4>
-              <div className="grid grid-cols-1 gap-3">
-                {['christmas', 'newyear', 'halloween'].map((seasonId) => {
-                  const season = SEASON_CONFIGS[seasonId as Season];
-                  return (
-                    <Button
-                      key={season.id}
-                      variant={currentSeason === season.id ? "default" : "outline"}
-                      size="lg"
-                      onClick={() => handleSeasonChange(season.id)}
-                      disabled={isChangingSeason}
-                      className={`h-16 text-base font-semibold ${
-                        currentSeason === season.id 
-                          ? 'bg-blue-500 text-white shadow-lg' 
-                          : isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-white text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      <span className="text-2xl mr-2">{season.emoji}</span>
-                      {season.name}
-                    </Button>
-                  );
-                })}
+              <div className="text-sm text-gray-500 text-center mt-2">
+                {plan === 'starter' && 'Upgrade to Premium or Ultimate to unlock more seasons!'}
+                {plan === 'premium' && 'Upgrade to Ultimate to unlock all seasons!'}
               </div>
             </div>
 
