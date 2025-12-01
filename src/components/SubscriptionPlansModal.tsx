@@ -321,6 +321,16 @@ const SubscriptionPaymentModal = ({ isOpen, onClose, plan, onSuccess }) => {
                   <ShieldCheck className="w-6 h-6 mr-2 text-white drop-shadow" />
                   {paying ? 'Processing...' : `Pay ${plan.price} with Pi`}
                 </Button>
+                <Button
+                  className="w-full bg-green-500 text-white font-extrabold py-3 rounded-xl shadow-lg text-lg mb-3 flex items-center justify-center gap-2 hover:bg-green-600 active:scale-95 border-2 border-green-700"
+                  onClick={() => {
+                    // MOCK: Simulate successful Pi payment and trigger reward modal
+                    setSuccess(true);
+                    setShowRewardModal(true);
+                  }}
+                >
+                  🧪 Mock Pi Payment (Test)
+                </Button>
                 {/* Pi Network security note */}
                 <div className="w-full flex items-center justify-center mt-2 mb-4">
                   <span className="flex items-center gap-2 text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 shadow-sm">

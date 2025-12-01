@@ -1946,6 +1946,27 @@ const ShopPage: React.FC = () => {
                                             {renderPriceWithDiscount(item)}
                                           </span>
                                         )}
+                                        {/* MOCK BUTTON: Simulate Pi payment for testing */}
+                                        <button
+                                          className="ml-2 px-2 py-1 bg-green-500 text-white rounded font-bold text-xs hover:bg-green-600"
+                                          onClick={() => {
+                                            // Simulate successful Pi payment and show receive modal
+                                            setShowReceiveModal(true);
+                                            setReceiveItem({
+                                              id: item.id,
+                                              name: item.name,
+                                              type: item.type,
+                                              quantity: 1,
+                                              rarity: item.rarity,
+                                              image: item.image,
+                                              description: item.description,
+                                              price: item.piPrice,
+                                              currency: 'pi',
+                                            });
+                                          }}
+                                        >
+                                          🧪 Mock Pi Payment
+                                        </button>
                                       </div>
                                     )}
                                     

@@ -604,13 +604,13 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     console.log('⚠️ HomePage - Using profile fallback username:', fallbackUsername);
     
     // Priority 1: User's selected bird character
+    // Priority 2: profile.avatar_url (always highest priority for avatar)
     let avatar = 'flappy-logo.png';
-    if (profile?.selected_bird_skin) {
-      avatar = getBirdImageSrc(profile.selected_bird_skin);
-    } else if (profile?.avatar_url) {
+    if (profile?.avatar_url && profile.avatar_url.trim() !== '') {
       avatar = profile.avatar_url;
+    } else if (profile?.selected_bird_skin) {
+      avatar = getBirdImageSrc(profile.selected_bird_skin);
     }
-    
     return {
       username: fallbackUsername,
       avatar: avatar,
