@@ -1066,6 +1066,27 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({ isOpen,
                           'Pay with Pi'
                         )}
                       </Button>
+                      {/* Mock Pi Payment for Subscription */}
+                      <button
+                        className="ml-2 px-2 py-1 bg-green-500 text-white rounded font-bold text-xs hover:bg-green-600"
+                        onClick={() => {
+                          // Simulate successful subscription purchase and show reward modal
+                          const planRewards = getPlanRewards(plan.id);
+                          setRewards(planRewards);
+                          setSuccess(true);
+                          setShowRewardModal(true);
+                          if (plan.coinReward) {
+                            addCoins(plan.coinReward);
+                          }
+                          if (typeof onPurchase === 'function') onPurchase(plan);
+                          toast({
+                            title: 'Mock Subscription Activated! 🎉',
+                            description: `${plan.name} subscription is now active (mock).`
+                          });
+                        }}
+                      >
+                        🧪 Mock Pi Payment
+                      </button>
                     </div>
                   </div>
                   

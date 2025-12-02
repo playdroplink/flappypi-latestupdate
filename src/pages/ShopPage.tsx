@@ -1957,7 +1957,7 @@ const ShopPage: React.FC = () => {
                                               name: item.name,
                                               type: item.type,
                                               quantity: 1,
-                                              rarity: item.rarity,
+                                              rarity: 'rarity' in item ? item.rarity : undefined,
                                               image: item.image,
                                               description: item.description,
                                               price: item.piPrice,
@@ -1976,7 +1976,7 @@ const ShopPage: React.FC = () => {
                                         <>
                                           {equipped ? (
                                             <>
-                                              <ShopButton type="equip" onClick={() => {}} disabled className="w-full">
+                                              <ShopButton type="equip" onClick={() => {}} disabled className="w-full bg-green-500 text-white">
                                                 ✓ Equipped
                                               </ShopButton>
                                               <ShopButton type="unequip" onClick={() => handleUnequipSkin(item.id)} className="w-full">
@@ -1984,7 +1984,7 @@ const ShopPage: React.FC = () => {
                                               </ShopButton>
                                             </>
                                           ) : (
-                                            <ShopButton type="equip" onClick={() => handleEquipSkin(item.id)} className="w-full">
+                                            <ShopButton type="equip" onClick={() => handleEquipSkin(item.id)} className="w-full bg-green-500 text-white">
                                               Equip
                                             </ShopButton>
                                           )}
@@ -2113,6 +2113,26 @@ const ShopPage: React.FC = () => {
                                           </ShopButton>
                                         </TooltipTrigger>
                                       </Tooltip>
+                                      {/* Mock Pi Payment */}
+                                      <button
+                                        className="ml-2 px-2 py-1 bg-green-500 text-white rounded font-bold text-xs hover:bg-green-600"
+                                        onClick={() => {
+                                          setShowReceiveModal(true);
+                                          setReceiveItem({
+                                            id: item.id,
+                                            name: item.name,
+                                            type: item.type,
+                                            quantity: getQuantity(item.id),
+                                            rarity: 'rarity' in item ? item.rarity : undefined,
+                                            image: item.image,
+                                            description: item.description,
+                                            price: item.piPrice,
+                                            currency: 'pi',
+                                          });
+                                        }}
+                                      >
+                                        🧪 Mock Pi Payment
+                                      </button>
                                     </div>
                                   </div>
                                 </div>
@@ -2169,6 +2189,26 @@ const ShopPage: React.FC = () => {
                                         </ShopButton>
                                       </TooltipTrigger>
                                     </Tooltip>
+                                    {/* Mock Pi Payment */}
+                                    <button
+                                      className="ml-2 px-2 py-1 bg-green-500 text-white rounded font-bold text-xs hover:bg-green-600"
+                                      onClick={() => {
+                                        setShowReceiveModal(true);
+                                        setReceiveItem({
+                                          id: pkg.id,
+                                          name: pkg.name,
+                                          type: 'coins',
+                                          quantity: getQuantity(pkg.id),
+                                          rarity: 'rarity' in pkg ? pkg.rarity : undefined,
+                                          image: '/flappycoins.png',
+                                          description: pkg.description,
+                                          price: pkg.piPrice,
+                                          currency: 'pi',
+                                        });
+                                      }}
+                                    >
+                                      🧪 Mock Pi Payment
+                                    </button>
                                   </div>
                                 </div>
                               );
@@ -2241,6 +2281,26 @@ const ShopPage: React.FC = () => {
                                           </ShopButton>
                                         </TooltipTrigger>
                                       </Tooltip>
+                                      {/* Mock Pi Payment */}
+                                      <button
+                                        className="ml-2 px-2 py-1 bg-green-500 text-white rounded font-bold text-xs hover:bg-green-600"
+                                        onClick={() => {
+                                          setShowReceiveModal(true);
+                                          setReceiveItem({
+                                            id: box.id,
+                                            name: box.name,
+                                            type: 'mystery-box',
+                                            quantity: getQuantity(box.id),
+                                            rarity: 'rarity' in box ? box.rarity : undefined,
+                                            image: box.image,
+                                            description: box.description,
+                                            price: box.piPrice,
+                                            currency: 'pi',
+                                          });
+                                        }}
+                                      >
+                                        🧪 Mock Pi Payment
+                                      </button>
                                     </div>
                                   </div>
                                 </div>
@@ -2323,6 +2383,26 @@ const ShopPage: React.FC = () => {
                                           </ShopButton>
                                         </TooltipTrigger>
                                       </Tooltip>
+                                      {/* Mock Pi Payment */}
+                                      <button
+                                        className="ml-2 px-2 py-1 bg-green-500 text-white rounded font-bold text-xs hover:bg-green-600"
+                                        onClick={() => {
+                                          setShowReceiveModal(true);
+                                          setReceiveItem({
+                                            id: bundle.id,
+                                            name: bundle.name + ' Bundle',
+                                            type: 'bundle',
+                                            quantity: getQuantity(bundle.id),
+                                            rarity: 'rarity' in bundle ? bundle.rarity : undefined,
+                                            image: bundle.image,
+                                            description: t('bundleDescription'),
+                                            price: bundle.piPrice,
+                                            currency: 'pi',
+                                          });
+                                        }}
+                                      >
+                                        🧪 Mock Pi Payment
+                                      </button>
                                     </div>
                                   </div>
                                 </div>

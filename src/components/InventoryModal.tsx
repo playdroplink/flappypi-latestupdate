@@ -75,7 +75,7 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ open, onClose }) => {
 
   const handleClaimRewards = () => {
     setShowUnclaimedModal(false);
-    const rewards = inventoryService.claimSubscriptionRewards();
+    const rewards = inventoryService.claimSubscriptionRewards(undefined);
     setMysteryBoxRewards(rewards);
     setShowMysteryBoxModal(true);
     loadInventoryData();
