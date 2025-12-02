@@ -60,7 +60,8 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
   planName = 'Subscription',
   planId,
   onClaim,
-  isPreview = false
+  isPreview = false,
+  suppressIfAllOwned = false
 }) => {
   const { toast } = useToast();
   const [claimed, setClaimed] = useState(false);

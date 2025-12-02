@@ -174,7 +174,7 @@ const ItemReceiveModal: React.FC<ItemReceiveModalProps> = ({ isOpen, onClose, it
               onClick={handleGoToInventory}
               className="flex-1 bg-green-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-green-600 transition-all duration-200"
             >
-              📦 Go to Inventory
+              📦 Inventory
             </button>
           )}
         </div>

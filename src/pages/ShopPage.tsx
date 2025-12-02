@@ -2401,13 +2401,12 @@ const ShopPage: React.FC = () => {
                             )}
                           </div>
                           <ShopButton 
-                            type="equip" 
+                            type="equip"
                             onClick={() => {
                               setShowReceiveModal(false);
-                              navigate('/inventory');
                             }}
                           >
-                            Go to Inventory
+                            Close
                           </ShopButton>
                         </>
                       )}

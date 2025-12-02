@@ -30,7 +30,7 @@ const ReceiveItemModal: React.FC<ReceiveItemModalProps> = ({ isOpen, onClose, it
             <div className="text-lg font-semibold text-purple-700 mb-2">x{item.quantity}</div>
           )}
         </div>
-        <Button onClick={onGoToInventory} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-lg mt-2">Go to Inventory</Button>
+        <Button onClick={onClose} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-lg mt-2">Close</Button>
       </DialogContent>
     </Dialog>
   );
