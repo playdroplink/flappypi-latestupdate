@@ -127,7 +127,16 @@ const RewardModal: React.FC<RewardModalProps> = ({ open, onClose, rewards, onCla
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto relative">
+        {/* Close (X) button */}
+        <button
+          aria-label="Close"
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none"
+          style={{ lineHeight: 1 }}
+        >
+          ×
+        </button>
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
             {claimed ? '🎉 Rewards Claimed!' : '🎁 Subscription Rewards!'}

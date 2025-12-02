@@ -1,3 +1,8 @@
+// Helper to safely map mode to allowed types for legacy APIs/components
+function toClassicChallengeEndlessMode(mode: string): 'classic' | 'endless' | 'challenge' {
+  if (mode === 'endless' || mode === 'classic' || mode === 'challenge') return mode;
+  return 'classic';
+}
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Pipe from './Pipe';
 // WeatherEffect import removed - weather effects disabled
@@ -3630,7 +3635,7 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
     // Record game session in history
     if (sessionStartTime > 0 && score > 0) {
       recordGameSession({
-        gameMode: mode,
+        gameMode: toClassicChallengeEndlessMode(mode),
         score,
         level: getUserLevel(score),
         coinsEarned: gameStats.coinsCollected,
@@ -4048,7 +4053,7 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
       setGameSessionId(sessionId);
       
       // Start real-time scoring session
-      startGameSession(safeMode, safeChallenge?.id);
+      startGameSession(toClassicChallengeEndlessMode(safeMode), safeChallenge?.id);
       
       // Dispatch game start event for music gesture detection
       window.dispatchEvent(new CustomEvent('game-started'));
@@ -4184,7 +4189,7 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
           }}
         >
           {/* Background - Only use Background component for special effects */}
-          {mode !== 'classic' && <Background mode={mode} scene={scene} effect={effect} />}
+          {mode !== 'classic' && <Background mode={toClassicChallengeEndlessMode(mode)} scene={scene} effect={effect} />}
           
           
           {/* Ice Slide Mode - Winter Effects */}
@@ -5796,7 +5801,7 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
             <FooterPowerupBar
               powerUps={footerPowerUps}
               onActivate={handleActivatePowerup}
-              gameMode={mode}
+              gameMode={toClassicChallengeEndlessMode(mode)}
               level={getUserLevel(score)}
               levelLabel={getLevelLabel(score)}
               openInventory={handleOpenInventory}

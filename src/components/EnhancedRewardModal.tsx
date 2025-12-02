@@ -17,6 +17,7 @@ interface EnhancedRewardModalProps {
   planId?: string;
   onClaim?: () => void;
   isPreview?: boolean;
+  suppressIfAllOwned?: boolean; // new prop
 }
 
 const getRarityColor = (rarity: string) => {
@@ -199,6 +200,39 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
 
   if (!open) return null;
 
+
+  // Deduplicate rewards by id+name+type and sum quantity
+  const dedupedRewards = React.useMemo(() => {
+    const map = new Map();
+    for (const reward of rewards) {
+      const key = `${reward.id}|${reward.name}|${reward.type}`;
+      if (map.has(key)) {
+        map.get(key).quantity += reward.quantity;
+      } else {
+        map.set(key, { ...reward });
+      }
+    }
+    return Array.from(map.values());
+  }, [rewards]);
+
+  // If suppressIfAllOwned is true, check inventory and suppress modal if all rewards are already owned
+  const shouldSuppress = React.useMemo(() => {
+    if (!dedupedRewards.length || !suppressIfAllOwned) return false;
+    try {
+      const inv = inventoryService.getInventory ? inventoryService.getInventory() : [];
+      return dedupedRewards.every(r => inv.some(i => i.id === r.id));
+    } catch {
+      return false;
+    }
+  }, [dedupedRewards, suppressIfAllOwned]);
+
+  if (shouldSuppress) return null;
+
+  // Navigation to inventory
+  const goToInventory = () => {
+    window.location.href = '/inventory';
+  };
+
   return (
     <>
       {/* Main Reward Modal */}
@@ -238,7 +272,7 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
           
           {showRewards && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              {rewards.map((reward, index) => (
+              {dedupedRewards.map((reward, index) => (
                 <Card
                   key={index}
                   className={`border-2 transition-all duration-300 hover:scale-105 cursor-pointer ${getRarityColor(reward.rarity)}`}
@@ -296,12 +330,20 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
                 🎉 Claim All Rewards
               </Button>
             ) : (
-              <Button
-                onClick={onClose}
-                className="flex-1 bg-green-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-green-600 transition-all duration-200"
-              >
-                ✅ Done
-              </Button>
+              <>
+                <Button
+                  onClick={onClose}
+                  className="flex-1 bg-green-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-green-600 transition-all duration-200"
+                >
+                  ✅ Done
+                </Button>
+                <Button
+                  onClick={goToInventory}
+                  className="flex-1 bg-blue-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-blue-600 transition-all duration-200 ml-2"
+                >
+                  📦 Go to Inventory
+                </Button>
+              </>
             )}
           </div>
         </div>
