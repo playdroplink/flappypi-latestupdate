@@ -51,6 +51,17 @@ const ItemReceiveModal: React.FC<ItemReceiveModalProps> = ({ isOpen, onClose, it
         image: item.image,
         description: item.description
       });
+
+      // If item is coins, update wallet balance
+      if (item.id === 'coins') {
+        const prevCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
+        const addAmount = typeof item.quantity === 'number' && item.quantity > 0 ? item.quantity : 1;
+        const newCoins = prevCoins + addAmount;
+        localStorage.setItem('flappypi-coins', newCoins.toString());
+        // Dispatch event so wallet UI updates
+        window.dispatchEvent(new Event('wallet-updated'));
+      }
+
       setClaimed(true);
       toast({
         title: 'Item Claimed! 🎉',

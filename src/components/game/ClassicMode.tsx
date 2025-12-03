@@ -1119,42 +1119,66 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
       setPowerUpParticles(particles);
       
       // Set power-up specific effects with enhanced durations
-      switch (powerUpId) {
-        case 'shield':
-          // Use the equipment system's activatePowerUp function
-          try {
-            await activatePowerUp('shield');
-            setShieldActive(true);
-            setPowerUpTimers(prev => ({ ...prev, shield: Date.now() + 15000 })); // Increased duration
-            createShieldActivationEffect();
-          } catch (error) {
-            // Fallback to local activation
+      try {
+        await activatePowerUp(powerUpId);
+        switch (powerUpId) {
+          case 'shield':
             setShieldActive(true);
             setPowerUpTimers(prev => ({ ...prev, shield: Date.now() + 15000 }));
             createShieldActivationEffect();
-          }
-          break;
-        case 'magnet':
-          setMagnetActive(true);
-          setPowerUpTimers(prev => ({ ...prev, magnet: Date.now() + 20000 })); // Increased duration
-          createMagnetActivationEffect();
-          break;
-        case 'coin_multiplier':
-          setCoinMultiplier(2);
-          setPowerUpTimers(prev => ({ ...prev, coin_multiplier: Date.now() + 25000 })); // Increased duration
-          createCoinMultiplierActivationEffect();
-          break;
-        case 'turbo_start':
-          setTurboActive(true);
-          setSpeedMultiplier(1.8); // Increased speed boost
-          setScoreMultiplier(2); // Double score when turbo is active
-          setPowerUpTimers(prev => ({ ...prev, turbo_start: Date.now() + 18000 })); // Increased duration
-          createTurboActivationEffect();
-          break;
-        case 'extra_life':
-          setExtraLives(prev => prev + 1);
-          createExtraLifeActivationEffect();
-          break;
+            break;
+          case 'magnet':
+            setMagnetActive(true);
+            setPowerUpTimers(prev => ({ ...prev, magnet: Date.now() + 20000 }));
+            createMagnetActivationEffect();
+            break;
+          case 'coin_multiplier':
+            setCoinMultiplier(2);
+            setPowerUpTimers(prev => ({ ...prev, coin_multiplier: Date.now() + 25000 }));
+            createCoinMultiplierActivationEffect();
+            break;
+          case 'turbo_start':
+            setTurboActive(true);
+            setSpeedMultiplier(1.8);
+            setScoreMultiplier(2);
+            setPowerUpTimers(prev => ({ ...prev, turbo_start: Date.now() + 18000 }));
+            createTurboActivationEffect();
+            break;
+          case 'extra_life':
+            setExtraLives(prev => prev + 1);
+            createExtraLifeActivationEffect();
+            break;
+        }
+      } catch (error) {
+        // Fallback to local activation if central activation fails
+        switch (powerUpId) {
+          case 'shield':
+            setShieldActive(true);
+            setPowerUpTimers(prev => ({ ...prev, shield: Date.now() + 15000 }));
+            createShieldActivationEffect();
+            break;
+          case 'magnet':
+            setMagnetActive(true);
+            setPowerUpTimers(prev => ({ ...prev, magnet: Date.now() + 20000 }));
+            createMagnetActivationEffect();
+            break;
+          case 'coin_multiplier':
+            setCoinMultiplier(2);
+            setPowerUpTimers(prev => ({ ...prev, coin_multiplier: Date.now() + 25000 }));
+            createCoinMultiplierActivationEffect();
+            break;
+          case 'turbo_start':
+            setTurboActive(true);
+            setSpeedMultiplier(1.8);
+            setScoreMultiplier(2);
+            setPowerUpTimers(prev => ({ ...prev, turbo_start: Date.now() + 18000 }));
+            createTurboActivationEffect();
+            break;
+          case 'extra_life':
+            setExtraLives(prev => prev + 1);
+            createExtraLifeActivationEffect();
+            break;
+        }
       }
       
       // Enhanced combo system

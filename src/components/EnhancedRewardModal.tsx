@@ -69,6 +69,8 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
   const [previewReward, setPreviewReward] = useState<SubscriptionReward | null>(null);
   const [showPreview, setShowPreview] = useState(false);
 
+
+
   useEffect(() => {
     if (open && rewards.length > 0) {
       setShowRewards(true);
@@ -78,7 +80,14 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
     }
   }, [open, rewards]);
 
-  // Save unclaimed rewards when modal is closed without claiming
+  useEffect(() => {
+    if (planId && inventoryService.hasClaimedPlanRewards(planId) && open) {
+      onClose();
+    }
+  }, [planId, open, onClose]);
+
+  if (!open) return null;
+  if (shouldSuppress) return null;
   const handleClose = () => {
     if (!claimed && !isPreview && planId && rewards.length > 0) {
       // Save rewards as unclaimed
