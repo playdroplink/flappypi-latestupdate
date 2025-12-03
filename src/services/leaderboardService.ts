@@ -3,14 +3,18 @@
  * Handles all leaderboard-related API calls and score submissions
  */
 
-interface LeaderboardEntry {
+import { supabase } from '@/utils/supabaseClient';
+
+export interface LeaderboardEntry {
   id: string;
-  pi_user_id: string;
+  user_id: string;
   username: string;
-  score: number;
-  game_mode: 'classic' | 'screampi' | 'dinopi';
-  created_at: string;
+  high_score: number;
+  total_games: number;
+  total_coins: number;
   rank?: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface UserStats {
@@ -356,6 +360,38 @@ export class LeaderboardService {
         error: error instanceof Error ? error.message : 'Failed to fetch stats'
       };
     }
+  }
+
+  /**
+   * Save or update user score in Supabase leaderboard
+   */
+  static async saveUserScore({ user_id, username, score, coins }: { user_id: string; username: string; score: number; coins: number }) {
+    // Upsert logic: update if exists, insert if not
+    const { data, error } = await supabase
+      .from('leaderboard')
+      .upsert({
+        user_id,
+        username,
+        high_score: score,
+        total_coins: coins,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id' })
+      .select();
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * Fetch top N leaderboard entries
+   */
+  static async fetchLeaderboard(limit = 50) {
+    const { data, error } = await supabase
+      .from('leaderboard')
+      .select('*')
+      .order('high_score', { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    return data as LeaderboardEntry[];
   }
 }
 
