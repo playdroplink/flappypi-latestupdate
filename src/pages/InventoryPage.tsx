@@ -290,8 +290,8 @@ const InventoryPage: React.FC = () => {
                     </div>
                     <div className="text-purple-600">
                       {subscriptionStatus.activeSubscriptions.length > 1
-                        ? `Longest: ${subscriptionStatus.activeSubscriptions[0].daysRemaining} days remaining`
-                        : `${subscriptionStatus.activeSubscriptions[0].daysRemaining} days remaining`
+                        ? `Longest: ${subscriptionStatus.activeSubscriptions[0].daysRemaining ?? ''} days remaining`
+                        : `${subscriptionStatus.activeSubscriptions[0].daysRemaining ?? ''} days remaining`
                       }
                     </div>
                   </div>
@@ -465,10 +465,10 @@ const InventoryPage: React.FC = () => {
             <div>
               <h2 className={`text-base sm:text-lg font-bold mb-2 ${theme === 'night' ? 'text-white' : 'text-blue-900'} flex items-center gap-2`}>
                 <Gift className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
-                Mystery Boxes ({getInventoryByType('mystery_box').length})
+                Mystery Boxes ({getInventoryByType('mystery-box').length})
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-                {getInventoryByType('mystery_box').map((item) => (
+                {getInventoryByType('mystery-box').map((item) => (
                   <Card key={item.id} className="relative overflow-hidden border-2 border-purple-200 hover:shadow-lg transition-shadow">
                     <CardHeader className="pb-2 p-3 sm:p-4">
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">

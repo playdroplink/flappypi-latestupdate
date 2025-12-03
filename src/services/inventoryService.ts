@@ -18,7 +18,8 @@ const safeSupabaseCall = async (operation: () => Promise<any>) => {
 export interface InventoryItem {
   id: string;
   name: string;
-  type: 'skin' | 'powerup' | 'subscription' | 'mystery-box' | 'bundle' | 'random_bundle' | 'coins' | 'mysterybox';
+  type: 'skin' | 'powerup' | 'subscription' | 'mystery-box' | 'bundle' | 'random_bundle' | 'coins' | 'mysterybox' | 'accessory';
+    unlocked?: boolean;
   quantity: number;
   purchasedAt: string;
   expiresAt?: string;
@@ -26,6 +27,7 @@ export interface InventoryItem {
   image?: string;
   description?: string;
   equipped?: boolean;
+  daysRemaining?: number;
 }
 
 export interface PurchaseHistory {
@@ -312,7 +314,7 @@ class InventoryService {
       // Only add default skin if user has no skins at all
       if (item.type === 'skin' && (item.id === 'classic' || item.id === 'fluppy' || item.id === 'default')) {
         const hasAnySkin = inventory.some(i => i.type === 'skin');
-        if (hasAnySkin) return; // Don't add default skin if user already has any skin
+        if (hasAnySkin) return;
       }
       // Always use correct id/image for Fire Phoenix
       if (item.type === 'skin' && (item.id === 'inferno_phoenix' || item.name?.toLowerCase().includes('inferno'))) {
@@ -323,47 +325,26 @@ class InventoryService {
       const existingItem = inventory.find(i => i.id === item.id && i.type === item.type);
       if (existingItem) {
         if (item.type === 'skin') {
-          // For skins, never increment above 1
           existingItem.quantity = 1;
           if (item.equipped) {
             existingItem.equipped = true;
           }
+        } else if (item.type === 'accessory') {
+          // Accessories: only 1 per type, unlock if not already
+          existingItem.quantity = 1;
+          existingItem.unlocked = true;
         } else {
           // For other types, add quantity
           existingItem.quantity += item.quantity;
         }
       } else {
-        // For power-ups, check if we're at the 5-item limit
-        if (item.type === 'powerup') {
-          const powerUps = inventory.filter(i => i.type === 'powerup' && i.quantity > 0);
-          if (powerUps.length >= 5) {
-            // Find the power-up with the lowest quantity to replace
-            const lowestQuantityPowerUp = powerUps.reduce((lowest, current) => 
-              current.quantity < lowest.quantity ? current : lowest
-            );
-            
-            // If the new item has higher quantity than the lowest, replace it
-            if (item.quantity > lowestQuantityPowerUp.quantity) {
-              const index = inventory.findIndex(i => i.id === lowestQuantityPowerUp.id && i.type === 'powerup');
-              if (index !== -1) {
-                inventory.splice(index, 1);
-                console.log(`🔄 Replaced ${lowestQuantityPowerUp.name} (${lowestQuantityPowerUp.quantity}) with ${item.name} (${item.quantity})`);
-              }
-            } else {
-              // Don't add the new power-up if it has lower quantity
-              console.log(`⚠️ Skipping ${item.name} (${item.quantity}) - lower quantity than existing power-ups`);
-              return;
-            }
-          }
-        }
-        
-        // Add new item
+        // Add new item for all types
         const newItem: InventoryItem = {
           ...item,
-          quantity: item.type === 'skin' ? 1 : item.quantity, // Always 1 for skins
-          purchasedAt: new Date().toISOString()
+          quantity: item.type === 'skin' || item.type === 'accessory' ? 1 : item.quantity,
+          purchasedAt: new Date().toISOString(),
+          ...(item.type === 'accessory' ? { unlocked: true } : {})
         };
-        // Auto-equip first skin if no skin is currently equipped
         if (item.type === 'skin') {
           const hasEquippedSkin = inventory.some(i => i.type === 'skin' && i.equipped);
           if (!hasEquippedSkin) {

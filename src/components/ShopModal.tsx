@@ -61,7 +61,7 @@ const PaymentConfirmationModal: React.FC<{
       <div className="bg-white rounded-2xl max-w-md w-full p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <h3 className={`text-xl font-bold ${paymentType === 'pi' ? 'text-purple-600' : 'text-blue-600'}`}>
+          <h3 className="text-xl font-bold" style={{ color: paymentType === 'pi' ? '#8f38ff' : '#3b82f6' }}>
             {getModalTitle()}
           </h3>
           <Button
@@ -85,7 +85,7 @@ const PaymentConfirmationModal: React.FC<{
 
         {/* Confirmation Text */}
         <div className="text-center mb-6">
-          <h4 className={`text-lg font-semibold mb-2 ${paymentType === 'pi' ? 'text-purple-600' : 'text-blue-600'}`}>
+          <h4 className="text-lg font-semibold mb-2" style={{ color: paymentType === 'pi' ? '#8f38ff' : '#3b82f6' }}>
             Are you sure?
           </h4>
           <p className="text-gray-700">
@@ -98,13 +98,13 @@ const PaymentConfirmationModal: React.FC<{
           <Button
             onClick={onClose}
             variant="outline"
-            className={`flex-1 ${paymentType === 'pi' ? 'border-purple-200 text-purple-600 hover:bg-purple-50' : 'border-blue-200 text-blue-600 hover:bg-blue-50'}`}
+            className="flex-1" style={{ borderColor: paymentType === 'pi' ? '#8f38ff' : '#3b82f6', color: paymentType === 'pi' ? '#8f38ff' : '#3b82f6', background: paymentType === 'pi' ? '#f3e8ff' : '#e0f2fe' }}
           >
             No
           </Button>
           <Button
             onClick={onConfirm}
-            className={`flex-1 ${paymentType === 'pi' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+            className="flex-1" style={{ background: paymentType === 'pi' ? '#8f38ff' : '#3b82f6', color: '#fff' }}
           >
             Yes
           </Button>
@@ -113,7 +113,7 @@ const PaymentConfirmationModal: React.FC<{
         {/* Confirm Payment Button */}
         <Button
           onClick={onConfirm}
-          className={`w-full mb-3 ${paymentType === 'pi' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+          className="w-full mb-3" style={{ background: paymentType === 'pi' ? '#8f38ff' : '#3b82f6', color: '#fff' }}
         >
           Confirm {paymentType === 'pi' ? 'Pi' : 'Flappy Coin'} Payment
         </Button>
@@ -231,25 +231,50 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
       });
 
       if (result.success) {
-        // Add item to inventory using proper inventory service
+        // Build inventory item for all types
         const inventoryItem = {
           id: item.id,
           name: item.name,
           type: item.type || 'skin',
-          image: item.image, // Use the GIF image from shop items
+          image: item.image,
           description: item.description,
           rarity: item.rarity,
           quantity: 1,
-          equipped: false
+          equipped: item.type === 'skin' ? false : undefined
         };
 
-        // Save to inventory service
-        inventoryService.saveToInventory(inventoryItem);
+        // Save to inventory for all except coins
+        if (inventoryItem.type !== 'coins') {
+          inventoryService.saveToInventory(inventoryItem);
+        }
 
-        // Also keep in ownedSkins for backwards compatibility
-        const newOwnedSkins = [...ownedSkins, item.id];
-        setOwnedSkins(newOwnedSkins);
-        localStorage.setItem('flappypi-owned-skins', JSON.stringify(newOwnedSkins));
+        // Update localStorage ownership arrays
+        if (inventoryItem.type === 'skin') {
+          const newOwnedSkins = [...ownedSkins, item.id];
+          setOwnedSkins(newOwnedSkins);
+          localStorage.setItem('flappypi-owned-skins', JSON.stringify(newOwnedSkins));
+        } else if (inventoryItem.type === 'powerup') {
+          const ownedPowerups = JSON.parse(localStorage.getItem('flappypi-owned-powerups') || '[]');
+          const newOwnedPowerups = [...ownedPowerups, item.id];
+          localStorage.setItem('flappypi-owned-powerups', JSON.stringify(newOwnedPowerups));
+        } else if (inventoryItem.type === 'bundle') {
+          const ownedBundles = JSON.parse(localStorage.getItem('flappypi-owned-bundles') || '[]');
+          const newOwnedBundles = [...ownedBundles, item.id];
+          localStorage.setItem('flappypi-owned-bundles', JSON.stringify(newOwnedBundles));
+        } else if (inventoryItem.type === 'mysterybox' || inventoryItem.type === 'mystery-box') {
+          const ownedMysteryBoxes = JSON.parse(localStorage.getItem('flappypi-owned-mysteryboxes') || '[]');
+          const newOwnedMysteryBoxes = [...ownedMysteryBoxes, item.id];
+          localStorage.setItem('flappypi-owned-mysteryboxes', JSON.stringify(newOwnedMysteryBoxes));
+        } else if (inventoryItem.type === 'accessory') {
+          const ownedAccessories = JSON.parse(localStorage.getItem('flappypi-owned-accessories') || '[]');
+          const newOwnedAccessories = [...ownedAccessories, item.id];
+          localStorage.setItem('flappypi-owned-accessories', JSON.stringify(newOwnedAccessories));
+        }
+
+        // Flappy Coins: update wallet only
+        if (inventoryItem.type === 'coins') {
+          // Coins are handled by setCoins above
+        }
 
         toast({
           title: "Purchase Successful! 🎉",
@@ -513,7 +538,7 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
                      <div className="flex items-center gap-3">
-             <ShoppingCart className="w-6 h-6 text-blue-600" />
+             <ShoppingCart className="w-6 h-6" style={{ color: '#3b82f6' }} />
              <h2 className="text-2xl font-bold text-gray-900">
                Shop
                <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
@@ -533,14 +558,14 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
 
         <div className="p-6">
           {/* User Info */}
-          <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+          <div className="mb-6 p-4 rounded-lg" style={{ background: '#e0f2fe' }}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-blue-600">Your Balance</p>
-                <p className="text-2xl font-bold text-blue-900">{coins.toLocaleString()} Coins</p>
+                <p className="text-sm" style={{ color: '#3b82f6' }}>Your Balance</p>
+                <p className="text-2xl font-bold" style={{ color: '#1e3a8a' }}>{coins.toLocaleString()} Coins</p>
               </div>
                              <div className="text-right">
-                 <p className="text-sm text-blue-600">
+                 <p className="text-sm" style={{ color: '#3b82f6' }}>
                    {PI_CONFIG.isSandbox() ? 'Sandbox Mode' : 'Pi Browser'}
                  </p>
                  <Badge variant={PI_CONFIG.isSandbox() ? "default" : (isPiBrowser ? "default" : "destructive")}>
@@ -558,21 +583,21 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Ad-Free */}
-              <Card className="border-2 border-blue-200 hover:border-blue-300 transition-colors">
+              <Card style={{ border: '2px solid #3b82f6' }}>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-blue-600" />
+                    <Zap className="w-5 h-5" style={{ color: '#3b82f6' }} />
                     Ad-Free Gaming
                   </CardTitle>
                   <CardDescription>Remove all ads for 7 days</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-blue-600 mb-4">5 Pi</div>
+                  <div className="text-2xl font-bold mb-4" style={{ color: '#3b82f6' }}>5 Pi</div>
                   <div className="space-y-2">
                     <Button 
                       onClick={handlePurchaseAdFree}
                       disabled={isProcessingPayment || !isPiBrowser}
-                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      className="w-full" style={{ background: '#3b82f6', color: '#fff' }}
                     >
                       {isProcessingPayment ? "Processing..." : "Buy with Pi"}
                     </Button>
@@ -581,21 +606,21 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
               </Card>
 
               {/* All Skins */}
-              <Card className="border-2 border-purple-200 hover:border-purple-300 transition-colors">
+              <Card style={{ border: '2px solid #8f38ff' }}>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <Star className="w-5 h-5 text-purple-600" />
+                    <Star className="w-5 h-5" style={{ color: '#8f38ff' }} />
                     All Skins Access
                   </CardTitle>
                   <CardDescription>Unlock all skins for 15 days</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-purple-600 mb-4">15 Pi</div>
+                  <div className="text-2xl font-bold mb-4" style={{ color: '#8f38ff' }}>15 Pi</div>
                   <div className="space-y-2">
                     <Button 
                       onClick={handlePurchaseAllSkins}
                       disabled={isProcessingPayment}
-                      className="w-full bg-purple-600 hover:bg-purple-700"
+                      className="w-full" style={{ background: '#8f38ff', color: '#fff' }}
                     >
                       {isProcessingPayment ? "Processing..." : "Buy with Pi"}
                     </Button>
@@ -655,7 +680,7 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
                   <CardContent className="pt-0">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-sm text-gray-600">{item.flappyCoinPrice} Coins</span>
-                      <span className="text-sm font-semibold text-blue-600">{item.piPrice} Pi</span>
+                      <span className="text-sm font-semibold" style={{ color: '#3b82f6' }}>{item.piPrice} Pi</span>
                     </div>
                     <div className="flex flex-col gap-2">
                       <div className="flex gap-2">
@@ -672,7 +697,7 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
                           onClick={() => handleBuyWithPi(item)}
                           disabled={isProcessingPayment || item.isOwned}
                           size="sm"
-                          className="flex-1 bg-blue-600 hover:bg-blue-700"
+                          className="flex-1" style={{ background: '#3b82f6', color: '#fff' }}
                         >
                           {item.isOwned ? "Owned" : "Buy Pi"}
                         </Button>
@@ -682,7 +707,7 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
                         disabled={item.isOwned}
                         size="sm"
                         variant="outline"
-                        className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-green-600"
+                        className="w-full" style={{ background: '#22c55e', color: '#fff', border: '2px solid #22c55e' }}
                       >
                         <QrCode className="w-3 h-3 mr-1" />
                         {item.isOwned ? "Owned" : "Manual Payment"}

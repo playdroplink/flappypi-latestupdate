@@ -45,8 +45,8 @@ const ItemReceiveModal: React.FC<ItemReceiveModalProps> = ({ isOpen, onClose, it
       inventoryService.saveToInventory({
         id: item.id,
         name: item.name,
-        type: item.type,
-        quantity: item.quantity,
+        type: item.type || 'powerup', // fallback for missing type
+        quantity: typeof item.quantity === 'number' && item.quantity > 0 ? item.quantity : 1, // fallback for missing/invalid quantity
         rarity: item.rarity,
         image: item.image,
         description: item.description
