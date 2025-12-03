@@ -231,16 +231,59 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
       });
 
       if (result.success) {
-        // Build inventory item for all types
+        // If the purchased item is a Flappy Coin pack, add coins to wallet and show claim modal
+        if (item.type === 'coins') {
+          const walletCoins = parseInt(localStorage.getItem('flappypi-coins') || '0');
+          let claimedAmount = 0;
+          if (item.amount) {
+            claimedAmount = item.amount;
+          } else if (item.fcAmount) {
+            claimedAmount = item.fcAmount;
+          } else if (item.flappyCoinPrice) {
+            claimedAmount = item.flappyCoinPrice;
+          } else if (item.coinAmount) {
+            claimedAmount = item.coinAmount;
+          } else if (item.quantity) {
+            claimedAmount = item.quantity;
+          }
+          // Fallback: try to parse from name (e.g., "FC500")
+          if (!claimedAmount && item.name) {
+            const match = item.name.match(/FC(\d+)/);
+            if (match) claimedAmount = parseInt(match[1], 10);
+          }
+          // Fallback: try to parse from description
+          if (!claimedAmount && item.description) {
+            const match = item.description.match(/FC(\d+)/);
+            if (match) claimedAmount = parseInt(match[1], 10);
+          }
+          const updatedWalletCoins = walletCoins + claimedAmount;
+          setCoins(updatedWalletCoins);
+          localStorage.setItem('flappypi-coins', updatedWalletCoins.toString());
+          toast({
+            title: "Coins Claimed! \ud83d\udcb0",
+            description: `${claimedAmount} Flappy Coins have been added to your wallet.`
+          });
+          return;
+        }
+
+        // Build inventory item for all other types
+        let itemType = item.type;
+        if (!itemType) {
+          if (["shield","magnet","extra_life","coin_multiplier","turbo_start"].includes(item.id)) {
+            itemType = "powerup";
+          } else {
+            itemType = "skin";
+          }
+        }
         const inventoryItem = {
           id: item.id,
           name: item.name,
-          type: item.type || 'skin',
+          type: itemType,
           image: item.image,
           description: item.description,
           rarity: item.rarity,
           quantity: 1,
-          equipped: item.type === 'skin' ? false : undefined
+          equipped: itemType === 'skin' ? false : undefined
         };
 
         // Save to inventory for all except coins
@@ -269,11 +312,6 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
           const ownedAccessories = JSON.parse(localStorage.getItem('flappypi-owned-accessories') || '[]');
           const newOwnedAccessories = [...ownedAccessories, item.id];
           localStorage.setItem('flappypi-owned-accessories', JSON.stringify(newOwnedAccessories));
-        }
-
-        // Flappy Coins: update wallet only
-        if (inventoryItem.type === 'coins') {
-          // Coins are handled by setCoins above
         }
 
         toast({
@@ -305,7 +343,21 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
       const newCoins = coins - coinPrice;
       setCoins(newCoins);
       localStorage.setItem('flappypi-coins', newCoins.toString());
-      
+
+      // If the purchased item is Flappy Coins, increment wallet balance
+      if (item.type === 'coins') {
+        const walletCoins = parseInt(localStorage.getItem('flappypi-coins') || '0');
+        const claimedAmount = item.amount || item.quantity || 0;
+        const updatedWalletCoins = walletCoins + claimedAmount;
+        setCoins(updatedWalletCoins);
+        localStorage.setItem('flappypi-coins', updatedWalletCoins.toString());
+        toast({
+          title: "Coins Claimed! \ud83d\udcb0",
+          description: `${claimedAmount} Flappy Coins have been added to your wallet.`
+        });
+        return;
+      }
+
       // Add item to inventory using proper inventory service
       const inventoryItem = {
         id: item.id,
@@ -325,9 +377,9 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
       const newOwnedSkins = [...ownedSkins, item.id];
       setOwnedSkins(newOwnedSkins);
       localStorage.setItem('flappypi-owned-skins', JSON.stringify(newOwnedSkins));
-      
+
       toast({
-        title: "Purchase Successful! 🎉",
+        title: "Purchase Successful! \ud83c\udf89",
         description: `${item.name} has been added to your collection.`
       });
     } else {
