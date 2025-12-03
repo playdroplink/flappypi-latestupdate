@@ -16,9 +16,17 @@ function getPiService() {
 // POST /api/payments/create - Create A2U payment (App -> User)
 router.post('/create', async (req, res) => {
 	try {
-		const { amount, memo, metadata, user_id } = req.body || {};
+		const { amount, memo, metadata, user_id, skin_id } = req.body || {};
 		if (!amount || !memo || !user_id) {
 			return res.status(400).json({ error: 'amount, memo and user_id are required' });
+		}
+		// If purchasing a skin, check supply and deduct
+		if (metadata && metadata.type === 'skin' && skin_id) {
+			const db = getPiService().db;
+			const purchaseSuccess = await db.purchaseSkinAndDeductSupply(skin_id, user_id);
+			if (!purchaseSuccess) {
+				return res.status(409).json({ success: false, error: 'Skin is sold out!' });
+			}
 		}
 		const pi = getPiService();
 		const paymentId = await pi.createPayment({ amount, memo, metadata, user_id });

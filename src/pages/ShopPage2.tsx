@@ -43,6 +43,7 @@ import { usePiAuth } from '../context/PiAuthContext';
 import { useUnifiedPayment } from '@/hooks/useUnifiedPayment';
 import UnifiedPaymentModal from '@/components/UnifiedPaymentModal';
 import { PaymentItem } from '@/services/unifiedShopPaymentService';
+import { supabase } from '@/utils/supabaseClient';
 
 type ShopTab = 'characters' | 'coins' | 'power-ups' | 'mystery-boxes' | 'bundles' | 'subscription' | 'pi-adnetwork';
 
@@ -196,11 +197,20 @@ const ShopPage: React.FC = () => {
 
   // Payment functions for shop items
   const handlePiPurchase = useCallback(async (item: ShopItem | CoinPackage | PowerUpItem | MysteryBoxItem) => {
+    // Use correct price for Pi payment
+    let piAmount = 'piPrice' in item ? item.piPrice : 0;
+    if ('promoPiPrice' in item && item.promoPiPrice && saleActive) {
+      piAmount = item.promoPiPrice;
+    }
+    // For ShopItem, use getEffectivePiPrice
+    if ('type' in item && item.type === 'skin') {
+      piAmount = getEffectivePiPrice(item as ShopItem);
+    }
     const paymentItem: PaymentItem = {
       id: item.id,
       name: item.name,
       type: item.type as any,
-      piPrice: item.piPrice,
+      piPrice: piAmount,
       coinPrice: 'coinPrice' in item ? item.coinPrice : undefined,
       image: item.image,
       description: item.description,
@@ -210,9 +220,8 @@ const ShopPage: React.FC = () => {
         originalItem: item
       }
     };
-    
     showPiPaymentModal(paymentItem);
-  }, [showPiPaymentModal]);
+  }, [showPiPaymentModal, saleActive]);
 
   const handleCoinPurchase = useCallback(async (item: ShopItem | CoinPackage | PowerUpItem | MysteryBoxItem) => {
     const paymentItem: PaymentItem = {
@@ -233,6 +242,39 @@ const ShopPage: React.FC = () => {
     showCoinPaymentModal(paymentItem);
   }, [showCoinPaymentModal]);
 
+  const [soldOutModalOpen, setSoldOutModalOpen] = useState(false);
+  const [soldOutSkin, setSoldOutSkin] = useState<ShopItem | null>(null);
+
+  // Fetch skin supply from Supabase and merge into shopItems
+  const fetchSkinSupply = async () => {
+    const { data, error } = await supabase.from('skin_supply').select('skin_id,current_supply');
+    if (error) {
+      console.error('Failed to fetch skin supply:', error);
+      return {};
+    }
+    // Map skin_id to current_supply
+    const supplyMap = {};
+    data.forEach(row => {
+      supplyMap[row.skin_id] = row.current_supply;
+    });
+    return supplyMap;
+  };
+
+  // Add this function to refresh supply after purchase
+  const refreshSkinSupply = async () => {
+    const supplyMap = await fetchSkinSupply();
+    setShopItems(prevItems => prevItems.map(item => {
+      if (item.type === 'skin') {
+        const current_supply = supplyMap[item.id];
+        return {
+          ...item,
+          current_supply: typeof current_supply === 'number' ? current_supply : item.current_supply
+        };
+      }
+      return item;
+    }));
+  };
+
   useEffect(() => {
     const fetchAndSetShopItems = async () => {
       setLoading(true);
@@ -244,12 +286,16 @@ const ShopPage: React.FC = () => {
           // In development, fallback to static data if backend fails
           fetchedItems = staticShopItems;
         }
+        // Fetch supply and merge
+        const supplyMap = await fetchSkinSupply();
         const mergedItems = initialShopItems.map(staticItem => {
           const fetchedItem = fetchedItems.find(fi => fi.id === staticItem.id);
+          const current_supply = supplyMap[staticItem.id];
           return {
             ...staticItem,
             ...fetchedItem,
-            isDefault: staticItem.isDefault
+            isDefault: staticItem.isDefault,
+            current_supply: typeof current_supply === 'number' ? current_supply : staticItem.supply || null
           };
         });
         setShopItems(mergedItems);
@@ -1421,7 +1467,7 @@ const ShopPage: React.FC = () => {
   const [receiveModalItem, setReceiveModalItem] = useState(null);
 
   // After successful payment (coin or Pi), show receive modal
-  const handlePurchaseSuccess = (item) => {
+  const handlePurchaseSuccess = async (item) => {
     // If Ultimate Plan, add Fire Phoenix skin
     if (item.id === 'ultimate-plan') {
       const infernoPhoenix: Omit<import('@/services/inventoryService').InventoryItem, 'purchasedAt'> = {

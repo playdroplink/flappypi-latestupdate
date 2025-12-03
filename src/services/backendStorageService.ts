@@ -58,6 +58,8 @@ export interface InventoryItem {
   metadata: any;
   created_at: string;
   updated_at: string;
+  serial_code?: string; // Unique serial code for NFT future support
+  rarity?: string; // Rarity tier: Common, Rare, Epic, Special, Legendary
 }
 
 export class BackendStorageService {

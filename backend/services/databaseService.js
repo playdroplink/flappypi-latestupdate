@@ -241,6 +241,34 @@ class DatabaseService {
       throw error;
     }
   }
+
+  /**
+   * Atomically purchase a skin and deduct supply
+   * @param {string} skinId - Skin ID
+   * @param {string} piUserId - Pi Network user ID
+   * @returns {Promise<boolean>} True if purchase succeeded, false if sold out
+   */
+  async purchaseSkinAndDeductSupply(skinId, piUserId) {
+    if (!this.supabase) {
+      console.warn('Database not available. Skin purchase not processed.');
+      return false;
+    }
+    try {
+      const { data, error } = await this.supabase.rpc('purchase_skin_and_deduct_supply', {
+        p_skin_id: skinId,
+        p_user_id: piUserId
+      });
+      if (error) {
+        console.error('Error purchasing skin:', error);
+        return false;
+      }
+      // Supabase RPC returns true/false
+      return data === true;
+    } catch (err) {
+      console.error('Database error purchasing skin:', err);
+      return false;
+    }
+  }
 }
 
 export default DatabaseService;

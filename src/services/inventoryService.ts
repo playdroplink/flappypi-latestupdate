@@ -4,6 +4,7 @@ import { powerUpItems } from '../constants/powerUpItems';
 import { getSkinNameById } from '@/utils/getSkinName';
 import { SubscriptionReward } from '@/constants/subscriptionRewards';
 import { supabase } from '../lib/supabase';
+import { generateSkinSerialCode, type SkinRarity } from '@/utils/serialCodeGenerator';
 
 // Add error handling wrapper
 const safeSupabaseCall = async (operation: () => Promise<any>) => {
@@ -28,6 +29,7 @@ export interface InventoryItem {
   description?: string;
   equipped?: boolean;
   daysRemaining?: number;
+  serialCode?: string; // Unique serial code for NFT future support (format: RARITY-SKINID-DATE-RANDOM)
 }
 
 export interface PurchaseHistory {
@@ -345,6 +347,16 @@ class InventoryService {
           purchasedAt: new Date().toISOString(),
           ...(item.type === 'accessory' ? { unlocked: true } : {})
         };
+        
+        // Generate serial code for skins (NFT future support)
+        if (item.type === 'skin' && !item.serialCode) {
+          const rarity = (item.rarity as SkinRarity) || 'Common';
+          const serialMetadata = generateSkinSerialCode(item.id, rarity);
+          newItem.serialCode = serialMetadata.serialCode;
+          newItem.rarity = rarity; // Ensure rarity is set
+          console.log(`🎫 Generated serial code for ${item.name}: ${serialMetadata.serialCode}`);
+        }
+        
         if (item.type === 'skin') {
           const hasEquippedSkin = inventory.some(i => i.type === 'skin' && i.equipped);
           if (!hasEquippedSkin) {
@@ -2845,6 +2857,83 @@ class InventoryService {
         itemCount: 0,
         syncStatus: 'error'
       };
+    }
+  }
+
+  /**
+   * Migrate existing skins to add serial codes (NFT future support)
+   * Assigns unique serial codes to all skins that don't have them
+   * @returns Number of skins updated
+   */
+  migrateSkinsWithSerialCodes(): number {
+    try {
+      const inventory = this.getInventory();
+      let updatedCount = 0;
+      
+      const updatedInventory = inventory.map((item) => {
+        // Only process skins without serial codes
+        if (item.type === 'skin' && !item.serialCode) {
+          const rarity = (item.rarity as SkinRarity) || 'Common';
+          const serialMetadata = generateSkinSerialCode(item.id, rarity);
+          
+          updatedCount++;
+          console.log(`🎫 Migrated ${item.name} with serial code: ${serialMetadata.serialCode}`);
+          
+          return {
+            ...item,
+            serialCode: serialMetadata.serialCode,
+            rarity: rarity, // Ensure rarity is set
+          };
+        }
+        return item;
+      });
+      
+      if (updatedCount > 0) {
+        localStorage.setItem('flappypi-inventory', JSON.stringify(updatedInventory));
+        console.log(`✅ Migration complete: ${updatedCount} skins updated with serial codes`);
+        
+        // Dispatch event for UI updates
+        window.dispatchEvent(new CustomEvent('inventory-migrated', { 
+          detail: { count: updatedCount, timestamp: new Date().toISOString() } 
+        }));
+      } else {
+        console.log('ℹ️ No skins to migrate - all skins already have serial codes');
+      }
+      
+      return updatedCount;
+    } catch (error) {
+      console.error('❌ Failed to migrate skins with serial codes:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Get all skins with their serial codes
+   * @returns Array of skins with serial code metadata
+   */
+  getSkinsWithSerialCodes(): Array<{
+    id: string;
+    name: string;
+    serialCode: string;
+    rarity: string;
+    purchasedAt: string;
+    equipped: boolean;
+  }> {
+    try {
+      const inventory = this.getInventory();
+      return inventory
+        .filter((item) => item.type === 'skin' && item.serialCode)
+        .map((item) => ({
+          id: item.id,
+          name: item.name,
+          serialCode: item.serialCode!,
+          rarity: item.rarity || 'Common',
+          purchasedAt: item.purchasedAt,
+          equipped: item.equipped || false,
+        }));
+    } catch (error) {
+      console.error('❌ Failed to get skins with serial codes:', error);
+      return [];
     }
   }
 }
