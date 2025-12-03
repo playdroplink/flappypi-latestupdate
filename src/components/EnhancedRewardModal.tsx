@@ -70,7 +70,6 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
   const [showPreview, setShowPreview] = useState(false);
 
 
-
   useEffect(() => {
     if (open && rewards.length > 0) {
       setShowRewards(true);
@@ -87,6 +86,32 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
   }, [planId, open, onClose]);
 
   if (!open) return null;
+
+  // Deduplicate rewards by id+name+type and sum quantity
+  const dedupedRewards = React.useMemo(() => {
+    const map = new Map();
+    for (const reward of rewards) {
+      const key = `${reward.id}|${reward.name}|${reward.type}`;
+      if (map.has(key)) {
+        map.get(key).quantity += reward.quantity;
+      } else {
+        map.set(key, { ...reward });
+      }
+    }
+    return Array.from(map.values());
+  }, [rewards]);
+
+  // If suppressIfAllOwned is true, check inventory and suppress modal if all rewards are already owned
+  const shouldSuppress = React.useMemo(() => {
+    if (!dedupedRewards.length || !suppressIfAllOwned) return false;
+    try {
+      const inv = inventoryService.getInventory ? inventoryService.getInventory() : [];
+      return dedupedRewards.every(r => inv.some(i => i.id === r.id));
+    } catch {
+      return false;
+    }
+  }, [dedupedRewards, suppressIfAllOwned]);
+
   if (shouldSuppress) return null;
   const handleClose = () => {
     if (!claimed && !isPreview && planId && rewards.length > 0) {
@@ -209,10 +234,8 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
   }, [planId, open, onClose]);
 
   if (!open) return null;
-
-
-  // Deduplicate rewards by id+name+type and sum quantity
-  const dedupedRewards = React.useMemo(() => {
+  // Deduplicate rewards by id+name+type and sum quantity (ALT)
+  const dedupedRewardsAlt = React.useMemo(() => {
     const map = new Map();
     for (const reward of rewards) {
       const key = `${reward.id}|${reward.name}|${reward.type}`;
@@ -224,19 +247,17 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
     }
     return Array.from(map.values());
   }, [rewards]);
-
-  // If suppressIfAllOwned is true, check inventory and suppress modal if all rewards are already owned
-  const shouldSuppress = React.useMemo(() => {
-    if (!dedupedRewards.length || !suppressIfAllOwned) return false;
+  // If suppressIfAllOwned is true, check inventory and suppress modal if all rewards are already owned (ALT)
+  const shouldSuppressAlt = React.useMemo(() => {
+    if (!dedupedRewardsAlt.length || !suppressIfAllOwned) return false;
     try {
       const inv = inventoryService.getInventory ? inventoryService.getInventory() : [];
-      return dedupedRewards.every(r => inv.some(i => i.id === r.id));
+      return dedupedRewardsAlt.every(r => inv.some(i => i.id === r.id));
     } catch {
       return false;
     }
-  }, [dedupedRewards, suppressIfAllOwned]);
-
-  if (shouldSuppress) return null;
+  }, [dedupedRewardsAlt, suppressIfAllOwned]);
+  if (shouldSuppressAlt) return null;
 
   // Navigation to inventory
   const goToInventory = () => {

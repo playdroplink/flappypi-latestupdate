@@ -1288,7 +1288,7 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
                                               </div>
                                               {/* Notification Bell */}
                                               <button
-                                                className={`${theme === 'night' ? 'bg-gray-800 hover:bg-gray-700 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'} relative rounded-full p-3 transition-all duration-200 hover:scale-105 shadow-md`}
+                                                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 text-lg font-semibold shadow-lg"
                                                 onClick={handleOpenAnnouncement}
                                                 aria-label="Notifications"
                                               >
@@ -1986,7 +1986,7 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
                   handleFLPYNotificationDismiss('dismiss');
                   navigate('/shop');
                 }}
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-3 text-lg font-semibold shadow-lg"
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 text-lg font-semibold shadow-lg"
               >
                 🛒 Shop Skins Now
               </Button>
