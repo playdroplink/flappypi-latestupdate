@@ -391,7 +391,7 @@ const InventoryPage: React.FC = () => {
                       {!item.equipped && (
                         <Button
                           onClick={() => handleEquipSkin(item.id)}
-                          className="w-full bg-purple-600 hover:bg-purple-700 text-xs sm:text-sm py-2"
+                          className="w-full bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm py-2"
                         >
                           Equip Skin
                         </Button>

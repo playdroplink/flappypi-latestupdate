@@ -239,7 +239,7 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ open, onClose }) => {
             )}
             <Button
               onClick={() => setShowSubscriptionPlansModal(true)}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold text-xs sm:text-sm px-2 sm:px-3 py-2 w-full sm:w-auto"
+              className="bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs sm:text-sm px-2 sm:px-3 py-2 w-full sm:w-auto"
             >
               <Crown className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               <span className="sm:inline">Subscribe</span>
@@ -295,10 +295,10 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ open, onClose }) => {
                         </div>
                         <Button
                           onClick={() => handleEquipSkin(item.id)}
-                          className="w-full bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm py-1 sm:py-2"
+                          className="w-full bg-blue-500 hover:bg-blue-600 text-xs sm:text-sm py-1 sm:py-2"
                           disabled={item.equipped}
                         >
-                          {item.equipped ? 'Equipped' : 'Equip'}
+                          {item.equipped ? 'Equipped' : 'Equip Skin'}
                         </Button>
                       </CardContent>
                     </Card>

@@ -15,7 +15,7 @@ const WelcomeUserModal = ({ open, onClose }: { open: boolean; onClose: () => voi
         <p className="text-yellow-900 mb-6">Ready to start your adventure? Tap <b>Skip</b> to begin!</p>
         <button
           onClick={onClose}
-          className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white font-bold px-8 py-3 rounded-xl shadow-lg hover:scale-105 transition-all duration-200"
+          className="bg-yellow-500 text-white font-bold px-8 py-3 rounded-xl shadow-lg hover:scale-105 transition-all duration-200"
         >
           Skip
         </button>

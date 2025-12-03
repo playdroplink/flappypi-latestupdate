@@ -345,38 +345,31 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
           )}
           
           <div className="flex space-x-3">
-            {isPreview ? (
-              <Button
-                onClick={onClose}
-                className="flex-1 bg-gray-500 text-white py-3 px-6 rounded-xl font-bold text-lg cursor-default"
-                disabled
-              >
-                🔒 Subscribe to Claim
-              </Button>
-            ) : !claimed ? (
-              <Button
-                onClick={handleClaim}
-                className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:from-purple-600 hover:to-pink-600 transition-all duration-200 transform hover:scale-105"
-              >
-                🎉 Claim All Rewards
-              </Button>
-            ) : (
-              <>
-                <Button
-                  onClick={onClose}
-                  className="flex-1 bg-green-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-green-600 transition-all duration-200"
-                >
-                  ✅ Done
-                </Button>
-                <Button
-                  onClick={goToInventory}
-                  className="flex-1 bg-blue-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-blue-600 transition-all duration-200 ml-2"
-                >
-                  📦 Go to Inventory
-                </Button>
-              </>
-            )}
+            <Button
+              onClick={handleClaim}
+              className="flex-1 bg-purple-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-purple-600 transition-all duration-200 transform hover:scale-105"
+            >
+              🎉 Claim All Rewards
+            </Button>
+            <Button
+              onClick={onClose}
+              className="flex-1 bg-green-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-green-600 transition-all duration-200"
+            >
+              ✅ Done
+            </Button>
+            <Button
+              onClick={goToInventory}
+              className="flex-1 bg-blue-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-blue-600 transition-all duration-200 ml-2"
+            >
+              📦 Go to Inventory
+            </Button>
           </div>
+          <Button
+            onClick={onClose}
+            className="w-full bg-blue-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-blue-600 transition-all duration-200 mt-4"
+          >
+            🚀 Ready to start? Let's flap those wings!
+          </Button>
         </div>
       </div>
 
@@ -395,7 +388,6 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
                 <X className="w-6 h-6" />
               </Button>
             </div>
-            
             <div className="text-center mb-6">
               <div className="relative inline-block">
                 <ImageWithFallback
@@ -411,10 +403,8 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
                   </Badge>
                 </div>
               </div>
-              
               <h4 className="text-xl font-bold text-gray-800 mt-4 mb-2">{previewReward.name}</h4>
               <p className="text-gray-600 mb-4">{previewReward.description}</p>
-              
               <div className="flex items-center justify-center space-x-4">
                 <Badge className={`text-sm font-medium ${getRarityColor(previewReward.rarity)}`}>
                   {getTypeIcon(previewReward.type)}
@@ -425,7 +415,6 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
                 </Badge>
               </div>
             </div>
-            
             <div className="flex space-x-3">
               <Button
                 onClick={closePreview}
