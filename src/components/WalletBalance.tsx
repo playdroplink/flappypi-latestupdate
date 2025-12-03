@@ -33,11 +33,11 @@ const WalletBalance = ({ className = "", showBackground = true }) => {
     );
   }
   
-  // Original version with background
+  // Modern version: white background, soft shadow, no yellow border
   return (
     <div
-      className={`wallet-balance-footer flex items-center justify-center gap-2 px-6 py-2 bg-yellow-300 rounded-full shadow font-bold text-yellow-900 text-lg border-2 border-yellow-400 ${className}`}
-      style={{ minWidth: 120, minHeight: 48 }}
+      className={`wallet-balance-footer flex items-center justify-center gap-2 px-6 py-2 bg-white rounded-full shadow-lg font-bold text-gray-900 text-lg ${className}`}
+      style={{ minWidth: 120, minHeight: 48, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}
     >
       <CoinIcon className="w-6 h-6 mr-1" />
       {formattedBalance}

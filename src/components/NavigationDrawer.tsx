@@ -64,8 +64,8 @@ const NavigationDrawer: React.FC<NavigationDrawerProps> = ({ onNavigate, onOpenT
         <Button 
           variant="ghost" 
           size="icon" 
-          className="text-blue-700 bg-blue-100 hover:bg-blue-200 mt-16 p-0 relative" 
-          style={{ width: 48, height: 48 }}
+          className="text-blue-700 bg-white hover:bg-gray-100 mt-16 p-0 relative" 
+          style={{ width: 48, height: 48, background: 'transparent' }}
           onClick={() => console.log('NavigationDrawer Debug - Menu button clicked')}
         >
           <img src="/menu.png" alt="Menu" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />

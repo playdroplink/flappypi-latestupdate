@@ -203,11 +203,11 @@ const getRandomCoinSpawn = (gapY, gap, gameWidth, gameHeight, score = 0) => {
 
 // Move these above ClassicMode:
 const availablePowerUps = [
-  { id: 'shield', name: 'Shield', icon: '/powerups/Shield.png', quantity: 0 },
-  { id: 'magnet', name: 'Magnet', icon: '/powerups/Coin Magnet.png', quantity: 0 },
-  { id: 'extra_life', name: 'Extra Life', icon: '/powerups/Extra life.png', quantity: 0 },
+  { id: 'shield', name: 'Shield', icon: '/powerups/shield.png', quantity: 0 },
+  { id: 'magnet', name: 'Magnet', icon: '/powerups/coin-magnet.png', quantity: 0 },
+  { id: 'extra_life', name: 'Extra Life', icon: '/powerups/extra-life.png', quantity: 0 },
   { id: 'turbo_start', name: 'Turbo Start', icon: '/powerups/turbo-start.png', quantity: 0 },
-  { id: 'coin_multiplier', name: '2x Multiplier', icon: '/powerups/2x Coin Multiplier.png', quantity: 0 }
+  { id: 'coin_multiplier', name: '2x Multiplier', icon: '/powerups/2x-coin-multiplier.png', quantity: 0 }
 ];
 
 const levelThemes = [
@@ -623,11 +623,11 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge }
 
   // Define the 5 main power-ups for the footer
   const footerPowerUpItems = [
-    { id: 'shield', name: 'Shield', icon: '/powerups/Shield.png' },
-    { id: 'magnet', name: 'Magnet', icon: '/powerups/Coin Magnet.png' },
-    { id: 'extra_life', name: 'Extra Life', icon: '/powerups/Extra life.png' },
+    { id: 'shield', name: 'Shield', icon: '/powerups/shield.png' },
+    { id: 'magnet', name: 'Magnet', icon: '/powerups/coin-magnet.png' },
+    { id: 'extra_life', name: 'Extra Life', icon: '/powerups/extra-life.png' },
     { id: 'turbo_start', name: 'Turbo Start', icon: '/powerups/turbo-start.png' },
-    { id: 'coin_multiplier', name: '2x Multiplier', icon: '/powerups/2x Coin Multiplier.png' }
+    { id: 'coin_multiplier', name: '2x Multiplier', icon: '/powerups/2x-coin-multiplier.png' }
   ];
   
   // Use equipment system for powerup quantities

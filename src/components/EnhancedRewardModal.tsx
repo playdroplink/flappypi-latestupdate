@@ -79,14 +79,6 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
     }
   }, [open, rewards]);
 
-  useEffect(() => {
-    if (planId && inventoryService.hasClaimedPlanRewards(planId) && open) {
-      onClose();
-    }
-  }, [planId, open, onClose]);
-
-  if (!open) return null;
-
   // Deduplicate rewards by id+name+type and sum quantity
   const dedupedRewards = React.useMemo(() => {
     const map = new Map();
@@ -101,7 +93,6 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
     return Array.from(map.values());
   }, [rewards]);
 
-  // If suppressIfAllOwned is true, check inventory and suppress modal if all rewards are already owned
   const shouldSuppress = React.useMemo(() => {
     if (!dedupedRewards.length || !suppressIfAllOwned) return false;
     try {
@@ -112,19 +103,25 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
     }
   }, [dedupedRewards, suppressIfAllOwned]);
 
+  useEffect(() => {
+    if (planId && inventoryService.hasClaimedPlanRewards(planId) && open) {
+      onClose();
+    }
+  }, [planId, open, onClose]);
+
+  if (!open) return null;
   if (shouldSuppress) return null;
+
   const handleClose = () => {
     if (!claimed && !isPreview && planId && rewards.length > 0) {
       // Save rewards as unclaimed
       inventoryService.saveUnclaimedSubscriptionRewards(planId, planName, rewards);
-      
       toast({
         title: '📦 Rewards Saved!',
         description: `Your ${planName} rewards have been saved. You can claim them later from your inventory!`,
         duration: 4000
       });
     }
-    
     onClose();
     setShowRewards(false);
     setClaimed(false);
@@ -227,13 +224,6 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
   };
 
   // Move the claimed rewards check to useEffect to avoid calling onClose during render
-  useEffect(() => {
-    if (planId && inventoryService.hasClaimedPlanRewards(planId) && open) {
-      onClose();
-    }
-  }, [planId, open, onClose]);
-
-  if (!open) return null;
   // Deduplicate rewards by id+name+type and sum quantity (ALT)
   const dedupedRewardsAlt = React.useMemo(() => {
     const map = new Map();
@@ -257,6 +247,15 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
       return false;
     }
   }, [dedupedRewardsAlt, suppressIfAllOwned]);
+
+  useEffect(() => {
+    if (planId && inventoryService.hasClaimedPlanRewards(planId) && open) {
+      onClose();
+    }
+  }, [planId, open, onClose]);
+
+  // Early returns after all hooks
+  if (!open) return null;
   if (shouldSuppressAlt) return null;
 
   // Navigation to inventory

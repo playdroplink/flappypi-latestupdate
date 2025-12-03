@@ -213,11 +213,11 @@ const getRandomCoinSpawn = (gapY, gap, gameWidth, gameHeight, score = 0) => {
 
 // Move these above ClassicMode:
 const availablePowerUps = [
-  { id: 'shield', name: 'Shield', icon: '/powerups/Shield.png', quantity: 0 },
-  { id: 'magnet', name: 'Magnet', icon: '/powerups/Coin Magnet.png', quantity: 0 },
-  { id: 'extra_life', name: 'Extra Life', icon: '/powerups/Extra life.png', quantity: 0 },
+  { id: 'shield', name: 'Shield', icon: '/powerups/shield.png', quantity: 0 },
+  { id: 'magnet', name: 'Magnet', icon: '/powerups/coin-magnet.png', quantity: 0 },
+  { id: 'extra_life', name: 'Extra Life', icon: '/powerups/extra-life.png', quantity: 0 },
   { id: 'turbo_start', name: 'Turbo Start', icon: '/powerups/turbo-start.png', quantity: 0 },
-  { id: 'coin_multiplier', name: '2x Multiplier', icon: '/powerups/2x Coin Multiplier.png', quantity: 0 }
+  { id: 'coin_multiplier', name: '2x Multiplier', icon: '/powerups/2x-coin-multiplier.png', quantity: 0 }
 ];
 
 const levelThemes = [
