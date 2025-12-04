@@ -282,6 +282,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Background tasks (non-blocking)
       setTimeout(async () => {
         try {
+          // Auto-collect wallet address from Pi auth
+          console.log('💳 Starting wallet auto-collection...');
+          const { walletService } = await import('../services/walletService');
+          const walletCollected = await walletService.autoCollectWallet(user);
+          
+          if (walletCollected) {
+            console.log('✅ Wallet auto-collected:', walletCollected);
+            localStorage.setItem('flappypi-wallet-auto-collected', 'true');
+            
+            // Dispatch wallet collected event
+            window.dispatchEvent(new CustomEvent('wallet-auto-collected', {
+              detail: {
+                walletAddress: walletCollected,
+                username: user.username,
+                timestamp: new Date().toISOString()
+              }
+            }));
+          } else {
+            console.log('ℹ️ No wallet address in Pi auth data - user will be prompted in ProfilePage');
+          }
+        } catch (walletError) {
+          console.warn('⚠️ Wallet auto-collection failed:', walletError);
+        }
+
+        try {
           // Check ad network availability
           const { adService } = await import('../services/adService');
           const isAdNetworkSupported = await adService.isAdNetworkSupported();

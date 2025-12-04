@@ -258,7 +258,7 @@ const FooterPowerupBar: React.FC<FooterPowerupBarProps> = memo(({
               }}
               onError={(e) => {
                 console.log('❌ Power-up icon failed to load:', powerup.icon);
-                (e.target as HTMLImageElement).src = 'powerups/Shield.png';
+                (e.target as HTMLImageElement).src = '/powerups/shield.png';
               }}
             />
                     

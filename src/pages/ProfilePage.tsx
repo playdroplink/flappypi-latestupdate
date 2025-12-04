@@ -304,6 +304,33 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
     }
   }, []);
 
+  // Auto-load wallet address from Supabase if user is Pi authenticated
+  useEffect(() => {
+    const loadWalletFromSupabase = async () => {
+      if (isPiAuth && piUser?.uid && !walletSaved) {
+        try {
+          const { walletService } = await import('../services/walletService');
+          const wallet = await walletService.getWalletAddress(piUser.uid);
+          
+          if (wallet) {
+            console.log('✅ Wallet loaded from Supabase:', wallet);
+            setWalletInput(wallet);
+            setWalletSaved(true);
+            setShowWalletConsent(false);
+          } else {
+            console.log('ℹ️ No wallet found in Supabase for this user');
+            setShowWalletConsent(true);
+          }
+        } catch (error) {
+          console.warn('⚠️ Error loading wallet from Supabase:', error);
+          setShowWalletConsent(true);
+        }
+      }
+    };
+
+    loadWalletFromSupabase();
+  }, [isPiAuth, piUser?.uid, walletSaved]);
+
   // Update avatar when profile changes
   useEffect(() => {
     // Priority 1: User's selected bird character
@@ -495,17 +522,55 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
     }
   };
 
-  const handleSaveWallet = () => {
-    localStorage.setItem('pi-mainnet-wallet', walletInput);
-    setWalletSaved(true);
-    setShowWalletConsent(false);
-    setShowWalletInput(false);
-    setShowWalletModal(false);
-    toast({
-      title: "Wallet Address Saved! 💰",
-      description: "Your wallet address has been saved successfully.",
-      duration: 3000,
-    });
+  const handleSaveWallet = async () => {
+    if (!walletInput.trim()) {
+      toast({
+        title: "Invalid Wallet Address",
+        description: "Please enter a valid wallet address.",
+        variant: "destructive",
+        duration: 3000,
+      });
+      return;
+    }
+
+    try {
+      // Save to localStorage first (quick access)
+      localStorage.setItem('pi-mainnet-wallet', walletInput);
+      
+      // Save to Supabase if user is Pi authenticated
+      if (isPiAuth && piUser?.uid) {
+        const { walletService } = await import('../services/walletService');
+        const saved = await walletService.saveWalletToSupabase(
+          piUser.uid,
+          piUser.username || username,
+          walletInput
+        );
+
+        if (saved) {
+          console.log('✅ Wallet saved to Supabase');
+        } else {
+          console.warn('⚠️ Failed to save wallet to Supabase, but saved locally');
+        }
+      }
+      
+      setWalletSaved(true);
+      setShowWalletConsent(false);
+      setShowWalletInput(false);
+      setShowWalletModal(false);
+      toast({
+        title: "Wallet Address Saved! 💰",
+        description: "Your wallet address has been saved successfully.",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error('Error saving wallet:', error);
+      toast({
+        title: "Error Saving Wallet",
+        description: "There was an error saving your wallet address.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
   };
 
   const handleDeclineWallet = () => {
@@ -737,10 +802,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
                 <h2 className="text-base sm:text-lg font-bold text-purple-700 mb-2">Connect your Pi Wallet</h2>
                 <p className="text-xs text-purple-800 mb-4">Flappy Pi needs your Pi mainnet wallet address to send you Pi rewards if you are a top player in the leaderboards.</p>
                 <div className="flex flex-col sm:flex-row gap-2 w-full">
-                  <Button className="flex-1 bg-white hover:bg-gray-100 text-white font-bold px-4 sm:px-6 py-2 rounded-lg shadow border border-gray-400" onClick={() => setShowWalletModal(true)}>
+                  <Button className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold px-4 sm:px-6 py-2 rounded-lg shadow" onClick={() => setShowWalletModal(true)}>
                     Connect Wallet
                   </Button>
-                  <Button className="flex-1 bg-white hover:bg-gray-200 text-white font-bold px-4 sm:px-6 py-2 rounded-lg shadow border border-gray-400" onClick={handleDeclineWallet}>
+                  <Button className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold px-4 sm:px-6 py-2 rounded-lg shadow" onClick={handleDeclineWallet}>
                     Decline
                   </Button>
                 </div>

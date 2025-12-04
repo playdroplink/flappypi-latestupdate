@@ -2965,11 +2965,11 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
 
   // Footer powerup items - only show the 5 main power-ups, with dynamic quantity and always correct icon
   const mainPowerUpIcons = {
-    shield: 'powerups/Shield.png',
-    magnet: 'powerups/Coin Magnet.png',
-    extra_life: 'powerups/Extra life.png',
-    coin_multiplier: 'powerups/2x Coin Multiplier.png',
-    turbo_start: 'powerups/turbo-start.png',
+    shield: '/powerups/shield.png',
+    magnet: '/powerups/coin-magnet.png',
+    extra_life: '/powerups/extra-life.png',
+    coin_multiplier: '/powerups/2x-coin-multiplier.png',
+    turbo_start: '/powerups/turbo-start.png',
   };
   const mainPowerUpIds = ['shield', 'magnet', 'extra_life', 'coin_multiplier', 'turbo_start'];
   

@@ -331,12 +331,12 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ open, onClose }) => {
                           <ImageWithFallback
                             src={(() => {
                               switch (item.id) {
-                                case 'shield': return 'powerups/Shield.png';
-                                case 'magnet': return 'powerups/Coin Magnet.png';
-                                case 'extra_life': return 'powerups/Extra life.png';
-                                case 'coin_multiplier': return 'powerups/2x Coin Multiplier.png';
-                                case 'turbo_start': return 'powerups/turbo-start.png';
-                                default: return item.image || `powerups/${item.name.replace(/ /g, '_')}.png` || 'powerups/Shield.png';
+                                case 'shield': return '/powerups/shield.png';
+                                case 'magnet': return '/powerups/coin-magnet.png';
+                                case 'extra_life': return '/powerups/extra-life.png';
+                                case 'coin_multiplier': return '/powerups/2x-coin-multiplier.png';
+                                case 'turbo_start': return '/powerups/turbo-start.png';
+                                default: return item.image || `/powerups/${item.name.replace(/ /g, '-')}.png` || '/powerups/shield.png';
                               }
                             })()}
                             alt={item.name}
