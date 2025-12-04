@@ -712,7 +712,7 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
               Bird Skins
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {getShopItemsWithOwnership().map((item) => (
+              {getShopItemsWithOwnership().filter(item => item.type === 'skin').map((item) => (
                 <Card key={item.id} className={`relative ${item.isOwned ? 'border-green-300 bg-green-50' : 'hover:shadow-lg'} transition-all`}>
                   <CardHeader className="pb-2">
                     <div className="relative">

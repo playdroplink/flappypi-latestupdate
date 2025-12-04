@@ -36,7 +36,7 @@ const defaultAvatars = [
   '/birds2/bird_9.gif',
   '/birds2/bird_10.gif',
   '/birds2/bird_11.gif',
-  '/flappy pi gif/flappy-2.gif.gif',
+  '/birds2/bird_12.gif', // Fire Phoenix (Special)
 ];
 
 
@@ -267,18 +267,28 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
     
     // Load owned skins from inventory
     const ownedSkinItems = inventoryService.getInventoryByType('skin');
-    setOwnedSkins(ownedSkinItems);
+    
+    // Always include the default bird (Sky Blue Flappy)
+    const defaultBirdItem = shopItems.find(item => item.id === 'bird-0');
+    const defaultBird = defaultBirdItem ? { ...defaultBirdItem, equipped: false, purchasedAt: new Date().toISOString() } : null;
+    const skins = defaultBird && !ownedSkinItems.some(s => s.id === 'bird-0')
+      ? [defaultBird as any, ...ownedSkinItems]
+      : ownedSkinItems;
+    
+    setOwnedSkins(skins);
     
     // Find currently equipped skin
-    const equipped = ownedSkinItems.find(skin => skin.equipped);
+    const equipped = skins.find(skin => skin.equipped);
     setEquippedSkinId(equipped?.id || null);
     
     // Get locked skins (available in shop but not owned)
-    const ownedSkinIds = ownedSkinItems.map(skin => skin.id);
+    const ownedSkinIds = skins.map(skin => skin.id);
     const availableSkins = shopItems.filter(item => 
       item.type === 'skin' && 
-      !ownedSkinIds.includes(item.id) && 
-      !item.notForSale
+      !ownedSkinIds.includes(item.id) &&
+      !item.isDefault &&  // Don't show default as locked
+      // Show Fire Phoenix if not owned (even though notForSale), otherwise hide notForSale items
+      (item.id === 'inferno-phoenix' || item.id === 'inferno_phoenix' || !item.notForSale)
     );
     setLockedSkins(availableSkins);
     
@@ -348,18 +358,28 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
     const handleInventoryUpdate = () => {
       // Reload owned skins
       const ownedSkinItems = inventoryService.getInventoryByType('skin');
-      setOwnedSkins(ownedSkinItems);
+      
+      // Always include the default bird (Sky Blue Flappy)
+      const defaultBirdItem = shopItems.find(item => item.id === 'bird-0');
+      const defaultBird = defaultBirdItem ? { ...defaultBirdItem, equipped: false, purchasedAt: new Date().toISOString() } : null;
+      const skins = defaultBird && !ownedSkinItems.some(s => s.id === 'bird-0')
+        ? [defaultBird as any, ...ownedSkinItems]
+        : ownedSkinItems;
+      
+      setOwnedSkins(skins);
       
       // Update equipped skin
-      const equipped = ownedSkinItems.find(skin => skin.equipped);
+      const equipped = skins.find(skin => skin.equipped);
       setEquippedSkinId(equipped?.id || null);
       
       // Update locked skins
-      const ownedSkinIds = ownedSkinItems.map(skin => skin.id);
+      const ownedSkinIds = skins.map(skin => skin.id);
       const availableSkins = shopItems.filter(item => 
         item.type === 'skin' && 
-        !ownedSkinIds.includes(item.id) && 
-        !item.notForSale
+        !ownedSkinIds.includes(item.id) &&
+        !item.isDefault &&  // Don't show default as locked
+        // Show Fire Phoenix if not owned (even though notForSale), otherwise hide notForSale items
+        (item.id === 'inferno-phoenix' || item.id === 'inferno_phoenix' || !item.notForSale)
       );
       setLockedSkins(availableSkins);
     };
@@ -1128,7 +1148,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
                   <div className="w-full">
                     <h3 className="font-bold text-blue-800 mb-3 text-center">Other Avatars</h3>
                     <div className="flex flex-wrap gap-3 justify-center">
-                      {defaultAvatars.filter(img => !img.startsWith('/birds/')).map((img) => (
+                      {defaultAvatars.map((img) => (
                         <button
                           key={img}
                           className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full border-2 ${avatar === img && !customAvatar ? 'border-blue-500' : 'border-gray-300'} shadow bg-white p-1 transition-all hover:scale-105`}
