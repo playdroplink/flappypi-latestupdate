@@ -69,7 +69,7 @@ class DirectPaymentService {
         
         // Also unlock the Fire Phoenix skin for subscribers
         const infernoPhoenixSkin = {
-          id: 'inferno-phoenix',
+          id: 'inferno_phoenix',
           name: '🔥 Fire Phoenix',
           type: 'skin' as const,
           quantity: 1,

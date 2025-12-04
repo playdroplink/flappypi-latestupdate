@@ -204,6 +204,16 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
       if (updatedProfile) {
         setProfile(updatedProfile);
         localStorage.setItem('flappypi-profile', JSON.stringify(updatedProfile));
+        
+        // Dispatch custom event for real-time UI updates across components
+        window.dispatchEvent(new CustomEvent('profile-updated', {
+          detail: {
+            profile: updatedProfile,
+            timestamp: new Date().getTime()
+          }
+        }));
+        
+        console.log('📝 Profile updated and event dispatched:', { avatar_url: updatedProfile.avatar_url, selected_bird_skin: updatedProfile.selected_bird_skin });
       }
     } catch (error) {
       console.error('Error updating profile:', error);

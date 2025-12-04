@@ -499,6 +499,16 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
     if (profile && updateProfile) {
       try {
         await updateProfile({ avatar_url: avatarUrl });
+        
+        // Dispatch custom event for immediate UI update in HomePage modal
+        window.dispatchEvent(new CustomEvent('profile-updated', {
+          detail: {
+            profile: { ...profile, avatar_url: avatarUrl },
+            timestamp: new Date().getTime(),
+            source: 'ProfilePage'
+          }
+        }));
+        
         toast({
           title: "Avatar Saved! 🎉",
           description: "Your avatar has been saved to your profile and will now appear on the homescreen.",

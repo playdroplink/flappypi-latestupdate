@@ -39,10 +39,10 @@ export const DEMO_PI_CONFIG = {
   PI_NETWORK_API_KEY: 'htjotdxpfamsvnshw5yspxjtp9psgvqym5fusybgu4ouuiqobtrcupilytu3pg4w',
   PI_NETWORK_VALIDATION_KEY: '94e29cc9c70b87c8fc91e496ac630d23664bff7082cca3ad9d6466bba1aa2902caa46a8eb82a64437d272dbcd329c763679c85cfcba91b95e6fb5b4a6f17b2ce',
   
-  // Pi Network Environment Settings - SANDBOX
-  PI_SANDBOX_MODE: true,
-  PI_NETWORK: 'sandbox',
-  VITE_PI_NETWORK: 'sandbox',
+  // Pi Network Environment Settings - MAINNET
+  PI_SANDBOX_MODE: false,
+  PI_NETWORK: 'mainnet',
+  VITE_PI_NETWORK: 'mainnet',
   
   // Pi Network API URLs - Mainnet
   PI_API_URL: 'https://api.minepi.com',
@@ -87,10 +87,10 @@ export const DEMO_PI_CONFIG = {
   SFX_ENABLED: true,
   
   // Game Settings
-  GAME_MODE: 'sandbox',
+  GAME_MODE: 'mainnet',
   TESTNET_MODE: false,
-  MAINNET_MODE: false,
-  SANDBOX_MODE: true,
+  MAINNET_MODE: true,
+  SANDBOX_MODE: false,
   
   // Analytics Configuration
   ANALYTICS_ENABLED: true,
@@ -105,11 +105,11 @@ export const DEMO_PI_CONFIG = {
   PINET_BASE_URL: 'https://minepi.com',
   DOMAIN: 'flappypi.fun',
   
-  // SANDBOX SETTINGS
-  PRODUCTION_MODE: false,
-  LIVE_PAYMENTS: false,
-  REAL_PI_TRANSACTIONS: false,
-  MAINNET_ONLY: false
+  // MAINNET SETTINGS
+  PRODUCTION_MODE: true,
+  LIVE_PAYMENTS: true,
+  REAL_PI_TRANSACTIONS: true,
+  MAINNET_ONLY: true
 };
 
 // Pi payment trigger function for demo.pi

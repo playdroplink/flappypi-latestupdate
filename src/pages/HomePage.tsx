@@ -1288,7 +1288,7 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
                                               </div>
                                               {/* Notification Bell */}
                                               <button
-                                                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 text-lg font-semibold shadow-lg"
+                                                className="hover:bg-gray-100 text-gray-700 py-2 px-2 rounded-lg transition-colors"
                                                 onClick={handleOpenAnnouncement}
                                                 aria-label="Notifications"
                                               >

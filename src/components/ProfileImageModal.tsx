@@ -86,18 +86,80 @@ const ProfileImageModal: React.FC<ProfileImageModalProps> = ({ isOpen, onClose }
     const newImage = getCurrentProfileImage();
     const newUsername = getCurrentUsername();
     
+    console.log('📝 ProfileImageModal updating display:', {
+      profileImage: newImage,
+      username: newUsername,
+      selectedBirdSkin: profile?.selected_bird_skin,
+      avatarUrl: profile?.avatar_url,
+      isAuthenticated
+    });
+    
     setProfileImage(newImage);
     setUsername(newUsername);
-  }, [profile?.selected_bird_skin, profile?.avatar_url, isAuthenticated, piUser]);
+  }, [profile?.selected_bird_skin, profile?.avatar_url, profile, isAuthenticated, piUser]);
+
+  // Listen for profile updates from other components (e.g., ProfilePage)
+  useEffect(() => {
+    if (!isOpen) return; // Only listen when modal is open
+    
+    const handleProfileUpdate = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      console.log('🔄 ProfileImageModal received profile-updated event:', customEvent.detail);
+      
+      // Trigger refresh of profile image and username
+      const newImage = getCurrentProfileImage();
+      const newUsername = getCurrentUsername();
+      
+      console.log('✅ ProfileImageModal updating from event:', {
+        newImage,
+        newUsername,
+        eventDetail: customEvent.detail
+      });
+      
+      setProfileImage(newImage);
+      setUsername(newUsername);
+    };
+    
+    window.addEventListener('profile-updated', handleProfileUpdate);
+    
+    return () => {
+      window.removeEventListener('profile-updated', handleProfileUpdate);
+    };
+  }, [isOpen, profile?.selected_bird_skin, profile?.avatar_url, profile]);
 
   // Refresh function to manually update profile data
   const refreshProfile = () => {
     const newImage = getCurrentProfileImage();
     const newUsername = getCurrentUsername();
     
+    console.log('🔄 Manual refresh triggered:', { newImage, newUsername });
+    
     setProfileImage(newImage);
     setUsername(newUsername);
   };
+
+  // Load profile data when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      console.log('📂 ProfileImageModal opened - loading profile data');
+      refreshProfile();
+      
+      // Also load from localStorage to ensure we have latest saved profile
+      const savedProfile = localStorage.getItem('flappypi-profile');
+      if (savedProfile) {
+        try {
+          const parsedProfile = JSON.parse(savedProfile);
+          console.log('💾 Loaded profile from localStorage:', {
+            username: parsedProfile.username,
+            selected_bird_skin: parsedProfile.selected_bird_skin,
+            avatar_url: parsedProfile.avatar_url
+          });
+        } catch (error) {
+          console.warn('⚠️ Error parsing saved profile:', error);
+        }
+      }
+    }
+  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -128,13 +190,17 @@ const ProfileImageModal: React.FC<ProfileImageModalProps> = ({ isOpen, onClose }
 
           {/* Username Display */}
           <div className="text-center">
-            <h3 className="text-xl font-bold text-blue-800 mb-1">{username}</h3>
+            <h3 className="text-xl font-bold text-blue-800 mb-1">{username || 'User Profile'}</h3>
             <p className="text-sm text-blue-600">
               {profile?.selected_bird_skin 
                 ? `Character: ${profile.selected_bird_skin.replace('_', ' ').replace('-', ' ')}`
                 : 'Default Character'
               }
             </p>
+            {/* Debug info - show if data is being read */}
+            <div className="text-xs text-gray-400 mt-2">
+              Profile Data: {profile ? '✓' : '✗'} | User: {profile?.username || 'N/A'}
+            </div>
           </div>
 
           {/* Character Info */}
