@@ -86,99 +86,79 @@ const RewardModal: React.FC<RewardModalProps> = ({ open, onClose, rewards, onCla
     if (open && rewards.length > 0) {
       setShowRewards(true);
       setClaimed(false);
+      
+      // Save all rewards to inventory first (including coins)
+      rewards.forEach(reward => {
+        inventoryService.saveToInventory({
+          id: reward.id,
+          name: reward.name,
+          type: reward.type,
+          quantity: reward.quantity,
+          rarity: reward.rarity,
+          image: reward.image,
+          description: reward.description
+        });
+      });
+      console.log(`✅ Saved ${rewards.length} reward(s) to inventory`);
     }
   }, [open, rewards]);
 
   const handleClaim = async () => {
     try {
       let totalCoinsAdded = 0;
-      let claimedItems = [];
+      let itemsToProcess = [];
       
-      // Process each reward separately based on type
-      rewards.forEach(reward => {
-        // Handle coin rewards specially - add to wallet instead of inventory
-        if (reward.type === 'coins') {
-          const { loadWalletBalance, saveWalletBalance } = require('@/utils/walletUtils');
-          const savedUsername = localStorage.getItem('flappypi-username');
-          const currentBalance = loadWalletBalance(savedUsername);
-          const coinsToAdd = reward.quantity || 0;
-          const newBalance = currentBalance + coinsToAdd;
-          
-          // Save updated wallet balance
-          saveWalletBalance(newBalance, savedUsername);
-          localStorage.setItem('flappypi-coins', newBalance.toString());
-          totalCoinsAdded += coinsToAdd;
-          
-          // Dispatch wallet update event
-          window.dispatchEvent(new CustomEvent('wallet-balance-updated', { 
-            detail: { balance: newBalance, added: coinsToAdd } 
-          }));
-          
-          console.log(`✅ Added ${coinsToAdd} coins to wallet. New balance: ${newBalance}`);
-        } else {
-          // For non-coin rewards (items, skins, powerups), save to inventory
-          const itemToAdd = {
-            id: reward.id,
-            name: reward.name,
-            type: reward.type,
-            quantity: reward.quantity,
-            rarity: reward.rarity,
-            image: reward.image,
-            description: reward.description
-          };
-          
-          inventoryService.saveToInventory(itemToAdd);
-          claimedItems.push(itemToAdd);
-          
-          console.log(`✅ Added ${reward.name} to inventory`);
-        }
+      // Separate rewards by type
+      const coinRewards = rewards.filter(r => r.type === 'coins');
+      const itemRewards = rewards.filter(r => r.type !== 'coins');
+      
+      // Process coin rewards - add to wallet (remove from inventory later)
+      coinRewards.forEach(reward => {
+        const { loadWalletBalance, saveWalletBalance } = require('@/utils/walletUtils');
+        const savedUsername = localStorage.getItem('flappypi-username');
+        const currentBalance = loadWalletBalance(savedUsername);
+        const coinsToAdd = reward.quantity || 0;
+        const newBalance = currentBalance + coinsToAdd;
+        
+        // Save updated wallet balance
+        saveWalletBalance(newBalance, savedUsername);
+        localStorage.setItem('flappypi-coins', newBalance.toString());
+        totalCoinsAdded += coinsToAdd;
+        
+        // Dispatch wallet update event
+        window.dispatchEvent(new CustomEvent('wallet-balance-updated', { 
+          detail: { balance: newBalance, added: coinsToAdd } 
+        }));
+        
+        // Remove coin item from inventory after claiming to wallet
+        inventoryService.useItem(reward.id, 'coins', reward.quantity);
+        
+        console.log(`✅ Claimed ${coinsToAdd} coins to wallet. Removed from inventory. New balance: ${newBalance}`);
       });
-
-      // Supabase sync: get user_id from localStorage (from user_profiles.uid or pi user)
-      // Only sync items, not coins (coins are handled via wallet service)
-      let user_id = null;
-      try {
-        const piUser = localStorage.getItem('flappypi-pi-user');
-        if (piUser) {
-          const parsed = JSON.parse(piUser);
-          user_id = parsed.uid || parsed.user_id || parsed.username;
-        }
-      } catch {}
-
-      if (user_id && claimedItems.length > 0) {
-        try {
-          await fetch('/api/inventory/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id, items: claimedItems })
-          });
-          console.log(`✅ Synced ${claimedItems.length} item(s) to cloud`);
-        } catch (err) {
-          console.warn('Cloud sync failed for items:', err);
-          // Don't show error toast - items already saved locally
-        }
-      }
+      
+      // Item rewards are already in inventory from useEffect, just track them
+      itemRewards.forEach(reward => {
+        itemsToProcess.push({
+          id: reward.id,
+          name: reward.name,
+          quantity: reward.quantity,
+          image: reward.image,
+          rarity: reward.rarity
+        });
+        
+        console.log(`✅ ${reward.name} is in inventory`);
+      });
 
       setClaimed(true);
       if (onClaim) onClaim();
       
-      const itemCount = rewards.filter(r => r.type !== 'coins').length;
-      const coinCount = rewards.filter(r => r.type === 'coins').reduce((sum, r) => sum + r.quantity, 0);
+      const itemCount = itemRewards.length;
+      const coinCount = totalCoinsAdded;
       
       // If there are coins, show the coin claim modal
       if (coinCount > 0) {
         setTotalCoinsToShow(coinCount);
-        setClaimedItemsToShow(
-          rewards
-            .filter(r => r.type !== 'coins')
-            .map(r => ({
-              id: r.id,
-              name: r.name,
-              quantity: r.quantity,
-              image: r.image,
-              rarity: r.rarity
-            }))
-        );
+        setClaimedItemsToShow(itemsToProcess);
         setShowCoinClaimModal(true);
       }
       
@@ -267,7 +247,7 @@ const RewardModal: React.FC<RewardModalProps> = ({ open, onClose, rewards, onCla
                     <p className="text-sm opacity-75 mb-2">{reward.description || `${reward.type} item`}</p>
                     <div className="flex items-center justify-between">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRarityColor(reward.rarity)}`}>
-                        {reward.rarity}
+                        {reward.type === 'coins' ? '💰 Coins' : reward.rarity}
                       </span>
                       <span className="text-sm font-medium">
                         Quantity: {reward.quantity}

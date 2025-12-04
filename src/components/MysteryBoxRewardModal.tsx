@@ -30,6 +30,39 @@ const MysteryBoxRewardModal: React.FC<MysteryBoxRewardModalProps> = ({
   const [claimed, setClaimed] = useState(false);
   const [showRewards, setShowRewards] = useState(false);
 
+  // Helper to claim rewards if not already claimed
+  const autoClaimRewards = () => {
+    if (!claimed && rewards.length > 0) {
+      try {
+        rewards.forEach(reward => {
+          inventoryService.saveToInventory({
+            id: reward.id,
+            name: reward.name,
+            type: reward.type,
+            quantity: reward.quantity,
+            rarity: reward.rarity,
+            image: reward.image,
+            description: reward.description
+          });
+        });
+        setClaimed(true);
+        if (onClaim) onClaim();
+        toast({
+          title: 'Rewards Claimed! 🎉',
+          description: `Successfully claimed ${rewards.length} item(s) from your mystery box!`,
+          duration: 3000
+        });
+      } catch (error) {
+        console.error('Error auto-claiming rewards:', error);
+        toast({
+          title: 'Claim Failed',
+          description: 'An error occurred while claiming your rewards.',
+          variant: 'destructive'
+        });
+      }
+    }
+  };
+
   useEffect(() => {
     if (isOpen && rewards.length > 0) {
       setShowRewards(true);
@@ -38,43 +71,21 @@ const MysteryBoxRewardModal: React.FC<MysteryBoxRewardModalProps> = ({
   }, [isOpen, rewards]);
 
   const handleClaim = () => {
-    try {
-      // Save all rewards to inventory
-      rewards.forEach(reward => {
-        inventoryService.saveToInventory({
-          id: reward.id,
-          name: reward.name,
-          type: reward.type,
-          quantity: reward.quantity,
-          rarity: reward.rarity,
-          image: reward.image,
-          description: reward.description
-        });
-      });
+    autoClaimRewards();
+    // Close modal after a delay
+    setTimeout(() => {
+      onClose();
+      setShowRewards(false);
+      setClaimed(false);
+    }, 2000);
+  };
 
-      setClaimed(true);
-      onClaim();
-
-      toast({
-        title: 'Rewards Claimed! 🎉',
-        description: `Successfully claimed ${rewards.length} item(s) from your mystery box!`,
-        duration: 3000
-      });
-
-      // Close modal after a delay
-      setTimeout(() => {
-        onClose();
-        setShowRewards(false);
-        setClaimed(false);
-      }, 2000);
-    } catch (error) {
-      console.error('Error claiming rewards:', error);
-      toast({
-        title: 'Claim Failed',
-        description: 'An error occurred while claiming your rewards.',
-        variant: 'destructive'
-      });
-    }
+  // Wrap onClose to auto-claim if not already claimed
+  const handleClose = () => {
+    autoClaimRewards();
+    onClose();
+    setShowRewards(false);
+    setClaimed(false);
   };
 
   const getRarityColor = (rarity: string) => {
@@ -163,7 +174,7 @@ const MysteryBoxRewardModal: React.FC<MysteryBoxRewardModalProps> = ({
             </button>
           ) : (
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="flex-1 bg-green-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-green-600 transition-all duration-200"
             >
               ✅ Done

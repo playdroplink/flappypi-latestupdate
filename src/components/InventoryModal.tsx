@@ -156,6 +156,49 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ open, onClose }) => {
     }
   };
 
+  const handleClaimCoins = async (coinItem: InventoryItem) => {
+    try {
+      const { loadWalletBalance, saveWalletBalance } = require('@/utils/walletUtils');
+      const savedUsername = localStorage.getItem('flappypi-username');
+      const currentBalance = loadWalletBalance(savedUsername);
+      const coinsToAdd = coinItem.quantity || 0;
+      const newBalance = currentBalance + coinsToAdd;
+      
+      // Save updated wallet balance
+      saveWalletBalance(newBalance, savedUsername);
+      localStorage.setItem('flappypi-coins', newBalance.toString());
+      
+      // Dispatch wallet update event
+      window.dispatchEvent(new CustomEvent('wallet-balance-updated', { 
+        detail: { balance: newBalance, added: coinsToAdd } 
+      }));
+      
+      // Remove coin item from inventory
+      const success = inventoryService.useItem(coinItem.id, 'coins', coinsToAdd);
+      
+      if (success) {
+        toast({
+          title: 'Coins Claimed! 💰',
+          description: `${coinsToAdd} Flappy Coins have been added to your wallet!`,
+        });
+        loadInventoryData();
+      } else {
+        toast({
+          title: 'Claim Failed',
+          description: 'Failed to claim coins. Please try again.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error('Error claiming coins:', error);
+      toast({
+        title: 'Claim Error',
+        description: 'An error occurred while claiming your coins.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const handleClaimMysteryBoxRewards = () => {
     setShowMysteryBoxModal(false);
     loadInventoryData();
@@ -457,6 +500,47 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ open, onClose }) => {
                         >
                           📦 <span className="hidden sm:inline">Use Bundle</span>
                           <span className="sm:hidden">Use</span>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              {/* Flappy Coins */}
+              <div>
+                <h2 className="text-base sm:text-lg font-bold mb-2 text-black flex items-center gap-2">
+                  <Coins className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
+                  Flappy Coins ({getInventoryByType('coins').length})
+                </h2>
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
+                  {getInventoryByType('coins').map((item) => (
+                    <Card key={item.id} className="relative overflow-hidden border-2 border-yellow-200">
+                      <CardHeader className="pb-2 p-3 sm:p-4">
+                        <CardTitle className="text-sm sm:text-lg">{item.name}</CardTitle>
+                        <Badge className="w-fit bg-yellow-100 text-yellow-800 text-xs sm:text-sm">
+                          x{item.quantity}
+                        </Badge>
+                      </CardHeader>
+                      <CardContent className="p-3 sm:p-4">
+                        <div className="flex items-center justify-center mb-3 sm:mb-4">
+                          <ImageWithFallback
+                            src={item.image || `/coins/${item.id}.png`}
+                            alt={item.name}
+                            className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
+                            fallbackSrc="/coins/coin-pouch.png"
+                          />
+                        </div>
+                        <div className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">
+                          {dayjs(item.purchasedAt).format('MMM D, YYYY')}
+                        </div>
+                        <Button
+                          onClick={() => handleClaimCoins(item)}
+                          className="w-full bg-yellow-500 hover:bg-yellow-600 text-xs sm:text-sm py-1 sm:py-2 text-white"
+                          disabled={item.quantity <= 0}
+                        >
+                          💰 <span className="hidden sm:inline">Claim to Wallet</span>
+                          <span className="sm:hidden">Claim</span>
                         </Button>
                       </CardContent>
                     </Card>

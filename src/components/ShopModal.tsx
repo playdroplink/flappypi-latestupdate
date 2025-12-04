@@ -11,10 +11,11 @@ import { manualPaymentService } from '@/services/manualPaymentService';
 import { inventoryService } from '@/services/inventoryService';
 import DualPaymentModal from './DualPaymentModal';
 import ManualPaymentModal from './ManualPaymentModal';
+import RewardModal from './RewardModal';
 import { shopItems } from '@/constants/shopItems';
 import { subscriptionPlans } from '@/constants/subscriptionPlans';
 import { PI_CONFIG } from '@/config/piConfig';
-import { X, ShoppingCart, Crown, Zap, Heart, Star, QrCode, CreditCard } from 'lucide-react';
+import { X, ShoppingCart, Crown, Zap, Heart, Star, QrCode, CreditCard, ArrowLeft } from 'lucide-react';
 
 interface ShopModalProps {
   open: boolean;
@@ -141,6 +142,8 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
   const [showManualPaymentModal, setShowManualPaymentModal] = useState(false);
   const [showDualPaymentModal, setShowDualPaymentModal] = useState(false);
   const [paymentType, setPaymentType] = useState<'pi' | 'coins' | 'manual' | 'dual'>('pi');
+  const [showCoinRewardModal, setShowCoinRewardModal] = useState(false);
+  const [coinRewards, setCoinRewards] = useState<any[]>([]);
   const { toast } = useToast();
   const { profile, isAuthenticated, updateProfile } = useUserProfile();
   const { isPiBrowser } = usePiBrowserDetection();
@@ -231,9 +234,8 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
       });
 
       if (result.success) {
-        // If the purchased item is a Flappy Coin pack, add coins to wallet and show claim modal
+        // If the purchased item is a Flappy Coin pack, show claim modal instead of direct wallet update
         if (item.type === 'coins') {
-          const walletCoins = parseInt(localStorage.getItem('flappypi-coins') || '0');
           let claimedAmount = 0;
           if (item.amount) {
             claimedAmount = item.amount;
@@ -256,13 +258,18 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
             const match = item.description.match(/FC(\d+)/);
             if (match) claimedAmount = parseInt(match[1], 10);
           }
-          const updatedWalletCoins = walletCoins + claimedAmount;
-          setCoins(updatedWalletCoins);
-          localStorage.setItem('flappypi-coins', updatedWalletCoins.toString());
-          toast({
-            title: "Coins Claimed! \ud83d\udcb0",
-            description: `${claimedAmount} Flappy Coins have been added to your wallet.`
-          });
+          
+          // Show reward modal for coin claim
+          setCoinRewards([{
+            id: item.id,
+            name: item.name,
+            type: 'coins',
+            quantity: claimedAmount,
+            rarity: 'Common',
+            image: item.image,
+            description: item.description || 'Flappy Coins'
+          }]);
+          setShowCoinRewardModal(true);
           return;
         }
 
@@ -340,22 +347,21 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
 
     const coinPrice = item.flappyCoinPrice || item.coinPrice;
     if (coins >= coinPrice) {
-      // If the purchased item is Flappy Coins, add to wallet instead of deducting
+      // If the purchased item is Flappy Coins, show claim modal instead of direct wallet update
       if (item.type === 'coins') {
         const claimedAmount = item.amount || item.quantity || 0;
-        const updatedWalletCoins = coins + claimedAmount;
-        setCoins(updatedWalletCoins);
-        localStorage.setItem('flappypi-coins', updatedWalletCoins.toString());
         
-        // Dispatch wallet update event
-        window.dispatchEvent(new CustomEvent('wallet-balance-updated', { 
-          detail: { balance: updatedWalletCoins, added: claimedAmount } 
-        }));
-        
-        toast({
-          title: "Coins Claimed! 💰",
-          description: `${claimedAmount} Flappy Coins have been added to your wallet.`
-        });
+        // Show reward modal for coin claim
+        setCoinRewards([{
+          id: item.id,
+          name: item.name,
+          type: 'coins',
+          quantity: claimedAmount,
+          rarity: 'Common',
+          image: item.image,
+          description: item.description || 'Flappy Coins'
+        }]);
+        setShowCoinRewardModal(true);
         return;
       }
 
@@ -595,15 +601,24 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
       <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-                     <div className="flex items-center gap-3">
-             <ShoppingCart className="w-6 h-6" style={{ color: '#3b82f6' }} />
-             <h2 className="text-2xl font-bold text-gray-900">
-               Shop
-               <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
-                 MAINNET
-               </span>
-             </h2>
-           </div>
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={onClose}
+              variant="ghost"
+              size="sm"
+              className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 p-2"
+              title="Back to Home"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <ShoppingCart className="w-6 h-6" style={{ color: '#3b82f6' }} />
+            <h2 className="text-2xl font-bold text-gray-900">
+              Shop
+              <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+                MAINNET
+              </span>
+            </h2>
+          </div>
           <Button
             onClick={onClose}
             variant="ghost"
@@ -794,7 +809,6 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
       />
       
 
-
       <DualPaymentModal
         isOpen={showDualPaymentModal}
         onClose={() => setShowDualPaymentModal(false)}
@@ -807,6 +821,23 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
         }}
         onPaymentSuccess={handleDualPaymentSuccess}
         onPaymentError={handleDualPaymentError}
+      />
+
+      {/* Coin Rewards Modal - For Flappy Coins section claims */}
+      <RewardModal
+        open={showCoinRewardModal}
+        onClose={() => {
+          setShowCoinRewardModal(false);
+          // Reload wallet balance after coin claim
+          const savedCoins = parseInt(localStorage.getItem('flappypi-coins') || '0');
+          setCoins(savedCoins);
+        }}
+        rewards={coinRewards}
+        onClaim={() => {
+          // Reload wallet balance after coin claim
+          const savedCoins = parseInt(localStorage.getItem('flappypi-coins') || '0');
+          setCoins(savedCoins);
+        }}
       />
     </div>
   );
