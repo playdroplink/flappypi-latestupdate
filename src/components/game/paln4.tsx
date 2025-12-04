@@ -630,15 +630,19 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge }
     { id: 'coin_multiplier', name: '2x Multiplier', icon: '/powerups/2x-coin-multiplier.png' }
   ];
   
-  // Use equipment system for powerup quantities
+  // Use equipment system for powerup quantities - FIXED: Load actual quantities from useGameEquipment
   const footerPowerUps = footerPowerUpItems
-    .map(powerup => ({
-      id: powerup.id,
-      name: powerup.name,
-      icon: powerup.icon,
-      quantity: 0 // Simplified for now
-    }))
-    .filter(pu => pu.quantity > 0);
+    .map(powerup => {
+      // Find the powerup in availablePowerUps from useGameEquipment hook
+      const equippedPowerup = availablePowerUps?.find(p => p.id === powerup.id);
+      return {
+        id: powerup.id,
+        name: powerup.name,
+        icon: powerup.icon,
+        quantity: equippedPowerup ? equippedPowerup.quantity : 0
+      };
+    })
+    .filter(pu => pu.quantity > 0); // Only show powerups with quantity > 0
 
   // On play again, play playbutton SFX
   const handlePlayAgain = () => {

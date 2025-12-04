@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,13 +7,32 @@ import { shopItems } from '@/constants/shopItems';
 import { useToast } from '@/hooks/use-toast';
 import { inventoryService } from '@/services/inventoryService';
 import ImageWithFallback from './ImageWithFallback';
-import { getItemImage } from '@/utils/itemImageMapping';
+import { getItemImage, getExactItemImage } from '@/utils/itemImageMapping';
 import { getBirdImageSrc } from '@/utils/getBirdImageSrc';
+import CoinClaimModal from './CoinClaimModal';
+
+/**
+ * Get the appropriate image for any item type (skin, powerup, etc)
+ */
+const getRewardImage = (reward: Reward): string => {
+  // If item has explicit image path, use it
+  if (reward.image) {
+    return reward.image;
+  }
+  
+  // For bird/skin types, use getBirdImageSrc
+  if (reward.type === 'skin') {
+    return getBirdImageSrc(reward);
+  }
+  
+  // For all other types (powerup, subscription, etc), use getItemImage
+  return getItemImage(reward.id);
+};
 
 interface Reward {
   id: string;
   name: string;
-  type: 'skin' | 'powerup' | 'subscription' | 'mystery-box' | 'bundle';
+  type: 'skin' | 'powerup' | 'subscription' | 'mystery-box' | 'bundle' | 'coins';
   quantity: number;
   rarity: 'Common' | 'Rare' | 'Epic' | 'Special' | 'Legendary';
   image?: string;
@@ -53,6 +72,15 @@ const RewardModal: React.FC<RewardModalProps> = ({ open, onClose, rewards, onCla
   const { toast } = useToast();
   const [claimed, setClaimed] = React.useState(false);
   const [showRewards, setShowRewards] = React.useState(false);
+  const [showCoinClaimModal, setShowCoinClaimModal] = useState(false);
+  const [totalCoinsToShow, setTotalCoinsToShow] = useState(0);
+  const [claimedItemsToShow, setClaimedItemsToShow] = useState<Array<{
+    id: string;
+    name: string;
+    quantity: number;
+    image?: string;
+    rarity?: string;
+  }>>([]);
 
   React.useEffect(() => {
     if (open && rewards.length > 0) {
@@ -63,19 +91,51 @@ const RewardModal: React.FC<RewardModalProps> = ({ open, onClose, rewards, onCla
 
   const handleClaim = async () => {
     try {
+      let totalCoinsAdded = 0;
+      let claimedItems = [];
+      
+      // Process each reward separately based on type
       rewards.forEach(reward => {
-        inventoryService.saveToInventory({
-          id: reward.id,
-          name: reward.name,
-          type: reward.type,
-          quantity: reward.quantity,
-          rarity: reward.rarity,
-          image: reward.image,
-          description: reward.description
-        });
+        // Handle coin rewards specially - add to wallet instead of inventory
+        if (reward.type === 'coins') {
+          const { loadWalletBalance, saveWalletBalance } = require('@/utils/walletUtils');
+          const savedUsername = localStorage.getItem('flappypi-username');
+          const currentBalance = loadWalletBalance(savedUsername);
+          const coinsToAdd = reward.quantity || 0;
+          const newBalance = currentBalance + coinsToAdd;
+          
+          // Save updated wallet balance
+          saveWalletBalance(newBalance, savedUsername);
+          localStorage.setItem('flappypi-coins', newBalance.toString());
+          totalCoinsAdded += coinsToAdd;
+          
+          // Dispatch wallet update event
+          window.dispatchEvent(new CustomEvent('wallet-balance-updated', { 
+            detail: { balance: newBalance, added: coinsToAdd } 
+          }));
+          
+          console.log(`✅ Added ${coinsToAdd} coins to wallet. New balance: ${newBalance}`);
+        } else {
+          // For non-coin rewards (items, skins, powerups), save to inventory
+          const itemToAdd = {
+            id: reward.id,
+            name: reward.name,
+            type: reward.type,
+            quantity: reward.quantity,
+            rarity: reward.rarity,
+            image: reward.image,
+            description: reward.description
+          };
+          
+          inventoryService.saveToInventory(itemToAdd);
+          claimedItems.push(itemToAdd);
+          
+          console.log(`✅ Added ${reward.name} to inventory`);
+        }
       });
 
       // Supabase sync: get user_id from localStorage (from user_profiles.uid or pi user)
+      // Only sync items, not coins (coins are handled via wallet service)
       let user_id = null;
       try {
         const piUser = localStorage.getItem('flappypi-pi-user');
@@ -85,33 +145,64 @@ const RewardModal: React.FC<RewardModalProps> = ({ open, onClose, rewards, onCla
         }
       } catch {}
 
-      if (user_id) {
+      if (user_id && claimedItems.length > 0) {
         try {
           await fetch('/api/inventory/save', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id, items: rewards })
+            body: JSON.stringify({ user_id, items: claimedItems })
           });
+          console.log(`✅ Synced ${claimedItems.length} item(s) to cloud`);
         } catch (err) {
-          toast({
-            title: 'Cloud Sync Failed',
-            description: 'Could not sync rewards to cloud. Try again later.',
-            variant: 'destructive'
-          });
+          console.warn('Cloud sync failed for items:', err);
+          // Don't show error toast - items already saved locally
         }
       }
 
       setClaimed(true);
       if (onClaim) onClaim();
-      toast({
-        title: 'Rewards Claimed! 🎉',
-        description: `Successfully claimed ${rewards.length} item(s) from your subscription!`,
-        duration: 3000
-      });
+      
+      const itemCount = rewards.filter(r => r.type !== 'coins').length;
+      const coinCount = rewards.filter(r => r.type === 'coins').reduce((sum, r) => sum + r.quantity, 0);
+      
+      // If there are coins, show the coin claim modal
+      if (coinCount > 0) {
+        setTotalCoinsToShow(coinCount);
+        setClaimedItemsToShow(
+          rewards
+            .filter(r => r.type !== 'coins')
+            .map(r => ({
+              id: r.id,
+              name: r.name,
+              quantity: r.quantity,
+              image: r.image,
+              rarity: r.rarity
+            }))
+        );
+        setShowCoinClaimModal(true);
+      }
+      
+      // Show toast for non-coin claims only (coins get their own modal)
+      if (itemCount > 0 && coinCount === 0) {
+        let description = '';
+        if (itemCount > 0) {
+          description = `Successfully claimed ${itemCount} item(s)!`;
+        }
+        
+        toast({
+          title: 'Rewards Claimed! 🎉',
+          description: description,
+          duration: 3000
+        });
+      }
+      
       setTimeout(() => {
-        onClose();
-        setShowRewards(false);
-        setClaimed(false);
+        if (coinCount === 0) {
+          // Only close if no coins to claim
+          onClose();
+          setShowRewards(false);
+          setClaimed(false);
+        }
       }, 2000);
     } catch (error) {
       console.error('Error claiming rewards:', error);
@@ -159,7 +250,7 @@ const RewardModal: React.FC<RewardModalProps> = ({ open, onClose, rewards, onCla
                 <div className="flex items-center space-x-4">
                   <div className="flex-shrink-0">
                     <ImageWithFallback
-                      src={getBirdImageSrc(reward)}
+                      src={getRewardImage(reward)}
                       alt={reward.name}
                       className="w-16 h-16 object-contain bg-gray-50 rounded-lg p-2 border border-gray-200"
                       fallbackSrc="/icons/icon-128x128.png"
@@ -218,6 +309,20 @@ const RewardModal: React.FC<RewardModalProps> = ({ open, onClose, rewards, onCla
           }
         }
       `}</style>
+
+      {/* Coin Claim Modal - Show when coins are claimed */}
+      <CoinClaimModal
+        isOpen={showCoinClaimModal}
+        onClose={() => {
+          setShowCoinClaimModal(false);
+          onClose();
+          setShowRewards(false);
+          setClaimed(false);
+        }}
+        coins={totalCoinsToShow}
+        itemsCount={claimedItemsToShow.length}
+        claimedItems={claimedItemsToShow}
+      />
     </div>
   );
 };

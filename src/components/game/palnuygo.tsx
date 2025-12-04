@@ -298,7 +298,8 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge }
     getActiveEffects, 
     useExtraLife,
     getPowerUpStatus,
-    refreshEquipment
+    refreshEquipment,
+    availablePowerUps
   } = useGameEquipment();
 
   // Get equipped bird skin
@@ -961,14 +962,27 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge }
   }
 
   // Define the 5 main power-ups for the footer
-  const footerPowerUps = availablePowerUps
-    .map(powerup => ({
-      id: powerup.id,
-      name: powerup.name,
-      icon: powerup.icon,
-      quantity: 1 // Default quantity since it's not in the type
-    }))
-    .filter(pu => pu.quantity > 0);
+  // FIXED: Load actual quantities from useGameEquipment (Bundle/Endless mode)
+  const footerPowerUpItems = [
+    { id: 'shield', name: 'Shield', icon: '/powerups/shield.png' },
+    { id: 'magnet', name: 'Magnet', icon: '/powerups/coin-magnet.png' },
+    { id: 'extra_life', name: 'Extra Life', icon: '/powerups/extra-life.png' },
+    { id: 'turbo_start', name: 'Turbo Start', icon: '/powerups/turbo-start.png' },
+    { id: 'coin_multiplier', name: '2x Multiplier', icon: '/powerups/2x-coin-multiplier.png' }
+  ];
+  
+  const footerPowerUps = footerPowerUpItems
+    .map(powerup => {
+      // Find the powerup in availablePowerUps from useGameEquipment hook
+      const equippedPowerup = availablePowerUps?.find(p => p.id === powerup.id);
+      return {
+        id: powerup.id,
+        name: powerup.name,
+        icon: powerup.icon,
+        quantity: equippedPowerup ? equippedPowerup.quantity : 0
+      };
+    })
+    .filter(pu => pu.quantity > 0); // Only show powerups with quantity > 0
 
   // On play again, play playbutton SFX
   const handlePlayAgain = () => {

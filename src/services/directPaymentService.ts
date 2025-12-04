@@ -126,8 +126,26 @@ class DirectPaymentService {
           });
         }
       } else if (item.type === 'coins' && item.coins) {
-        // Handle coin purchases
+        // Handle coin purchases - actually add coins to wallet
         console.log('💰 Coins purchased:', item.coins);
+        
+        // Load current wallet balance
+        const { loadWalletBalance, saveWalletBalance } = require('@/utils/walletUtils');
+        const savedUsername = localStorage.getItem('flappypi-username');
+        const currentBalance = loadWalletBalance(savedUsername);
+        const newBalance = currentBalance + item.coins;
+        
+        // Save updated wallet balance
+        saveWalletBalance(newBalance, savedUsername);
+        console.log(`✅ Coins added to wallet: +${item.coins}, new balance: ${newBalance}`);
+        
+        // Also update localStorage for immediate UI refresh
+        localStorage.setItem('flappypi-coins', newBalance.toString());
+        
+        // Dispatch wallet update event so UI updates immediately
+        window.dispatchEvent(new CustomEvent('wallet-balance-updated', { 
+          detail: { balance: newBalance, added: item.coins } 
+        }));
         
         if (this.toast) {
           this.toast({

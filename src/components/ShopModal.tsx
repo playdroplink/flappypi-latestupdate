@@ -340,23 +340,29 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
 
     const coinPrice = item.flappyCoinPrice || item.coinPrice;
     if (coins >= coinPrice) {
-      const newCoins = coins - coinPrice;
-      setCoins(newCoins);
-      localStorage.setItem('flappypi-coins', newCoins.toString());
-
-      // If the purchased item is Flappy Coins, increment wallet balance
+      // If the purchased item is Flappy Coins, add to wallet instead of deducting
       if (item.type === 'coins') {
-        const walletCoins = parseInt(localStorage.getItem('flappypi-coins') || '0');
         const claimedAmount = item.amount || item.quantity || 0;
-        const updatedWalletCoins = walletCoins + claimedAmount;
+        const updatedWalletCoins = coins + claimedAmount;
         setCoins(updatedWalletCoins);
         localStorage.setItem('flappypi-coins', updatedWalletCoins.toString());
+        
+        // Dispatch wallet update event
+        window.dispatchEvent(new CustomEvent('wallet-balance-updated', { 
+          detail: { balance: updatedWalletCoins, added: claimedAmount } 
+        }));
+        
         toast({
-          title: "Coins Claimed! \ud83d\udcb0",
+          title: "Coins Claimed! 💰",
           description: `${claimedAmount} Flappy Coins have been added to your wallet.`
         });
         return;
       }
+
+      // For other items, deduct the coin price
+      const newCoins = coins - coinPrice;
+      setCoins(newCoins);
+      localStorage.setItem('flappypi-coins', newCoins.toString());
 
       // Add item to inventory using proper inventory service
       const inventoryItem = {
