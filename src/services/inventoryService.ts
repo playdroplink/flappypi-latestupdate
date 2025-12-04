@@ -778,14 +778,14 @@ class InventoryService {
       // Normalize Fire Phoenix ID to ensure consistency
       let normalizedItemId = itemId;
       if (type === 'skin' && (itemId === 'inferno_phoenix' || itemId === 'inferno-phoenix')) {
-        normalizedItemId = 'inferno_phoenix';
+        normalizedItemId = 'inferno-phoenix';
         console.log('🔥 [Fire Phoenix] Normalized Fire Phoenix ID for equipping:', normalizedItemId);
       }
-      
+
       console.log(`🔧 Attempting to equip ${type}: ${normalizedItemId}`);
       const inventory = this.getInventory();
       const item = inventory.find(i => i.id === normalizedItemId && i.type === type);
-      
+
       if (!item || item.quantity <= 0) {
         console.log(`❌ Cannot equip ${normalizedItemId}: item not found or quantity 0`);
         return false;
@@ -799,19 +799,33 @@ class InventoryService {
           }
         });
         console.log(`🔄 Unequipped all other skins`);
+        // If Fire Phoenix, set selected_bird_skin in profile
+        if (normalizedItemId === 'inferno-phoenix') {
+          type ProfileType = { selected_bird_skin?: string; [key: string]: any };
+          let profile: ProfileType = {};
+          const savedProfile = localStorage.getItem('flappypi-profile');
+          if (savedProfile) {
+            try {
+              profile = JSON.parse(savedProfile);
+            } catch {}
+          }
+          profile.selected_bird_skin = 'inferno-phoenix';
+          localStorage.setItem('flappypi-profile', JSON.stringify(profile));
+          window.dispatchEvent(new CustomEvent('profile-updated', { detail: { selected_bird_skin: 'inferno-phoenix' } }));
+        }
       }
 
       // Equip the selected item
       item.equipped = true;
-      
+
       // Save updated inventory
       localStorage.setItem('flappypi-inventory', JSON.stringify(inventory));
-      
+
       // Dispatch custom event to notify components
       window.dispatchEvent(new CustomEvent('inventory-updated', { 
         detail: { itemId: normalizedItemId, type, action: 'equipped' } 
       }));
-      
+
       console.log(`✅ Successfully equipped ${type}: ${normalizedItemId}`);
       console.log(`📦 Current inventory:`, inventory.filter(i => i.type === 'skin'));
       return true;
@@ -1707,32 +1721,59 @@ class InventoryService {
           repaired = true;
           continue;
         }
-        
+
         // Ensure required fields
         if (!item.id || !item.name || !item.type) {
           console.log('🔧 Removing item with missing fields:', item);
           repaired = true;
           continue;
         }
-        
+
         // Fix quantity
         if (typeof item.quantity !== 'number' || item.quantity < 0) {
           item.quantity = 1;
           repaired = true;
         }
-        
+
         // Fix purchasedAt
         if (!item.purchasedAt) {
           item.purchasedAt = new Date().toISOString();
           repaired = true;
         }
-        
+
         // Fix description
         if (typeof item.description !== 'string') {
           item.description = item.name || 'Item';
           repaired = true;
         }
-        
+
+        // --- Fire Phoenix Skin auto-fix ---
+        if (
+          item.type === 'skin' && (
+            item.id === 'inferno_phoenix' ||
+            item.id === 'inferno-phoenix' ||
+            (item.name && item.name.toLowerCase().includes('phoenix')) ||
+            (item.image && item.image.includes('bird_12.gif'))
+          )
+        ) {
+          if (item.id !== 'inferno_phoenix') {
+            item.id = 'inferno_phoenix';
+            repaired = true;
+          }
+          if (item.image !== '/birds2/bird_12.gif') {
+            item.image = '/birds2/bird_12.gif';
+            repaired = true;
+          }
+          if (item.rarity !== 'Special') {
+            item.rarity = 'Special';
+            repaired = true;
+          }
+          if (item.name !== 'Fire Phoenix Skin') {
+            item.name = 'Fire Phoenix Skin';
+            repaired = true;
+          }
+        }
+
         validItems.push(item);
       }
       

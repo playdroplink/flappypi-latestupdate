@@ -28,6 +28,15 @@ const getAutoTheme = () => {
 };
 
 const SubscriptionPlansPage: React.FC = () => {
+    // Mock payment handler for dev/sandbox
+    const handleMockPay = async (plan: any) => {
+      toast({
+        title: 'Mock Payment Successful!',
+        description: `${plan.name} subscription is now active (mock).`
+      });
+      // Simulate subscription activation
+      handlePiPaymentSuccess();
+    };
   const { toast } = useToast();
   const [selectedPlan, setSelectedPlan] = React.useState<any | null>(null);
   const [showPiModal, setShowPiModal] = React.useState(false);
@@ -130,14 +139,6 @@ const SubscriptionPlansPage: React.FC = () => {
           const powerUp = powerUpItems.find(p => p.id === reward.id || p.name.toLowerCase().includes(reward.name.toLowerCase()));
           if (powerUp) {
             individualPrice = powerUp.piPrice;
-            breakdown.push({
-              item: itemName,
-              quantity: reward.quantity,
-              individualPrice: individualPrice,
-              totalPrice: individualPrice * reward.quantity,
-              type: 'powerup'
-            });
-            totalPiValue += individualPrice * reward.quantity;
           }
           break;
 
@@ -276,6 +277,15 @@ const SubscriptionPlansPage: React.FC = () => {
   ];
 
   const handleBuyWithPi = async (plan: any) => {
+      // Mock payment handler for dev/sandbox
+      const handleMockPay = async (plan: any) => {
+        toast({
+          title: 'Mock Payment Successful!',
+          description: `${plan.name} subscription is now active (mock).`
+        });
+        // Simulate subscription activation
+        handlePiPaymentSuccess();
+      };
     try {
       console.log('🔍 [DEBUG] Starting direct payment for plan:', plan);
       
@@ -589,6 +599,15 @@ const SubscriptionPlansPage: React.FC = () => {
                 >
                   Pay with Pi
                 </Button>
+                {process.env.NODE_ENV !== 'production' && (
+                  <Button
+                    onClick={() => handleMockPay(plan)}
+                    className={`flex-2 bg-yellow-400 text-sm sm:text-base py-2 sm:py-3 shadow-lg ml-2`}
+                    size="lg"
+                  >
+                    Mock Pay
+                  </Button>
+                )}
               </div>
             </div>
             

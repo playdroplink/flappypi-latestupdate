@@ -224,7 +224,28 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ open, onClose }) => {
   };
 
   const getInventoryByType = (type: string) => {
-    return inventory.filter(item => item.type === type);
+    // Always show Fire Phoenix and Sky Blue Flappy as separate cards
+    const items = inventory.filter(item => item.type === type);
+    // Remove accidental merges: filter out items with same id but different canonical skin
+    const seen = new Set();
+    return items.filter(item => {
+      if (item.id === 'inferno-phoenix' || item.name === 'Fire Phoenix Skin') {
+        // Only allow one Fire Phoenix card
+        if (seen.has('inferno-phoenix')) return false;
+        seen.add('inferno-phoenix');
+        return true;
+      }
+      if (item.id === 'classic' || item.name === 'Sky Blue Flappy') {
+        // Only allow one Sky Blue Flappy card
+        if (seen.has('classic')) return false;
+        seen.add('classic');
+        return true;
+      }
+      // Allow all other skins
+      if (seen.has(item.id)) return false;
+      seen.add(item.id);
+      return true;
+    });
   };
 
   const getBundleImage = (bundleId: string) => {
