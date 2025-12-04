@@ -9,7 +9,7 @@ interface WalletData {
   pi_user_id: string;
   username: string;
   wallet_address: string;
-  collected_at: string;
+  updated_at: string;
 }
 
 export class WalletService {
@@ -262,7 +262,7 @@ export class WalletService {
       }
 
       console.log(`✅ Retrieved ${data?.length || 0} wallet addresses`);
-      return data || [];
+      return (data as WalletData[]) || [];
     } catch (error) {
       console.error('❌ Error in getAllWalletAddresses:', error);
       return [];
