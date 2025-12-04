@@ -1241,7 +1241,16 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({ isOpen,
       </Dialog>
               <EnhancedRewardModal
           open={showRewardModal}
-          onClose={() => setShowRewardModal(false)}
+          onClose={() => {
+            // Close reward modal first
+            setShowRewardModal(false);
+            // Then close subscription modal after a brief delay for smooth transition
+            setTimeout(() => {
+              setPaymentPlan(null);
+              setRewards([]);
+              onClose();
+            }, 300);
+          }}
           rewards={rewards}
           planName={paymentPlan?.name}
           planId={paymentPlan?.id}

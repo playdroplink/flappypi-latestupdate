@@ -150,9 +150,10 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
             duration: 3000
           });
           
+          // Close after brief delay to show success state
           setTimeout(() => {
-            handleClose();
-          }, 2000);
+            onClose();
+          }, 1500);
         } else {
           toast({
             title: 'Already Claimed',
@@ -171,7 +172,11 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
             quantity: reward.quantity,
             rarity: reward.rarity,
             image: reward.image,
-            description: reward.description
+            description: reward.description,
+            // Auto-equip Fire Phoenix skin when claimed
+            ...(reward.type === 'skin' && (reward.id === 'inferno_phoenix' || reward.id === 'inferno-phoenix') ? { equipped: true } : {}),
+            // Auto-equip powerups by default
+            ...(reward.type === 'powerup' ? { equipped: true } : {})
           };
           
           inventoryService.saveToInventory(inventoryItem);
@@ -207,9 +212,10 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
           duration: 3000
         });
         
+        // Close after brief delay to show success state
         setTimeout(() => {
-          handleClose();
-        }, 2000);
+          onClose();
+        }, 1500);
       }
     } catch (error) {
       console.error('Error claiming rewards:', error);
@@ -318,32 +324,39 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
             </div>
           )}
           
-          <div className="flex space-x-3">
-            <Button
-              onClick={handleClaim}
-              className="flex-1 bg-purple-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-purple-600 transition-all duration-200 transform hover:scale-105"
-            >
-              🎉 Claim All Rewards
-            </Button>
-            <Button
-              onClick={onClose}
-              className="flex-1 bg-green-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-green-600 transition-all duration-200"
-            >
-              ✅ Done
-            </Button>
-            <Button
-              onClick={goToInventory}
-              className="flex-1 bg-blue-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-blue-600 transition-all duration-200 ml-2"
-            >
-              📦 Go to Inventory
-            </Button>
-          </div>
-          <Button
-            onClick={onClose}
-            className="w-full bg-blue-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-blue-600 transition-all duration-200 mt-4"
-          >
-            🚀 Ready to start? Let's flap those wings!
-          </Button>
+          {!claimed && !isPreview && (
+            <div className="flex space-x-3">
+              <Button
+                onClick={handleClaim}
+                className="flex-1 bg-purple-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-purple-600 transition-all duration-200 transform hover:scale-105"
+              >
+                🎉 Claim All Rewards
+              </Button>
+              <Button
+                onClick={onClose}
+                className="flex-1 bg-gray-400 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-gray-500 transition-all duration-200"
+              >
+                💼 Save for Later
+              </Button>
+            </div>
+          )}
+          
+          {(claimed || isPreview) && (
+            <div className="flex space-x-3">
+              <Button
+                onClick={onClose}
+                className="flex-1 bg-green-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-green-600 transition-all duration-200"
+              >
+                ✅ Close
+              </Button>
+              <Button
+                onClick={goToInventory}
+                className="flex-1 bg-blue-500 text-white py-3 px-6 rounded-xl font-bold text-lg hover:bg-blue-600 transition-all duration-200"
+              >
+                📦 View Inventory
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 

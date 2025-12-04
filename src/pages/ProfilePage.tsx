@@ -275,12 +275,20 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
     // Load owned skins from inventory
     const ownedSkinItems = inventoryService.getInventoryByType('skin');
     
+    // Ensure Fire Phoenix has correct image
+    const normalizedSkinItems = ownedSkinItems.map(skin => {
+      if (skin.id === 'inferno_phoenix' || skin.id === 'inferno-phoenix') {
+        return { ...skin, id: 'inferno_phoenix', image: '/birds2/bird_12.gif' };
+      }
+      return skin;
+    });
+    
     // Always include the default bird (Sky Blue Flappy)
     const defaultBirdItem = shopItems.find(item => item.id === 'bird-0');
     const defaultBird = defaultBirdItem ? { ...defaultBirdItem, equipped: false, purchasedAt: new Date().toISOString() } : null;
-    const skins = defaultBird && !ownedSkinItems.some(s => s.id === 'bird-0')
-      ? [defaultBird as any, ...ownedSkinItems]
-      : ownedSkinItems;
+    const skins = defaultBird && !normalizedSkinItems.some(s => s.id === 'bird-0')
+      ? [defaultBird as any, ...normalizedSkinItems]
+      : normalizedSkinItems;
     
     setOwnedSkins(skins);
     
@@ -366,12 +374,20 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
       // Reload owned skins
       const ownedSkinItems = inventoryService.getInventoryByType('skin');
       
+      // Ensure Fire Phoenix has correct image
+      const normalizedSkinItems = ownedSkinItems.map(skin => {
+        if (skin.id === 'inferno_phoenix' || skin.id === 'inferno-phoenix') {
+          return { ...skin, id: 'inferno_phoenix', image: '/birds2/bird_12.gif' };
+        }
+        return skin;
+      });
+      
       // Always include the default bird (Sky Blue Flappy)
       const defaultBirdItem = shopItems.find(item => item.id === 'bird-0');
       const defaultBird = defaultBirdItem ? { ...defaultBirdItem, equipped: false, purchasedAt: new Date().toISOString() } : null;
-      const skins = defaultBird && !ownedSkinItems.some(s => s.id === 'bird-0')
-        ? [defaultBird as any, ...ownedSkinItems]
-        : ownedSkinItems;
+      const skins = defaultBird && !normalizedSkinItems.some(s => s.id === 'bird-0')
+        ? [defaultBird as any, ...normalizedSkinItems]
+        : normalizedSkinItems;
       
       setOwnedSkins(skins);
       
@@ -475,21 +491,33 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
   // Handle skin selection and equipping
   const handleSkinSelect = (skinId: string) => {
     try {
+      // Normalize Fire Phoenix ID to ensure consistency
+      let normalizedSkinId = skinId;
+      if (skinId === 'inferno_phoenix' || skinId === 'inferno-phoenix') {
+        normalizedSkinId = 'inferno_phoenix';
+      }
+      
       // Equip the selected skin
-      inventoryService.equipItem(skinId, 'skin');
+      inventoryService.equipItem(normalizedSkinId, 'skin');
       
       // Update local state
-      setEquippedSkinId(skinId);
+      setEquippedSkinId(normalizedSkinId);
       
       // Find the skin to get its image
-      const selectedSkin = ownedSkins.find(skin => skin.id === skinId);
+      let selectedSkin = ownedSkins.find(skin => skin.id === normalizedSkinId);
+      
+      // Ensure Fire Phoenix has correct image
+      if (selectedSkin && (selectedSkin.id === 'inferno_phoenix' || selectedSkin.id === 'inferno-phoenix')) {
+        selectedSkin = { ...selectedSkin, id: 'inferno_phoenix', image: '/birds2/bird_12.gif' };
+      }
+      
       if (selectedSkin) {
-        setAvatar(selectedSkin.image || getBirdImageSrc(skinId));
+        setAvatar(selectedSkin.image || getBirdImageSrc(normalizedSkinId));
         setCustomAvatar(null);
         
-        // Update profile with selected skin
+        // Update profile with selected skin (normalized ID)
         if (updateProfile) {
-          updateProfile({ selected_bird_skin: skinId });
+          updateProfile({ selected_bird_skin: normalizedSkinId });
         }
         
         toast({
@@ -1016,7 +1044,13 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
                       <h3 className="font-bold text-blue-800 mb-3 text-center">Your Current Bird Character</h3>
                       <div className="flex items-center justify-center gap-4">
                         {(() => {
-                          const equippedSkin = ownedSkins.find(skin => skin.id === equippedSkinId);
+                          let equippedSkin = ownedSkins.find(skin => skin.id === equippedSkinId);
+                          
+                          // Ensure Fire Phoenix has correct image
+                          if (equippedSkin && (equippedSkin.id === 'inferno_phoenix' || equippedSkin.id === 'inferno-phoenix')) {
+                            equippedSkin = { ...equippedSkin, id: 'inferno_phoenix', image: '/birds2/bird_12.gif' };
+                          }
+                          
                           return (
                             <>
                               <img 
@@ -1212,7 +1246,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
                     <h3 className="font-bold text-blue-800 mb-2 text-center">Current Weather Theme</h3>
                     <div className="flex items-center justify-center gap-4">
                       <div className={`w-24 h-24 rounded-lg ${themes[selectedWeather]} flex items-center justify-center shadow-lg border-2 border-blue-400`}>
-                        <span className="text-3xl">{selectedWeather === 'rain' ? '🌧️' : selectedWeather === 'snow' ? '❄️' : selectedWeather === 'night' ? '🌙' : '☀️'}</span>
+                        <span className="text-3xl">{selectedWeather === 'rain' ? '🌧️' : selectedWeather === 'winter' ? '❄️' : selectedWeather === 'night' ? '🌙' : '☀️'}</span>
                       </div>
                       <div className="flex flex-col gap-2 flex-1">
                         <h4 className="font-bold text-blue-800 capitalize text-lg">{selectedWeather}</h4>
@@ -1322,7 +1356,28 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
                         ].map((season) => {
                           // Check if season is available based on subscription
                           let isAvailable = false;
-                          const subscriptionType = subscriptions[0]?.subscription_tier?.toLowerCase() || '';
+                          
+                          // Extract subscription tier from ID or name
+                          const subscription = subscriptions[0];
+                          let subscriptionType = '';
+                          
+                          if (subscription) {
+                            // Check ID first (e.g., 'ultimate-subscription', 'premium-subscription', 'starter-subscription')
+                            if (subscription.id) {
+                              const idLower = subscription.id.toLowerCase();
+                              if (idLower.includes('ultimate')) subscriptionType = 'ultimate';
+                              else if (idLower.includes('premium')) subscriptionType = 'premium';
+                              else if (idLower.includes('starter')) subscriptionType = 'starter';
+                            }
+                            
+                            // Fallback to name if ID didn't match (e.g., 'Ultimate Pack', 'Premium Pack', 'Starter Pack')
+                            if (!subscriptionType && subscription.name) {
+                              const nameLower = subscription.name.toLowerCase();
+                              if (nameLower.includes('ultimate')) subscriptionType = 'ultimate';
+                              else if (nameLower.includes('premium')) subscriptionType = 'premium';
+                              else if (nameLower.includes('starter')) subscriptionType = 'starter';
+                            }
+                          }
                           
                           if (subscriptionType === 'ultimate') {
                             isAvailable = true;

@@ -396,6 +396,12 @@ class InventoryService {
       if (item.type === 'skin' && (item.id === 'inferno_phoenix' || item.name?.toLowerCase().includes('inferno'))) {
         item.id = 'inferno_phoenix';
         item.image = '/birds2/bird_12.gif';
+        console.log('🔥 [Fire Phoenix] Normalized Fire Phoenix ID and image:', {
+          id: item.id,
+          image: item.image,
+          equipped: item.equipped,
+          name: item.name
+        });
       }
       // Check if item already exists
       const existingItem = inventory.find(i => i.id === item.id && i.type === item.type);
@@ -747,12 +753,19 @@ class InventoryService {
   // Equip an item (for skins, only one can be equipped at a time)
   equipItem(itemId: string, type: InventoryItem['type']): boolean {
     try {
-      console.log(`🔧 Attempting to equip ${type}: ${itemId}`);
+      // Normalize Fire Phoenix ID to ensure consistency
+      let normalizedItemId = itemId;
+      if (type === 'skin' && (itemId === 'inferno_phoenix' || itemId === 'inferno-phoenix')) {
+        normalizedItemId = 'inferno_phoenix';
+        console.log('🔥 [Fire Phoenix] Normalized Fire Phoenix ID for equipping:', normalizedItemId);
+      }
+      
+      console.log(`🔧 Attempting to equip ${type}: ${normalizedItemId}`);
       const inventory = this.getInventory();
-      const item = inventory.find(i => i.id === itemId && i.type === type);
+      const item = inventory.find(i => i.id === normalizedItemId && i.type === type);
       
       if (!item || item.quantity <= 0) {
-        console.log(`❌ Cannot equip ${itemId}: item not found or quantity 0`);
+        console.log(`❌ Cannot equip ${normalizedItemId}: item not found or quantity 0`);
         return false;
       }
 
@@ -774,10 +787,10 @@ class InventoryService {
       
       // Dispatch custom event to notify components
       window.dispatchEvent(new CustomEvent('inventory-updated', { 
-        detail: { itemId, type, action: 'equipped' } 
+        detail: { itemId: normalizedItemId, type, action: 'equipped' } 
       }));
       
-      console.log(`✅ Successfully equipped ${type}: ${itemId}`);
+      console.log(`✅ Successfully equipped ${type}: ${normalizedItemId}`);
       console.log(`📦 Current inventory:`, inventory.filter(i => i.type === 'skin'));
       return true;
     } catch (error) {
@@ -2483,8 +2496,23 @@ class InventoryService {
             quantity: reward.quantity,
             rarity: reward.rarity,
             image: reward.image,
-            description: reward.description
+            description: reward.description,
+            // Auto-equip Fire Phoenix skin when claimed
+            ...(reward.type === 'skin' && (reward.id === 'inferno_phoenix' || reward.id === 'inferno-phoenix') ? { equipped: true } : {}),
+            // Auto-equip powerups by default
+            ...(reward.type === 'powerup' ? { equipped: true } : {})
           };
+          
+          // Log Fire Phoenix specifically
+          if (reward.id === 'inferno_phoenix' || reward.id === 'inferno-phoenix') {
+            console.log('🔥 [Fire Phoenix] Claiming Fire Phoenix skin:', {
+              id: inventoryItem.id,
+              name: inventoryItem.name,
+              image: inventoryItem.image,
+              equipped: inventoryItem.equipped,
+              type: inventoryItem.type
+            });
+          }
           
           this.saveToInventory(inventoryItem);
           console.log(`📦 Added ${reward.quantity}x ${reward.name} to inventory`);
