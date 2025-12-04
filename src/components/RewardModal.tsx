@@ -89,15 +89,20 @@ const RewardModal: React.FC<RewardModalProps> = ({ open, onClose, rewards, onCla
       
       // Save all rewards to inventory first (including coins)
       rewards.forEach(reward => {
-        inventoryService.saveToInventory({
+        // For powerups, mark as equipped so they show in game
+        const itemToSave = {
           id: reward.id,
           name: reward.name,
           type: reward.type,
           quantity: reward.quantity,
           rarity: reward.rarity,
           image: reward.image,
-          description: reward.description
-        });
+          description: reward.description,
+          ...(reward.type === 'powerup' ? { equipped: true } : {})
+        };
+        
+        inventoryService.saveToInventory(itemToSave);
+        console.log(`✅ Saved ${reward.type} ${reward.name} to inventory`, itemToSave);
       });
       console.log(`✅ Saved ${rewards.length} reward(s) to inventory`);
     }

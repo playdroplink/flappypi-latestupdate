@@ -22,6 +22,16 @@ const Background: React.FC<BackgroundProps> = ({ mode = 'classic', scene = 'morn
           50% { transform: translateX(20px) translateY(-10px); }
           100% { transform: translateX(0) translateY(0); }
         }
+        @keyframes snowfall {
+          0% { transform: translateY(0) translateX(0); opacity: 1; }
+          90% { opacity: 1; }
+          100% { transform: translateY(100vh) translateX(30px); opacity: 0; }
+        }
+        @keyframes twinkle {
+          0% { opacity: 0.4; }
+          50% { opacity: 1; }
+          100% { opacity: 0.4; }
+        }
       `;
       document.head.appendChild(style);
     }
@@ -181,6 +191,50 @@ const Background: React.FC<BackgroundProps> = ({ mode = 'classic', scene = 'morn
               boxShadow: '0 0 20px rgba(255,255,255,0.3)'
             }}
           />
+        </div>
+      );
+    case 'christmas':
+      return (
+        <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
+          {/* Festive red and green gradient background */}
+          <div style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(to bottom, #1a472a 0%, #2d5f3f 30%, #c41e3a 70%, #165e3a 100%)',
+            zIndex: 1,
+          }} />
+          {/* Falling snow particles */}
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 2,
+            pointerEvents: 'none',
+            overflow: 'hidden'
+          }}>
+            {[...Array(60)].map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  position: 'absolute',
+                  width: `${2 + Math.random() * 3}px`,
+                  height: `${2 + Math.random() * 3}px`,
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  borderRadius: '50%',
+                  left: `${Math.random() * 100}%`,
+                  top: `${-10 - Math.random() * 20}px`,
+                  animation: `snowfall ${5 + Math.random() * 3}s linear infinite`,
+                  animationDelay: `${Math.random() * 2}s`,
+                  boxShadow: '0 0 2px rgba(255, 255, 255, 0.8)'
+                }}
+              />
+            ))}
+          </div>
         </div>
       );
     default:

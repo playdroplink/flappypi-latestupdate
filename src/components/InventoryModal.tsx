@@ -138,9 +138,8 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ open, onClose }) => {
   const handleUseBundle = async (bundleId: string) => {
     const result = inventoryService.useBundle(bundleId);
     if (result.success) {
-      result.items.forEach(item => {
-        inventoryService.saveToInventory(item);
-      });
+      // Items are already saved to inventory by useBundle(), no need to save again
+      // This prevents duplicate saves and ensures equipped flags are preserved
       
       toast({
         title: 'Bundle Used! 📦',

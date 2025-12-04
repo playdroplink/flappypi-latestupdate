@@ -338,6 +338,14 @@ class InventoryService {
           // Accessories: only 1 per type, unlock if not already
           existingItem.quantity = 1;
           existingItem.unlocked = true;
+        } else if (item.type === 'powerup') {
+          // For powerups: add quantity and preserve/set equipped flag
+          existingItem.quantity += item.quantity;
+          // If new item has equipped flag, ensure existing item gets it
+          if (item.equipped === true) {
+            existingItem.equipped = true;
+          }
+          console.log(`💾 [inventoryService] Updated powerup ${item.id} quantity to ${existingItem.quantity}, equipped: ${existingItem.equipped}`);
         } else {
           // For other types, add quantity
           existingItem.quantity += item.quantity;
@@ -369,6 +377,15 @@ class InventoryService {
             console.log('🎯 Auto-equipping first skin:', item.id);
           }
         }
+        
+        // For powerups: set equipped flag if not explicitly provided
+        if (item.type === 'powerup') {
+          if (item.equipped === undefined) {
+            newItem.equipped = true; // Default to equipped for new powerups
+          }
+          console.log(`🎯 [powerup] Added new powerup ${item.id} with equipped: ${newItem.equipped}`);
+        }
+        
         inventory.push(newItem);
       }
       // Save to localStorage
@@ -2037,7 +2054,8 @@ class InventoryService {
       type: 'powerup',
       quantity: 15,
       rarity: 'Common',
-      image: p.image
+      image: p.image,
+      equipped: true // Bundle powerups should be equipped by default
     }));
     // Fallback: if allPowerUps is empty, add a default power-up
     if (allPowerUps.length === 0) {
@@ -2047,7 +2065,8 @@ class InventoryService {
         type: 'powerup',
         quantity: 15,
         rarity: 'Common',
-        image: '/powerups/shield.png'
+        image: '/powerups/shield.png',
+        equipped: true // Bundle powerups should be equipped by default
       }];
     }
     // Single power-up bundles (e.g., 'extra-life', 'coin-magnet', etc.)
@@ -2068,7 +2087,8 @@ class InventoryService {
           type: 'powerup',
           quantity: 15,
           rarity: 'Common',
-          image: powerUp.image
+          image: powerUp.image,
+          equipped: true // Bundle powerups should be equipped by default
         }];
       } else {
         // Fallback if not found
@@ -2078,7 +2098,8 @@ class InventoryService {
           type: 'powerup',
           quantity: 15,
           rarity: 'Common',
-          image: `/powerups/${singlePowerUpBundles[bundleId].replace(/ /g, '')}.png`
+          image: `/powerups/${singlePowerUpBundles[bundleId].replace(/ /g, '')}.png`,
+          equipped: true // Bundle powerups should be equipped by default
         }];
       }
     }

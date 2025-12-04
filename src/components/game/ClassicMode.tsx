@@ -618,6 +618,9 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
   // Time of day state
   const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('morning');
 
+  // Season state for background effects (like Christmas snow)
+  const [selectedSeason, setSelectedSeason] = useState<string>('spring');
+
   // Set time of day based on real time, but always 'morning' for classic
   useEffect(() => {
     if (mode === 'classic') setTimeOfDay('morning');
@@ -630,6 +633,27 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
       else setTimeOfDay('night');
     }
   }, [mode]);
+
+  // Load selected season from localStorage
+  useEffect(() => {
+    const savedSeason = localStorage.getItem('flappy-pi-current-season');
+    if (savedSeason) {
+      setSelectedSeason(savedSeason);
+    }
+
+    // Listen for season changes from settings modal
+    const handleSeasonChange = () => {
+      const newSeason = localStorage.getItem('flappy-pi-current-season');
+      if (newSeason) {
+        setSelectedSeason(newSeason);
+      }
+    };
+
+    window.addEventListener('seasonChanged', handleSeasonChange);
+    return () => {
+      window.removeEventListener('seasonChanged', handleSeasonChange);
+    };
+  }, []);
 
   // On initial load, show tap to start
   useEffect(() => {
@@ -4250,7 +4274,7 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
           }}
         >
           {/* Background - Only use Background component for special effects */}
-          {mode !== 'classic' && <Background mode={toClassicChallengeEndlessMode(mode)} scene={scene} effect={effect} />}
+          {mode !== 'classic' && <Background mode={toClassicChallengeEndlessMode(mode)} scene={selectedSeason} effect={effect} />}
           
           
           {/* Ice Slide Mode - Winter Effects */}
