@@ -65,6 +65,72 @@ export interface UnclaimedSubscriptionReward {
 
 
 class InventoryService {
+  // Normalize powerup IDs to consistent format (use underscores)
+  private normalizePowerUpId(id: string): string {
+    // Map of known powerup ID variations to canonical ID
+    const idMap: { [key: string]: string } = {
+      'extra-life': 'extra_life',
+      'extra_life': 'extra_life',
+      'coin-magnet': 'magnet',
+      'coin_magnet': 'magnet',
+      'magnet': 'magnet',
+      '2x-coin-multiplier': 'coin_multiplier',
+      '2x_coin_multiplier': 'coin_multiplier',
+      'coin-multiplier': 'coin_multiplier',
+      'coin_multiplier': 'coin_multiplier',
+      'shield': 'shield',
+      'turbo-start': 'turbo_start',
+      'turbo_start': 'turbo_start'
+    };
+    return idMap[id] || id;
+  }
+
+  // Deduplicate powerups with different ID formats and normalize them
+  private deduplicatePowerUps(inventory: InventoryItem[]): InventoryItem[] {
+    const powerUpMap = new Map<string, InventoryItem>();
+    const nonPowerUps: InventoryItem[] = [];
+    let hasDuplicates = false;
+    
+    inventory.forEach(item => {
+      if (item.type === 'powerup') {
+        const normalizedId = this.normalizePowerUpId(item.id);
+        const existing = powerUpMap.get(normalizedId);
+        
+        if (existing) {
+          // Found duplicate! Merge quantities
+          hasDuplicates = true;
+          existing.quantity += item.quantity;
+          // Preserve equipped flag if either is equipped
+          if (item.equipped === true) {
+            existing.equipped = true;
+          }
+          console.log(`🔧 [dedup] Merged ${item.id} (${item.quantity}) -> ${normalizedId} (total: ${existing.quantity})`);
+        } else {
+          // Add with normalized ID
+          if (item.id !== normalizedId) {
+            hasDuplicates = true;
+            console.log(`🔧 [dedup] Normalized ${item.id} -> ${normalizedId}`);
+          }
+          powerUpMap.set(normalizedId, {
+            ...item,
+            id: normalizedId
+          });
+        }
+      } else {
+        nonPowerUps.push(item);
+      }
+    });
+    
+    if (hasDuplicates) {
+      const originalCount = inventory.filter(i => i.type === 'powerup').length;
+      const deduplicatedCount = powerUpMap.size;
+      console.log(`✅ [dedup] Deduplicated powerups: ${originalCount} -> ${deduplicatedCount} unique types`);
+    }
+    
+    // Combine deduplicated powerups with other items
+    return [...nonPowerUps, ...Array.from(powerUpMap.values())];
+  }
+
   // Save all user game data under a username-specific key (for mobile/PC sync)
   saveAllUserGameDataToLocal(username: string): void {
     try {
@@ -313,6 +379,12 @@ class InventoryService {
   saveToInventory(item: Omit<InventoryItem, 'purchasedAt'>): void {
     console.log('💾 [inventoryService] saveToInventory called with:', item);
     try {
+      // Normalize powerup IDs to prevent duplicates from different naming conventions
+      if (item.type === 'powerup') {
+        item.id = this.normalizePowerUpId(item.id);
+        console.log('💾 [inventoryService] Normalized powerup ID to:', item.id);
+      }
+      
       const inventory = this.getInventory();
       console.log('💾 [inventoryService] Current inventory size:', inventory.length);
       // Only add default skin if user has no skins at all
@@ -484,6 +556,9 @@ class InventoryService {
         localStorage.removeItem('flappypi-inventory');
         return [];
       }
+      
+      // CRITICAL: Deduplicate powerups with different ID formats FIRST
+      items = this.deduplicatePowerUps(items);
       
       let changed = false;
       

@@ -1076,19 +1076,58 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({ isOpen,
                       <button
                         className="ml-2 px-2 py-1 bg-green-500 text-white rounded font-bold text-xs hover:bg-green-600"
                         onClick={() => {
-                          // Simulate successful subscription purchase and show reward modal
+                          // Calculate expiration date based on plan period
+                          const now = new Date();
+                          let durationDays = 7; // default
+                          if (plan.id === 'starter') durationDays = 7;
+                          else if (plan.id === 'premium') durationDays = 15;
+                          else if (plan.id === 'ultimate') durationDays = 30;
+                          
+                          const expiresAt = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000);
+                          
+                          // Extract Pi amount from price string
+                          const piAmount = parseFloat(plan.price.split(' ')[0]) || 0;
+                          
+                          // Use inventoryService.processMockPayment to save subscription
+                          inventoryService.processMockPayment({
+                            id: plan.id + '-subscription',
+                            name: plan.name,
+                            type: 'subscription',
+                            quantity: 1,
+                            price: piAmount,
+                            currency: 'pi',
+                            rarity: 'Special',
+                            description: `${plan.name} subscription (${plan.period})`,
+                            expiresAt: expiresAt.toISOString(),
+                          });
+                          
+                          // Add coins to wallet
+                          if (plan.coinReward) {
+                            addCoins(plan.coinReward, `Subscription Plan Reward: ${plan.name}`);
+                          }
+                          
+                          // Get rewards and save as unclaimed so they can be claimed properly
                           const planRewards = getPlanRewards(plan.id);
+                          inventoryService.saveUnclaimedSubscriptionRewards(plan.id, plan.name, planRewards);
+                          
+                          // Show reward modal for claiming
                           setRewards(planRewards);
                           setSuccess(true);
                           setShowRewardModal(true);
-                          if (plan.coinReward) {
-                            addCoins(plan.coinReward);
-                          }
+                          
+                          // Call onPurchase callback
                           if (typeof onPurchase === 'function') onPurchase(plan);
+                          
+                          // Show success toast
                           toast({
                             title: 'Mock Subscription Activated! 🎉',
-                            description: `${plan.name} subscription is now active (mock).`
+                            description: `${plan.name} subscription is now active. Claim your rewards!`
                           });
+                          
+                          // Dispatch subscription activated event
+                          window.dispatchEvent(new CustomEvent('subscription-activated', {
+                            detail: { plan, subscriptionItem: { id: plan.id + '-subscription', name: plan.name } }
+                          }));
                         }}
                       >
                         🧪 Mock Pi Payment
