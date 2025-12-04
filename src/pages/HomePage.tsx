@@ -977,8 +977,21 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
       {/* Header with Pi Authentication */}
       <HeaderWithPiAuth title="Flappy Pi" showNavigation={true} />
       
-      {/* Main content */}
-      <div className="pb-8 main-content">
+      {/* Main content - IMPROVED MOBILE LAYOUT */}
+      <div className="pb-8 sm:pb-12 main-content overflow-hidden">
+        {/* Safe area padding for mobile */}
+        <style>{`
+          .main-content {
+            padding-left: max(1rem, env(safe-area-inset-left));
+            padding-right: max(1rem, env(safe-area-inset-right));
+          }
+          @media (max-width: 640px) {
+            .main-content {
+              padding-left: 0.75rem;
+              padding-right: 0.75rem;
+            }
+          }
+        `}</style>
         {/* Night mode visuals */}
         {theme === 'night' && (
         <>
@@ -1427,28 +1440,32 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
              </div>
            </div>
           
-                     {/* Game mode and plan buttons - vertical, enhanced design */}
-           <div className="flex flex-col gap-6 w-full max-w-md mx-auto mt-8 mb-12">
+                     {/* Game mode and plan buttons - vertical, enhanced design - IMPROVED MOBILE */}
+           <div className="flex flex-col gap-4 sm:gap-6 w-full max-w-md mx-auto mt-6 sm:mt-8 mb-12 px-3 sm:px-0">
              <button
                onClick={() => navigateToPublic('/play')}
-               className="w-full flex items-center justify-center gap-3 py-6 rounded-3xl font-black text-2xl sm:text-3xl shadow-xl transition-all duration-200 bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 text-blue-900 border-4 border-yellow-600 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-yellow-300 animate-bounce-slow game-mode-button"
-               style={{ minHeight: '64px', pointerEvents: 'auto' }}
+               className="w-full flex items-center justify-center gap-2 sm:gap-3 py-4 sm:py-6 px-4 rounded-2xl sm:rounded-3xl font-black text-lg sm:text-3xl shadow-lg sm:shadow-xl transition-all duration-200 bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 text-blue-900 border-3 sm:border-4 border-yellow-600 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-yellow-300 animate-bounce-slow game-mode-button"
+               style={{ minHeight: '52px', pointerEvents: 'auto' }}
              >
-               <span className="text-3xl">▶️</span> {t('play')}
+               <span className="text-2xl sm:text-3xl">▶️</span> 
+               <span className="hidden sm:inline">{t('play')}</span>
+               <span className="sm:hidden text-base font-bold">{t('play')}</span>
              </button>
              <button
                onClick={() => navigateToPublic('/play')}
-               className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl shadow-lg transition-all duration-200 bg-green-400 hover:bg-green-500 text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-200 game-mode-button"
-               style={{ minHeight: '56px', pointerEvents: 'auto' }}
+               className="w-full flex items-center justify-center gap-2 sm:gap-3 py-4 sm:py-5 px-4 rounded-2xl sm:rounded-3xl font-black text-lg sm:text-2xl shadow-lg transition-all duration-200 bg-green-400 hover:bg-green-500 text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-200 game-mode-button"
+               style={{ minHeight: '50px', pointerEvents: 'auto' }}
              >
-               <span className="text-2xl">🌱</span> {t('classic')}
+               <span className="text-xl sm:text-2xl">🌱</span> 
+               <span className="text-sm sm:text-base">{t('classic')}</span>
              </button>
             <button
               onClick={() => navigateToPublic(ROUTES.ENDLESS)}
-              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl shadow-lg transition-all duration-200 bg-blue-400 hover:bg-blue-500 text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200"
-              style={{ minHeight: '56px', pointerEvents: 'auto' }}
+              className="w-full flex items-center justify-center gap-2 sm:gap-3 py-4 sm:py-5 px-4 rounded-2xl sm:rounded-3xl font-black text-lg sm:text-2xl shadow-lg transition-all duration-200 bg-blue-400 hover:bg-blue-500 text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200"
+              style={{ minHeight: '50px', pointerEvents: 'auto' }}
             >
-              <span className="text-2xl">♾️</span> {t('endless')}
+              <span className="text-xl sm:text-2xl">∞</span> 
+              <span className="text-sm sm:text-base">{t('endless')}</span>
             </button>
             <button
               onClick={() => navigateToPublic(ROUTES.CHALLENGE)}

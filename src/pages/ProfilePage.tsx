@@ -16,6 +16,7 @@ import { getDisplayUsername } from '../utils/usernameUtils';
 import { useToast } from '@/hooks/use-toast';
 import { getBirdImageSrc } from '@/utils/getBirdImageSrc';
 import { shopItems } from '@/constants/shopItems';
+import { themes, themeDescriptions, Theme } from '@/constants/gameThemes';
 // Removed UsernameDebug import - no debug components needed
 
 interface ProfilePageProps {
@@ -257,6 +258,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
   const [badges, setBadges] = useState<string[]>([]);
   // Add mock game history data loader
   const [gameHistory, setGameHistory] = useState<any[]>([]);
+  const [selectedWeather, setSelectedWeather] = useState<Theme>(() => {
+    return (localStorage.getItem('flappypi-selected-weather') as Theme) || 'day';
+  });
+  const [showWeatherLockedModal, setShowWeatherLockedModal] = useState(false);
 
   useEffect(() => {
     // Fetch subscriptions
@@ -607,6 +612,24 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
     setShowWalletConsent(false);
     setShowWalletInput(false);
     setShowWalletModal(false);
+  };
+
+  const handleWeatherSelect = (weather: Theme) => {
+    // Check if user has any active subscription
+    const hasSubscription = subscriptions && subscriptions.length > 0;
+    
+    if (!hasSubscription && weather !== 'day' && weather !== 'classic') {
+      // Only allow day/classic without subscription
+      setShowWeatherLockedModal(true);
+      return;
+    }
+    
+    setSelectedWeather(weather);
+    localStorage.setItem('flappypi-selected-weather', weather);
+    toast({
+      title: "Weather Selected!",
+      description: `You selected ${weather} theme. It will be used in your next game!`,
+    });
   };
 
   return (
@@ -973,9 +996,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
 
             {/* Tabs */}
             <Tabs value={tab} onValueChange={setTab} className="w-full mt-6 sm:mt-8 px-4">
-              <TabsList className="flex justify-center gap-2 mb-6">
+              <TabsList className="flex justify-center gap-2 mb-6 flex-wrap">
                 <TabsTrigger value="avatar" className="text-xs sm:text-sm"><User className="inline w-4 h-4 sm:w-5 sm:h-5 mr-1" />Avatar</TabsTrigger>
-                <TabsTrigger value="history" className="text-xs sm:text-sm"><Calendar className="inline w-4 h-4 sm:w-5 sm:h-5 mr-1" />Game History</TabsTrigger>
+                <TabsTrigger value="weather" className="text-xs sm:text-sm">🌤️ Weather</TabsTrigger>
+                <TabsTrigger value="history" className="text-xs sm:text-sm"><Calendar className="inline w-4 h-4 sm:w-5 sm:h-5 mr-1" />History</TabsTrigger>
                 <TabsTrigger value="settings" className="text-xs sm:text-sm"><Settings className="inline w-4 h-4 sm:w-5 sm:h-5 mr-1" />Settings</TabsTrigger>
                 <TabsTrigger value="achievements" className="text-xs sm:text-sm"><Star className="inline w-4 h-4 sm:w-5 sm:h-5 mr-1" />Achievements</TabsTrigger>
               </TabsList>
@@ -1165,6 +1189,108 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
                 </div>
               </TabsContent>
 
+              {/* Weather/Season Selection Tab */}
+              <TabsContent value="weather">
+                <div className="flex flex-col items-center gap-6">
+                  {/* Subscription Required Notice */}
+                  {subscriptions.length === 0 && (
+                    <div className="w-full bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-400 rounded-lg p-4 mb-4">
+                      <p className="text-center text-sm text-yellow-900 font-semibold">📝 Premium Feature: Subscribe to unlock all weather themes!</p>
+                      <Button 
+                        onClick={() => navigate('/shop')} 
+                        className="mt-3 w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg"
+                      >
+                        View Plans
+                      </Button>
+                    </div>
+                  )}
+                  
+                  {/* Currently Selected Weather */}
+                  <div className="w-full bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <h3 className="font-bold text-blue-800 mb-2 text-center">Current Weather Theme</h3>
+                    <div className="flex items-center justify-center gap-4">
+                      <div className={`w-24 h-24 rounded-lg ${themes[selectedWeather]} flex items-center justify-center shadow-lg border-2 border-blue-400`}>
+                        <span className="text-3xl">{selectedWeather === 'rain' ? '🌧️' : selectedWeather === 'snow' ? '❄️' : selectedWeather === 'night' ? '🌙' : '☀️'}</span>
+                      </div>
+                      <div className="flex flex-col gap-2 flex-1">
+                        <h4 className="font-bold text-blue-800 capitalize text-lg">{selectedWeather}</h4>
+                        <p className="text-sm text-blue-700">{themeDescriptions[selectedWeather] || 'Choose this weather theme'}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Weather Selection Grid */}
+                  <div className="w-full">
+                    <h3 className="font-bold text-blue-800 mb-4 text-center">Available Weather Themes</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-96 overflow-y-auto p-2">
+                      {Object.entries(themes).map(([weatherKey, weatherClass]) => {
+                        const isLocked = subscriptions.length === 0 && weatherKey !== 'day' && weatherKey !== 'classic';
+                        const isSelected = selectedWeather === weatherKey;
+                        
+                        return (
+                          <button
+                            key={weatherKey}
+                            onClick={() => handleWeatherSelect(weatherKey as Theme)}
+                            className={`relative rounded-lg p-3 border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 ${
+                              isSelected 
+                                ? 'border-green-500 shadow-lg scale-105 bg-green-50' 
+                                : isLocked 
+                                ? 'border-gray-300 bg-gray-100 opacity-70 cursor-not-allowed' 
+                                : 'border-blue-200 bg-white hover:border-blue-400 hover:shadow-md cursor-pointer'
+                            }`}
+                            disabled={isLocked}
+                          >
+                            {/* Weather preview */}
+                            <div className={`w-full h-16 rounded-md ${weatherClass} flex items-center justify-center text-2xl border border-opacity-30`}>
+                              {weatherKey === 'rain' || weatherKey === 'storm' ? '🌧️' :
+                               weatherKey === 'snow' || weatherKey === 'winter' || weatherKey === 'arctic' ? '❄️' :
+                               weatherKey === 'night' || weatherKey === 'midnight' ? '🌙' :
+                               weatherKey === 'space' || weatherKey === 'galaxy' || weatherKey === 'nebula' ? '🌌' :
+                               weatherKey === 'rainbow' ? '🌈' :
+                               weatherKey === 'aurora' ? '✨' :
+                               weatherKey === 'fog' || weatherKey === 'foggy' ? '🌫️' :
+                               weatherKey === 'desert' ? '🏜️' :
+                               weatherKey === 'ocean' ? '🌊' :
+                               weatherKey === 'forest' ? '🌲' :
+                               weatherKey === 'volcano' || weatherKey === 'volcanic' ? '🌋' :
+                               weatherKey === 'sunset' || weatherKey === 'dusk' ? '🌅' :
+                               weatherKey === 'dawn' ? '🌄' :
+                               '☀️'}
+                            </div>
+                            
+                            {/* Weather name */}
+                            <span className="text-xs sm:text-sm font-semibold capitalize text-gray-800 text-center line-clamp-2">
+                              {weatherKey}
+                            </span>
+                            
+                            {/* Lock icon for locked themes */}
+                            {isLocked && (
+                              <div className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1">
+                                <Lock className="w-3 h-3" />
+                              </div>
+                            )}
+                            
+                            {/* Selected checkmark */}
+                            {isSelected && (
+                              <div className="absolute top-1 right-1 bg-green-500 text-white rounded-full p-1">
+                                <span className="text-xs font-bold">✓</span>
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  
+                  {/* Info text */}
+                  <div className="w-full bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+                    <p className="text-xs sm:text-sm text-blue-700 font-medium">
+                      💡 <strong>Tip:</strong> Your selected weather theme will appear in your next game!
+                    </p>
+                  </div>
+                </div>
+              </TabsContent>
+
               {/* Game History Section */}
               <TabsContent value="history">
                 <div className="flex flex-col items-center gap-6 py-10 w-full">
@@ -1288,6 +1414,41 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
           </div>
         </div>
       </div>
+      
+      {/* Weather Locked Modal */}
+      <Dialog open={showWeatherLockedModal} onOpenChange={setShowWeatherLockedModal}>
+        <DialogContent className="max-w-md w-full bg-white rounded-xl p-4 sm:p-6 text-center">
+          <DialogHeader>
+            <DialogTitle className="text-xl sm:text-2xl font-bold text-blue-700 mb-2">🔒 Premium Feature</DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center justify-center mb-4">
+            <Lock className="w-12 h-12 text-red-500" />
+          </div>
+          <p className="mb-4 text-gray-700 text-sm sm:text-base leading-relaxed">
+            Advanced weather themes are <strong>exclusive to subscribers</strong>! Subscribe to a plan to unlock all weather themes for your games.
+          </p>
+          <p className="mb-6 text-xs sm:text-sm text-gray-600">
+            Basic themes like <strong>Day</strong> and <strong>Classic</strong> are available for free players.
+          </p>
+          <div className="flex flex-col gap-2 w-full">
+            <Button 
+              onClick={() => {
+                setShowWeatherLockedModal(false);
+                navigate('/shop');
+              }}
+              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg"
+            >
+              View Subscription Plans
+            </Button>
+            <Button 
+              onClick={() => setShowWeatherLockedModal(false)}
+              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-3 px-6 rounded-lg"
+            >
+              Cancel
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
