@@ -17,6 +17,8 @@ import { useToast } from '@/hooks/use-toast';
 import { getBirdImageSrc } from '@/utils/getBirdImageSrc';
 import { shopItems } from '@/constants/shopItems';
 import { themes, themeDescriptions, Theme } from '@/constants/gameThemes';
+import { useSeasonManager } from '@/hooks/useSeasonManager';
+import { SEASON_CONFIGS } from '@/utils/seasonManager';
 // Removed UsernameDebug import - no debug components needed
 
 interface ProfilePageProps {
@@ -1286,6 +1288,89 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
                   <div className="w-full bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
                     <p className="text-xs sm:text-sm text-blue-700 font-medium">
                       💡 <strong>Tip:</strong> Your selected weather theme will appear in your next game!
+                    </p>
+                  </div>
+
+                  {/* Seasonal Weather Selection */}
+                  <div className="w-full border-t pt-6 mt-6">
+                    <h3 className="font-bold text-blue-800 mb-4 text-center">🌍 Seasonal Weather (Premium)</h3>
+                    {subscriptions.length === 0 ? (
+                      <div className="w-full bg-gradient-to-r from-red-100 to-orange-100 border-2 border-red-300 rounded-lg p-4 text-center">
+                        <p className="text-sm text-red-900 font-semibold mb-2">🔒 Premium Feature</p>
+                        <p className="text-xs text-red-800 mb-3">Subscribe to unlock seasonal weather themes!</p>
+                        <Button 
+                          onClick={() => navigate('/shop')} 
+                          className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg"
+                        >
+                          View Plans
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-96 overflow-y-auto p-2">
+                        {[
+                          { name: 'spring', emoji: '🌸', color: 'from-green-200 to-green-400', desc: 'Fresh spring blooms' },
+                          { name: 'summer', emoji: '☀️', color: 'from-yellow-200 to-yellow-400', desc: 'Warm sunny days' },
+                          { name: 'autumn', emoji: '🍂', color: 'from-orange-200 to-orange-400', desc: 'Colorful fall leaves' },
+                          { name: 'winter', emoji: '❄️', color: 'from-cyan-200 to-blue-400', desc: 'Snowy landscapes' },
+                          { name: 'thunder', emoji: '⚡', color: 'from-gray-600 to-purple-600', desc: 'Thunderstorm' },
+                          { name: 'rain', emoji: '🌧️', color: 'from-blue-400 to-slate-600', desc: 'Rainy weather' },
+                          { name: 'fog', emoji: '🌫️', color: 'from-gray-300 to-gray-500', desc: 'Foggy mist' },
+                          { name: 'storm', emoji: '🌪️', color: 'from-slate-700 to-slate-900', desc: 'Severe storm' },
+                          { name: 'christmas', emoji: '🎄', color: 'from-red-500 to-green-500', desc: 'Christmas holiday' },
+                          { name: 'newyear', emoji: '🎆', color: 'from-purple-500 to-pink-500', desc: 'New Year celebration' },
+                          { name: 'halloween', emoji: '🎃', color: 'from-orange-600 to-purple-600', desc: 'Halloween spooky' },
+                        ].map((season) => {
+                          // Check if season is available based on subscription
+                          let isAvailable = false;
+                          const subscriptionType = subscriptions[0]?.subscription_tier?.toLowerCase() || '';
+                          
+                          if (subscriptionType === 'ultimate') {
+                            isAvailable = true;
+                          } else if (subscriptionType === 'premium') {
+                            isAvailable = ['spring', 'summer', 'autumn', 'winter', 'thunder', 'rain'].includes(season.name);
+                          } else if (subscriptionType === 'starter') {
+                            isAvailable = ['spring', 'summer'].includes(season.name);
+                          }
+
+                          return (
+                            <button
+                              key={season.name}
+                              onClick={() => {
+                                if (isAvailable) {
+                                  localStorage.setItem('flappypi-selected-season', season.name);
+                                  toast({
+                                    title: "Seasonal Weather Selected!",
+                                    description: `${season.desc} will appear in your next game!`,
+                                  });
+                                }
+                              }}
+                              disabled={!isAvailable}
+                              className={`relative rounded-lg p-3 border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 ${
+                                isAvailable
+                                  ? 'border-blue-200 bg-white hover:border-blue-400 hover:shadow-md cursor-pointer'
+                                  : 'border-gray-300 bg-gray-100 opacity-60 cursor-not-allowed'
+                              }`}
+                            >
+                              <div className={`w-full h-16 rounded-md bg-gradient-to-br ${season.color} flex items-center justify-center text-2xl border border-opacity-30`}>
+                                {season.emoji}
+                              </div>
+                              
+                              <span className="text-xs sm:text-sm font-semibold capitalize text-gray-800 text-center line-clamp-2">
+                                {season.name}
+                              </span>
+                              
+                              {!isAvailable && (
+                                <div className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1">
+                                  <Lock className="w-3 h-3" />
+                                </div>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                    <p className="text-xs sm:text-sm text-gray-600 font-medium text-center mt-3">
+                      ✨ Seasonal themes create unique game atmospheres!
                     </p>
                   </div>
                 </div>
