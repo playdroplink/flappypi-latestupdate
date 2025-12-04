@@ -1023,12 +1023,22 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
     
     let timer: NodeJS.Timeout | null = null;
     
-    // Apply turbo effect when powerup is activated
+    // Apply turbo effect when powerup is activated: double speed AND double score
+    console.log('⚡ [TURBO] Turbo Start activated! Speed x2, Score x2 for 12 seconds');
     setSpeedMultiplier(2); // Double speed
+    setScoreMultiplier(2); // Double score - FIXED: Now applies score multiplier
+    setTurboActive(true);
+    setPowerUpNotification('⚡ TURBO START! Speed x2 & Score x2!');
     
     // Set a timer to deactivate turbo after duration
     timer = setTimeout(() => {
+      console.log('⚡ [TURBO] Turbo Start expired');
       setSpeedMultiplier(1);
+      setScoreMultiplier(1); // Reset score multiplier
+      setTurboActive(false);
+      setPowerUpNotification('⚡ Turbo expired - normal speed restored!');
+      const turboTimeout = setTimeout(() => setPowerUpNotification(null), 3000);
+      notificationTimeouts.push(turboTimeout);
     }, 12000); // 12 seconds turbo effect (matches useGameEquipment duration)
     
     return () => {
@@ -2432,7 +2442,10 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
         // Check if bird passed a pipe
         if (pipesRef.current.length > 0 && pipesRef.current[0].x < 50 && pipesToUpdate.length < pipesRef.current.length) {
           setScore(s => {
-            const newScore = s + 1;
+            // FIXED: Apply scoreMultiplier (from turbo or other effects) to the score increase
+            const scoreIncrease = 1 * scoreMultiplier;
+            const newScore = s + scoreIncrease;
+            console.log(`📊 [SCORE] Pipe passed: +${scoreIncrease} (multiplier: ${scoreMultiplier}x), Total: ${newScore}`);
             // Update real-time scoring
             updateRealTimeScore(newScore);
             return newScore;
@@ -3519,8 +3532,11 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
 
   // Example: play swooshing SFX on pipe pass
   const handlePassPipe = () => {
-    const newScore = score + 1;
+    // FIXED: Apply scoreMultiplier to score increase
+    const scoreIncrease = 1 * scoreMultiplier;
+    const newScore = score + scoreIncrease;
     setScore(newScore);
+    console.log(`📊 [SCORE] Pipe passed (callback): +${scoreIncrease} (multiplier: ${scoreMultiplier}x), Total: ${newScore}`);
     
     // Track pipe passing in game stats
     setGameStats(prev => ({

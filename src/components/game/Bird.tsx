@@ -123,103 +123,133 @@ const Bird: React.FC<BirdProps> = ({ y, velocity, onFlap, isDead, skin, classNam
           animation: countdown-flap 1.2s infinite ease-in-out;
         }
         
-        /* Simplified power-up effects */
+        /* IMPROVED Power-up Effects - Cleaner and more distinct animations */
+        
+        /* Shield Effect: Protective aura with gentle pulsing */
         .enhanced-shield-effect {
           position: absolute;
           left: -8px; top: -8px;
           width: 64px; height: 64px;
           border-radius: 50%;
           border: 2px solid #6366f1;
-          background: radial-gradient(circle, #6366f122 0%, transparent 70%);
-          box-shadow: 0 0 16px #6366f188;
+          background: transparent;
+          box-shadow: inset 0 0 16px #6366f144, 0 0 12px #6366f1aa;
           z-index: 2;
           pointer-events: none;
-          animation: shieldPulse 1.5s infinite ease-in-out;
+          animation: shieldPulse 2s infinite ease-in-out;
         }
         
+        /* Magnet Effect: Spiral/swirl motion to show attraction */
         .enhanced-magnet-effect {
           position: absolute;
           left: -12px; top: -12px;
           width: 72px; height: 72px;
           border-radius: 50%;
-          border: 2px dashed #22d3ee;
-          background: radial-gradient(circle, #22d3ee22 0%, transparent 70%);
-          box-shadow: 0 0 20px #22d3ee88;
+          border: 3px dashed #22d3ee;
+          background: transparent;
+          box-shadow: 0 0 16px #22d3ee77;
           z-index: 1;
           pointer-events: none;
-          animation: magnetPulse 1.5s infinite ease-in-out;
+          animation: magnetSpin 3s linear infinite;
         }
         
+        /* Turbo Effect: Sharp, energetic pulses */
         .enhanced-turbo-effect {
           position: absolute;
-          left: -6px; top: -6px;
-          width: 56px; height: 56px;
+          left: -10px; top: -10px;
+          width: 68px; height: 68px;
           border-radius: 50%;
-          background: radial-gradient(circle, #a21caf22 0%, transparent 70%);
-          box-shadow: 0 0 12px #a21caf88;
+          border: 2px solid #a21caf;
+          background: linear-gradient(45deg, #a21caf22 0%, transparent 50%);
+          box-shadow: 0 0 14px #a21cafcc;
           z-index: 0;
           pointer-events: none;
-          animation: turboPulse 1s infinite ease-in-out;
+          animation: turboPulse 1.2s infinite cubic-bezier(0.43, 0.13, 0.23, 0.96);
         }
         
+        /* Coin Multiplier Effect: Shimmering/sparkling effect */
         .enhanced-multiplier-effect {
           position: absolute;
-          left: -4px; top: -4px;
-          width: 48px; height: 48px;
+          left: -6px; top: -6px;
+          width: 60px; height: 60px;
           border-radius: 50%;
-          background: radial-gradient(circle, #fbbf2433 0%, transparent 70%);
-          box-shadow: 0 0 8px #fbbf2488;
+          background: conic-gradient(#fbbf24, #f59e0b, #fbbf24);
+          box-shadow: 0 0 10px #fbbf24dd;
           z-index: 0;
           pointer-events: none;
-          animation: multiplierPulse 1.2s infinite ease-in-out;
+          animation: multiplierSpark 1.5s ease-in-out infinite;
         }
         
-        /* Simplified pulse animations */
+        /* KEYFRAME ANIMATIONS - Improved for clarity */
+        
+        /* Shield: Gentle protective pulse */
         @keyframes shieldPulse {
-          0%, 100% { 
-            box-shadow: 0 0 16px #6366f188; 
-            transform: scale(1);
+          0% { 
+            box-shadow: inset 0 0 16px #6366f144, 0 0 12px #6366f166;
+            transform: scale(0.98);
           }
           50% { 
-            box-shadow: 0 0 24px #6366f1cc; 
-            transform: scale(1.02);
+            box-shadow: inset 0 0 20px #6366f166, 0 0 20px #6366f1cc;
+            transform: scale(1.04);
+          }
+          100% { 
+            box-shadow: inset 0 0 16px #6366f144, 0 0 12px #6366f166;
+            transform: scale(0.98);
           }
         }
         
-        @keyframes magnetPulse {
-          0%, 100% { 
-            box-shadow: 0 0 20px #22d3ee88; 
-            transform: scale(1);
+        /* Magnet: Rotating dashed circle to show spin/attraction */
+        @keyframes magnetSpin {
+          0% { 
+            transform: rotate(0deg) scale(1);
+            border-color: #22d3ee;
           }
           50% { 
-            box-shadow: 0 0 28px #22d3eeaa; 
-            transform: scale(1.03);
+            transform: rotate(180deg) scale(1.05);
+            border-color: #06b6d4;
+          }
+          100% { 
+            transform: rotate(360deg) scale(1);
+            border-color: #22d3ee;
           }
         }
         
+        /* Turbo: Fast, snappy pulses for energetic feel */
         @keyframes turboPulse {
-          0%, 100% { 
-            box-shadow: 0 0 12px #a21caf88; 
+          0% { 
+            box-shadow: 0 0 8px #a21caf66;
             transform: scale(1);
           }
           50% { 
-            box-shadow: 0 0 18px #a21cafaa; 
-            transform: scale(1.05);
+            box-shadow: 0 0 18px #a21cafff;
+            transform: scale(1.08);
+          }
+          100% { 
+            box-shadow: 0 0 8px #a21caf66;
+            transform: scale(1);
           }
         }
         
-        @keyframes multiplierPulse {
-          0%, 100% { 
-            box-shadow: 0 0 8px #fbbf2488; 
-            transform: scale(1);
+        /* Multiplier: Sparkling/shimmering effect */
+        @keyframes multiplierSpark {
+          0% { 
+            box-shadow: 0 0 6px #fbbf2466, 0 2px 0 #f59e0b99;
+            transform: scale(0.95);
+            opacity: 0.7;
           }
           50% { 
-            box-shadow: 0 0 12px #fbbf24aa; 
-            transform: scale(1.03);
+            box-shadow: 0 0 14px #fbbf24ff, 0 -2px 4px #f59e0bff;
+            transform: scale(1.05);
+            opacity: 1;
+          }
+          100% { 
+            box-shadow: 0 0 6px #fbbf2466, 0 2px 0 #f59e0b99;
+            transform: scale(0.95);
+            opacity: 0.7;
           }
         }
 
-        /* Simplified revive glow */
+        /* Simplified revive glow - IMPROVED: Smoother and more subtle */
         .bird-revive-glow {
           position: absolute;
           left: -8px; top: -8px;
@@ -229,31 +259,102 @@ const Bird: React.FC<BirdProps> = ({ y, velocity, onFlap, isDead, skin, classNam
           box-shadow: 0 0 16px #00e6ff88;
           z-index: 3;
           pointer-events: none;
-          animation: reviveGlowPulse 1.5s infinite ease-in-out;
+          animation: reviveGlowPulse 2s infinite ease-in-out;
         }
         
         @keyframes reviveGlowPulse {
-          0%, 100% { 
-            box-shadow: 0 0 16px #00e6ff88; 
-            opacity: 0.6; 
-            transform: scale(1);
+          0% { 
+            box-shadow: 0 0 12px #00e6ff66; 
+            opacity: 0.5; 
+            transform: scale(0.95);
           }
           50% { 
-            box-shadow: 0 0 24px #00e6ffcc; 
+            box-shadow: 0 0 20px #00e6ffaa; 
             opacity: 0.8; 
             transform: scale(1.05);
           }
+          100% { 
+            box-shadow: 0 0 12px #00e6ff66; 
+            opacity: 0.5; 
+            transform: scale(0.95);
+          }
         }
         
-        /* Power-up icon animations */
+        /* Power-up icon animations - IMPROVED: Distinct animations for each type */
         @keyframes powerUpIconFloat {
           0%, 100% { 
-            transform: translateY(0) scale(1);
-            opacity: 0.8;
+            transform: translateY(-2px) scale(1);
+            opacity: 0.7;
           }
           50% { 
-            transform: translateY(-4px) scale(1.1);
+            transform: translateY(-6px) scale(1.08);
             opacity: 1;
+          }
+        }
+        
+        /* Shield icon: Gentle bounce */
+        @keyframes shieldIconBounce {
+          0%, 100% { 
+            transform: translateY(-2px) scale(1) rotate(0deg);
+            opacity: 0.8;
+            text-shadow: 0 0 4px #6366f1;
+          }
+          50% { 
+            transform: translateY(-8px) scale(1.15) rotate(-5deg);
+            opacity: 1;
+            text-shadow: 0 0 8px #6366f1cc;
+          }
+        }
+        
+        /* Magnet icon: Spinning motion */
+        @keyframes magnetIconSpin {
+          0%, 100% { 
+            transform: translateY(-2px) scale(1) rotate(0deg);
+            opacity: 0.8;
+            text-shadow: 0 0 4px #22d3ee;
+          }
+          50% { 
+            transform: translateY(-6px) scale(1.1) rotate(180deg);
+            opacity: 1;
+            text-shadow: 0 0 8px #22d3eecc;
+          }
+        }
+        
+        /* Coin Multiplier icon: Sparkle/twinkle */
+        @keyframes coinIconSparkle {
+          0%, 100% { 
+            transform: translateY(-2px) scale(1);
+            opacity: 0.7;
+            text-shadow: 0 0 4px #fbbf24;
+          }
+          25% { 
+            transform: translateY(-5px) scale(1.2) rotate(15deg);
+            opacity: 1;
+            text-shadow: 0 0 8px #fbbf24ff;
+          }
+          50% { 
+            transform: translateY(-8px) scale(0.9);
+            opacity: 0.8;
+            text-shadow: 0 0 4px #fbbf24;
+          }
+          75% { 
+            transform: translateY(-5px) scale(1.2) rotate(-15deg);
+            opacity: 1;
+            text-shadow: 0 0 8px #fbbf24ff;
+          }
+        }
+        
+        /* Turbo icon: Rapid pulsing */
+        @keyframes turboIconPulse {
+          0%, 100% { 
+            transform: translateY(-2px) scale(1);
+            opacity: 0.8;
+            text-shadow: 0 0 4px #a21caf;
+          }
+          50% { 
+            transform: translateY(-6px) scale(1.15);
+            opacity: 1;
+            text-shadow: 0 0 10px #a21cafff;
           }
         }
         
@@ -277,7 +378,7 @@ const Bird: React.FC<BirdProps> = ({ y, velocity, onFlap, isDead, skin, classNam
           boxShadow: '0 0 16px #00e6ff88',
           zIndex: 3,
           pointerEvents: 'none',
-          animation: 'reviveGlowPulse 1.5s infinite ease-in-out',
+          animation: 'reviveGlowPulse 2s infinite ease-in-out',
         }} />
       )}
       
@@ -295,7 +396,7 @@ const Bird: React.FC<BirdProps> = ({ y, velocity, onFlap, isDead, skin, classNam
           zIndex: 2,
           pointerEvents: 'none',
           filter: 'blur(1px)',
-          animation: 'reviveGlowPulse 1.5s infinite ease-in-out',
+          animation: 'reviveGlowPulse 2s infinite ease-in-out',
         }} />
       )}
       
@@ -337,32 +438,28 @@ const Bird: React.FC<BirdProps> = ({ y, velocity, onFlap, isDead, skin, classNam
           <span style={{
             fontSize: 16,
             color: '#6366f1',
-            filter: 'drop-shadow(0 0 4px #6366f1)',
-            animation: 'powerUpIconFloat 2s ease-in-out infinite'
+            animation: 'shieldIconBounce 1.5s ease-in-out infinite'
           }}>🛡️</span>
         )}
         {hasMagnet && (
           <span style={{
             fontSize: 16,
             color: '#22d3ee',
-            filter: 'drop-shadow(0 0 4px #22d3ee)',
-            animation: 'powerUpIconFloat 2s ease-in-out infinite 0.5s'
+            animation: 'magnetIconSpin 2s ease-in-out infinite'
           }}>🧲</span>
         )}
         {hasMultiplier && (
           <span style={{
             fontSize: 16,
             color: '#fbbf24',
-            filter: 'drop-shadow(0 0 4px #fbbf24)',
-            animation: 'powerUpIconFloat 2s ease-in-out infinite 1s'
+            animation: 'coinIconSparkle 1.2s ease-in-out infinite'
           }}>💰</span>
         )}
         {hasTurbo && (
           <span style={{
             fontSize: 16,
             color: '#a21caf',
-            filter: 'drop-shadow(0 0 4px #a21caf)',
-            animation: 'powerUpIconFloat 2s ease-in-out infinite 1.5s'
+            animation: 'turboIconPulse 0.8s ease-in-out infinite'
           }}>⚡</span>
         )}
       </div>

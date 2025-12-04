@@ -457,7 +457,7 @@ const InventoryPage: React.FC = () => {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
                 <h2 className={`text-base sm:text-lg font-bold ${theme === 'night' ? 'text-white' : 'text-blue-900'} flex items-center gap-2`}>
                   <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
-                  Power-ups ({inventoryService.getOrganizedPowerUps().length}/5)
+                  Power-ups ({getInventoryByType('powerup').length})
                 </h2>
                 <div className="text-sm text-gray-600 text-center sm:text-right">
                   Total: {getTotalItemsCount()} items
@@ -465,7 +465,7 @@ const InventoryPage: React.FC = () => {
               </div>
               {/* Improved mobile power-ups layout */}
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-                {inventoryService.getOrganizedPowerUps().map((item) => (
+                {getInventoryByType('powerup').map((item) => (
                   <Card key={item.id} className="relative overflow-hidden hover:shadow-lg transition-shadow">
                     <CardHeader className="pb-2 p-3 sm:p-4">
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">

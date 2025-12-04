@@ -60,6 +60,20 @@ export const useGameEquipment = () => {
       const equippedSkin = inventory.find(item => item.type === 'skin' && item.equipped);
       console.log('🔧 [useGameEquipment] Equipped skin:', equippedSkin?.id || 'none');
       
+      // MIGRATION: Auto-equip all powerups that don't have equipped field set (legacy purchases)
+      let needsSave = false;
+      inventory.forEach(item => {
+        if (item.type === 'powerup' && item.quantity > 0 && item.equipped === undefined) {
+          console.log('🔄 [MIGRATION] Auto-equipping legacy powerup:', item.id);
+          item.equipped = true;
+          needsSave = true;
+        }
+      });
+      if (needsSave) {
+        localStorage.setItem('flappypi-inventory', JSON.stringify(inventory));
+        console.log('✅ [MIGRATION] Saved auto-equipped powerups to localStorage');
+      }
+      
       // Get available powerups from localStorage FIRST (this is the source of truth after purchase)
       // Only include powerups that are equipped (equipped === true) OR have no equipped field (undefined = auto-equipped)
       // This handles both shop purchases (equipped: undefined) and mystery box rewards (no equipped field)

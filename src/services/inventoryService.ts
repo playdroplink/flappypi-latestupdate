@@ -542,12 +542,8 @@ class InventoryService {
   getInventoryByType(type: InventoryItem['type']): InventoryItem[] {
     const items = this.getInventory().filter(item => item.type === type);
     
-    // For power-ups, only return items with quantity > 0
-    if (type === 'powerup') {
-      return items.filter(item => item.quantity > 0);
-    }
-    
-    return items;
+    // For all types, only return items with quantity > 0
+    return items.filter(item => item.quantity > 0);
   }
 
   // Enhanced method to get organized power-ups (limited to 5 types)
