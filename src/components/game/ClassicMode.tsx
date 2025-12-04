@@ -437,6 +437,16 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
     validatePowerUpUsage
   } = useGameEquipment();
   
+  // DEBUG: Log available powerups whenever they change
+  useEffect(() => {
+    console.log('🎮 [ClassicMode] availablePowerUps updated:', availablePowerUps);
+    if (availablePowerUps.length === 0) {
+      console.warn('⚠️ [ClassicMode] WARNING: No powerups available! Checking inventory directly...');
+      const inventory = inventoryService.getInventory();
+      console.log('⚠️ [ClassicMode] Direct inventory check:', inventory.filter(i => i.type === 'powerup'));
+    }
+  }, [availablePowerUps]);
+  
 
   
   const [scoreSubmitted, setScoreSubmitted] = useState(false);
@@ -2981,6 +2991,9 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
     const validation = validatePowerUpUsage(id);
     const isBlocked = !validation.allowed;
     
+    if (powerup?.quantity > 0) {
+      console.log(`📊 [Footer] Mapping ${id}:`, { quantity: powerup.quantity, name: powerup.name });
+    }
 
     
     return {
@@ -2993,6 +3006,8 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
     };
     })
     .filter(powerup => powerup.quantity >= 0); // Show all power-ups, even with 0 quantity (disabled)
+    
+  console.log('📊 [Footer] Final powerups to display:', footerPowerUps.filter(p => p.quantity > 0).map(p => `${p.id}:${p.quantity}`).join(', ') || 'NONE');
 
 
 
@@ -3405,6 +3420,9 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
     setCountdown(3);
     setShowCountdown(true);
     setPipesActive(false);
+    
+    // Dispatch game start event to refresh equipment
+    window.dispatchEvent(new CustomEvent('game-started'));
     
     // Sound handled by useSoundEffects hook
     
@@ -4070,6 +4088,9 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
       setBirdVel(0);
       setPipes([]);
       setCoins([]);
+      
+      // Dispatch game start event to refresh equipment with latest powerups
+      window.dispatchEvent(new CustomEvent('game-started'));
       
       // Start game session tracking
       setGameStartTime(Date.now());

@@ -311,8 +311,10 @@ class InventoryService {
 
   // Save item to inventory
   saveToInventory(item: Omit<InventoryItem, 'purchasedAt'>): void {
+    console.log('💾 [inventoryService] saveToInventory called with:', item);
     try {
       const inventory = this.getInventory();
+      console.log('💾 [inventoryService] Current inventory size:', inventory.length);
       // Only add default skin if user has no skins at all
       if (item.type === 'skin' && (item.id === 'classic' || item.id === 'fluppy' || item.id === 'default')) {
         const hasAnySkin = inventory.some(i => i.type === 'skin');
@@ -326,6 +328,7 @@ class InventoryService {
       // Check if item already exists
       const existingItem = inventory.find(i => i.id === item.id && i.type === item.type);
       if (existingItem) {
+        console.log('💾 [inventoryService] Item exists, updating quantity from', existingItem.quantity);
         if (item.type === 'skin') {
           existingItem.quantity = 1;
           if (item.equipped) {
@@ -339,8 +342,10 @@ class InventoryService {
           // For other types, add quantity
           existingItem.quantity += item.quantity;
         }
+        console.log('💾 [inventoryService] Updated to quantity', existingItem.quantity);
       } else {
         // Add new item for all types
+        console.log('💾 [inventoryService] Adding new item:', item.id);
         const newItem: InventoryItem = {
           ...item,
           quantity: item.type === 'skin' || item.type === 'accessory' ? 1 : item.quantity,
@@ -369,6 +374,8 @@ class InventoryService {
       // Save to localStorage
       try {
         localStorage.setItem('flappypi-inventory', JSON.stringify(inventory));
+        console.log('✅ [inventoryService] Inventory saved to localStorage, total items:', inventory.length);
+        console.log('✅ [inventoryService] Powerups in inventory after save:', inventory.filter(i => i.type === 'powerup').map(p => `${p.id}:${p.quantity}`).join(', ') || 'NONE');
       } catch (storageError) {
         console.error('❌ Failed to save inventory to localStorage:', storageError);
         // Attempt to clear some space and retry
@@ -387,11 +394,12 @@ class InventoryService {
         window.dispatchEvent(new CustomEvent('inventory-updated', { 
           detail: { itemId: item.id, type: item.type, action: 'added' } 
         }));
+        console.log('✅ [inventoryService] inventory-updated event dispatched from saveToInventory');
       } catch (eventError) {
         console.error('❌ Failed to dispatch inventory event:', eventError);
       }
       
-      console.log(`📦 Added to inventory: ${item.name} (${item.quantity})`);
+      console.log(`📦 [inventoryService] Added to inventory: ${item.name} (${item.quantity})`);
       
       // Try to sync with Supabase immediately after purchase (but don't fail if it doesn't work)
       this.syncToCloudAfterPurchase(item);

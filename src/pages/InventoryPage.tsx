@@ -151,6 +151,56 @@ const InventoryPage: React.FC = () => {
     }
   };
 
+  const handleEquipPowerUp = async (powerUpId: string) => {
+    console.log('🎮 [InventoryPage] Attempting to equip powerup:', powerUpId);
+    const success = inventoryService.equipItem(powerUpId, 'powerup');
+    if (success) {
+      toast({
+        title: 'Power-up Enabled! ⚡',
+        description: 'This power-up will be available in game mode!',
+        duration: 3000,
+      });
+      console.log('✅ [InventoryPage] Power-up equipped successfully');
+      loadInventoryData(); // Refresh to show equipped status
+      // Dispatch event to notify game that powerups changed
+      window.dispatchEvent(new CustomEvent('powerup-equipped', {
+        detail: { powerUpId, equipped: true }
+      }));
+    } else {
+      toast({
+        title: 'Equip Failed',
+        description: 'Failed to enable this power-up. Please try again.',
+        variant: 'destructive',
+        duration: 3000,
+      });
+    }
+  };
+
+  const handleUnequipPowerUp = async (powerUpId: string) => {
+    console.log('🎮 [InventoryPage] Attempting to unequip powerup:', powerUpId);
+    const success = inventoryService.unequipItem(powerUpId, 'powerup');
+    if (success) {
+      toast({
+        title: 'Power-up Disabled ⚠️',
+        description: 'This power-up will no longer be available in game mode.',
+        duration: 3000,
+      });
+      console.log('✅ [InventoryPage] Power-up unequipped successfully');
+      loadInventoryData(); // Refresh to show equipped status
+      // Dispatch event to notify game that powerups changed
+      window.dispatchEvent(new CustomEvent('powerup-unequipped', {
+        detail: { powerUpId, equipped: false }
+      }));
+    } else {
+      toast({
+        title: 'Disable Failed',
+        description: 'Failed to disable this power-up. Please try again.',
+        variant: 'destructive',
+        duration: 3000,
+      });
+    }
+  };
+
   const handleOpenMysteryBox = async (boxType: string) => {
     const result = inventoryService.openMysteryBox(boxType as any);
     if (result.success) {
@@ -422,9 +472,17 @@ const InventoryPage: React.FC = () => {
                         <CardTitle className="text-xs sm:text-lg truncate text-center sm:text-left">
                           {item.name}
                         </CardTitle>
-                        <Badge className="w-fit bg-blue-100 text-blue-800 text-xs self-center sm:self-auto">
-                          x{item.quantity}
-                        </Badge>
+                        <div className="flex gap-1 justify-center sm:justify-start">
+                          <Badge className="w-fit bg-blue-100 text-blue-800 text-xs self-center sm:self-auto">
+                            x{item.quantity}
+                          </Badge>
+                          {item.equipped && (
+                            <Badge className="w-fit bg-green-100 text-green-800 text-xs self-center sm:self-auto flex items-center gap-1">
+                              <Check className="w-3 h-3" />
+                              Enabled
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent className="p-3 sm:p-4">
@@ -448,13 +506,32 @@ const InventoryPage: React.FC = () => {
                       <div className="text-xs sm:text-sm text-gray-600 mb-3 text-center truncate">
                         {dayjs(item.purchasedAt).format('MMM D, YYYY')}
                       </div>
-                      <Button
-                        onClick={() => { setSelectedPowerUp(item); setShowPowerUpModal(true); }}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-xs sm:text-sm py-2"
-                        disabled={item.quantity <= 0}
-                      >
-                        Details
-                      </Button>
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          onClick={() => { 
+                            if (item.equipped) {
+                              handleUnequipPowerUp(item.id);
+                            } else {
+                              handleEquipPowerUp(item.id);
+                            }
+                          }}
+                          className={`w-full text-xs sm:text-sm py-2 ${
+                            item.equipped 
+                              ? 'bg-green-600 hover:bg-green-700' 
+                              : 'bg-blue-600 hover:bg-blue-700'
+                          }`}
+                          disabled={item.quantity <= 0}
+                        >
+                          {item.equipped ? '✅ Enabled' : 'Enable for Game'}
+                        </Button>
+                        <Button
+                          onClick={() => { setSelectedPowerUp(item); setShowPowerUpModal(true); }}
+                          className="w-full bg-gray-500 hover:bg-gray-600 text-xs sm:text-sm py-2"
+                          disabled={item.quantity <= 0}
+                        >
+                          Details
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 ))}

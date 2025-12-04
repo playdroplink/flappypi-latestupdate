@@ -290,7 +290,7 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
           description: item.description,
           rarity: item.rarity,
           quantity: 1,
-          equipped: itemType === 'skin' ? false : undefined
+          equipped: itemType === 'skin' ? false : (itemType === 'powerup' ? true : undefined)
         };
 
         // Save to inventory for all except coins
@@ -307,6 +307,16 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
           const ownedPowerups = JSON.parse(localStorage.getItem('flappypi-owned-powerups') || '[]');
           const newOwnedPowerups = [...ownedPowerups, item.id];
           localStorage.setItem('flappypi-owned-powerups', JSON.stringify(newOwnedPowerups));
+          
+          // Dispatch event for powerup purchase to sync game equipment
+          window.dispatchEvent(new CustomEvent('power-up-purchased', {
+            detail: {
+              powerUpId: item.id,
+              name: item.name,
+              quantity: 1,
+              purchasedAt: new Date().toISOString()
+            }
+          }));
         } else if (inventoryItem.type === 'bundle') {
           const ownedBundles = JSON.parse(localStorage.getItem('flappypi-owned-bundles') || '[]');
           const newOwnedBundles = [...ownedBundles, item.id];
@@ -320,6 +330,17 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
           const newOwnedAccessories = [...ownedAccessories, item.id];
           localStorage.setItem('flappypi-owned-accessories', JSON.stringify(newOwnedAccessories));
         }
+
+        // Dispatch inventory update event for all purchases
+        console.log('🛍️ [Shop] Dispatching inventory-updated event for:', item.id);
+        window.dispatchEvent(new CustomEvent('inventory-updated', {
+          detail: {
+            itemId: item.id,
+            type: inventoryItem.type,
+            action: 'purchased'
+          }
+        }));
+        console.log('✅ [Shop] inventory-updated event dispatched');
 
         toast({
           title: "Purchase Successful! 🎉",
@@ -379,7 +400,7 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
         description: item.description,
         rarity: item.rarity,
         quantity: 1,
-        equipped: false
+        equipped: item.type === 'powerup' ? true : false
       };
 
       // Save to inventory service
@@ -390,8 +411,33 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
       setOwnedSkins(newOwnedSkins);
       localStorage.setItem('flappypi-owned-skins', JSON.stringify(newOwnedSkins));
 
+      // Dispatch event for powerup purchase to sync game equipment
+      if (inventoryItem.type === 'powerup') {
+        console.log('🛍️ [Shop-Coins] Dispatching power-up-purchased event for:', item.id);
+        window.dispatchEvent(new CustomEvent('power-up-purchased', {
+          detail: {
+            powerUpId: item.id,
+            name: item.name,
+            quantity: 1,
+            purchasedAt: new Date().toISOString()
+          }
+        }));
+        console.log('✅ [Shop-Coins] power-up-purchased event dispatched');
+      }
+
+      // Dispatch inventory update event
+      console.log('🛍️ [Shop-Coins] Dispatching inventory-updated event for:', item.id);
+      window.dispatchEvent(new CustomEvent('inventory-updated', {
+        detail: {
+          itemId: item.id,
+          type: inventoryItem.type,
+          action: 'purchased'
+        }
+      }));
+      console.log('✅ [Shop-Coins] inventory-updated event dispatched');
+
       toast({
-        title: "Purchase Successful! \ud83c\udf89",
+        title: "Purchase Successful! 🎉",
         description: `${item.name} has been added to your collection.`
       });
     } else {
@@ -498,6 +544,7 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
 
   // Manual payment handlers
   const handleManualPaymentSuccess = (transaction: any) => {
+    console.log('🛍️ [Shop-Manual] Manual payment success:', transaction);
     if (paymentItem) {
       // Add item to inventory using proper inventory service
       const inventoryItem = {
@@ -508,16 +555,40 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
         description: paymentItem.description,
         rarity: paymentItem.rarity,
         quantity: 1,
-        equipped: false
+        equipped: paymentItem.type === 'powerup' ? true : false
       };
 
       // Save to inventory service
+      console.log('🛍️ [Shop-Manual] Saving to inventory:', inventoryItem);
       inventoryService.saveToInventory(inventoryItem);
 
       // Also keep in ownedSkins for backwards compatibility
       const newOwnedSkins = [...ownedSkins, paymentItem.id];
       setOwnedSkins(newOwnedSkins);
       localStorage.setItem('flappypi-owned-skins', JSON.stringify(newOwnedSkins));
+
+      // Dispatch event for powerup purchase to sync game equipment
+      if (inventoryItem.type === 'powerup') {
+        console.log('🛍️ [Shop-Manual] Dispatching power-up-purchased for:', paymentItem.id);
+        window.dispatchEvent(new CustomEvent('power-up-purchased', {
+          detail: {
+            powerUpId: paymentItem.id,
+            name: paymentItem.name,
+            quantity: 1,
+            purchasedAt: new Date().toISOString()
+          }
+        }));
+      }
+
+      // Dispatch inventory update event
+      console.log('🛍️ [Shop-Manual] Dispatching inventory-updated');
+      window.dispatchEvent(new CustomEvent('inventory-updated', {
+        detail: {
+          itemId: paymentItem.id,
+          type: inventoryItem.type,
+          action: 'purchased'
+        }
+      }));
       
       toast({
         title: "Manual Payment Successful! 🎉",
@@ -554,7 +625,7 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
         description: paymentItem.description,
         rarity: paymentItem.rarity,
         quantity: 1,
-        equipped: false
+        equipped: paymentItem.type === 'powerup' ? true : false
       };
 
       // Save to inventory service
@@ -566,6 +637,27 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
         setOwnedSkins(newOwnedSkins);
         localStorage.setItem('flappypi-owned-skins', JSON.stringify(newOwnedSkins));
       }
+
+      // Dispatch event for powerup purchase to sync game equipment
+      if (inventoryItem.type === 'powerup') {
+        window.dispatchEvent(new CustomEvent('power-up-purchased', {
+          detail: {
+            powerUpId: paymentItem.id,
+            name: paymentItem.name,
+            quantity: 1,
+            purchasedAt: new Date().toISOString()
+          }
+        }));
+      }
+
+      // Dispatch inventory update event
+      window.dispatchEvent(new CustomEvent('inventory-updated', {
+        detail: {
+          itemId: paymentItem.id,
+          type: inventoryItem.type,
+          action: 'purchased'
+        }
+      }));
     }
     
     // Show success message

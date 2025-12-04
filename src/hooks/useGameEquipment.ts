@@ -50,14 +50,26 @@ export const useGameEquipment = () => {
   // Load equipment from inventory
   const loadEquipment = useCallback(() => {
     // Loading equipment...
+    console.log('🔧 [useGameEquipment] loadEquipment() called at', new Date().toISOString());
     try {
       const inventory = inventoryService.getInventory();
+      console.log('🔧 [useGameEquipment] Full inventory loaded:', inventory.length, 'items');
+      console.log('🔧 [useGameEquipment] Powerups in inventory:', inventory.filter(i => i.type === 'powerup'));
       
       // Get equipped skin
       const equippedSkin = inventory.find(item => item.type === 'skin' && item.equipped);
+      console.log('🔧 [useGameEquipment] Equipped skin:', equippedSkin?.id || 'none');
       
-      // Get available powerups from both localStorage and profile
-      const allPowerUps = inventory.filter(item => item.type === 'powerup' && item.quantity > 0);
+      // Get available powerups from localStorage FIRST (this is the source of truth after purchase)
+      // Only include powerups that are equipped (equipped === true) OR have no equipped field (undefined = auto-equipped)
+      // This handles both shop purchases (equipped: undefined) and mystery box rewards (no equipped field)
+      const allPowerUps = inventory.filter(item => 
+        item.type === 'powerup' && 
+        item.quantity > 0 && 
+        (item.equipped === true || item.equipped === undefined)
+      );
+      
+      console.log('📦 [useGameEquipment] Loaded EQUIPPED powerups from inventory:', allPowerUps.map(p => `${p.id}:${p.quantity} (equipped:${p.equipped})`).join(', ') || 'none');
       
       // Also check profile's owned_power_ups if available
       let profilePowerUps: PowerUp[] = [];
@@ -137,6 +149,8 @@ export const useGameEquipment = () => {
           effect: typeof getPowerUpEffect(item.id) === 'string' ? getPowerUpEffect(item.id) : 'Power-up effect'
         }))
         .filter(powerUp => powerUp.quantity > 0); // Final filter to ensure no 0 quantity power-ups
+
+      console.log('✅ [useGameEquipment] Final powerups ready for game:', powerUps.map(p => `${p.id}:${p.quantity}`).join(', ') || 'NONE');
 
       setEquipment(prev => {
         const newEquipment = {
@@ -495,21 +509,18 @@ export const useGameEquipment = () => {
   // Listen for inventory updates to refresh equipment
   useEffect(() => {
     const handleInventoryChange = () => {
+      console.log('🔄 [EVENT] Inventory update event received - refreshing equipment');
       loadEquipment();
     };
 
     const handlePowerUpPurchased = (event: CustomEvent) => {
-      // Force immediate sync and reload
-      if (profile?.owned_power_ups) {
-        inventoryService.syncWithProfilePowerUps(profile.owned_power_ups);
-      }
-      setTimeout(() => {
-        loadEquipment();
-      }, 50);
+      console.log('🎁 [EVENT] Power-up purchased event received:', event.detail);
+      loadEquipment();
     };
 
     window.addEventListener('inventory-updated', handleInventoryChange);
     window.addEventListener('power-up-purchased', handlePowerUpPurchased as EventListener);
+    console.log('✅ [LISTENERS] Registered inventory-updated and power-up-purchased listeners');
     
     // Initial load
     loadEquipment();
@@ -517,6 +528,37 @@ export const useGameEquipment = () => {
     return () => {
       window.removeEventListener('inventory-updated', handleInventoryChange);
       window.removeEventListener('power-up-purchased', handlePowerUpPurchased as EventListener);
+      console.log('✅ [LISTENERS] Removed event listeners');
+    };
+  }, [loadEquipment]);
+
+  // CRITICAL: Also listen for game-started event to ensure fresh load
+  useEffect(() => {
+    const handleGameStarted = () => {
+      console.log('🎮 [EVENT] Game started event received - refreshing equipment with fresh powerups');
+      loadEquipment();
+    };
+
+    const handlePowerUpEquipped = (event: CustomEvent) => {
+      console.log('⚙️ [EVENT] Power-up equipped event received:', event.detail);
+      loadEquipment();
+    };
+
+    const handlePowerUpUnequipped = (event: CustomEvent) => {
+      console.log('⚙️ [EVENT] Power-up unequipped event received:', event.detail);
+      loadEquipment();
+    };
+
+    window.addEventListener('game-started', handleGameStarted);
+    window.addEventListener('powerup-equipped', handlePowerUpEquipped as EventListener);
+    window.addEventListener('powerup-unequipped', handlePowerUpUnequipped as EventListener);
+    console.log('✅ [LISTENERS] Registered game-started, powerup-equipped, and powerup-unequipped listeners');
+    
+    return () => {
+      window.removeEventListener('game-started', handleGameStarted);
+      window.removeEventListener('powerup-equipped', handlePowerUpEquipped as EventListener);
+      window.removeEventListener('powerup-unequipped', handlePowerUpUnequipped as EventListener);
+      console.log('✅ [LISTENERS] Removed game-started, powerup-equipped, and powerup-unequipped listeners');
     };
   }, [loadEquipment]);
 
