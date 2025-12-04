@@ -392,10 +392,19 @@ class InventoryService {
         const hasAnySkin = inventory.some(i => i.type === 'skin');
         if (hasAnySkin) return;
       }
-      // Always use correct id/image for Fire Phoenix
-      if (item.type === 'skin' && (item.id === 'inferno_phoenix' || item.name?.toLowerCase().includes('inferno'))) {
+      // Always use correct id/image for Fire Phoenix (ID or name or image match)
+      if (
+        item.type === 'skin' && (
+          item.id === 'inferno_phoenix' ||
+          item.id === 'inferno-phoenix' ||
+          (item.name && item.name.toLowerCase().includes('phoenix')) ||
+          (item.image && item.image.includes('bird_12.gif'))
+        )
+      ) {
         item.id = 'inferno_phoenix';
         item.image = '/birds2/bird_12.gif';
+        item.rarity = 'Special';
+        item.equipped = item.equipped ?? true;
         console.log('🔥 [Fire Phoenix] Normalized Fire Phoenix ID and image:', {
           id: item.id,
           image: item.image,
@@ -568,11 +577,24 @@ class InventoryService {
       
       let changed = false;
       
-      // 1. Fix Fire Phoenix skin image if needed
+      // 1. Normalize Fire Phoenix skin for all variants
       items = items.map(item => {
-        if (item.type === 'skin' && item.id === 'inferno_phoenix' && item.image !== '/birds2/bird_12.gif') {
+        if (
+          item.type === 'skin' && (
+            item.id === 'inferno_phoenix' ||
+            item.id === 'inferno-phoenix' ||
+            (item.name && item.name.toLowerCase().includes('phoenix')) ||
+            (item.image && item.image.includes('bird_12.gif'))
+          )
+        ) {
           changed = true;
-          return { ...item, image: '/birds2/bird_12.gif' };
+          return {
+            ...item,
+            id: 'inferno_phoenix',
+            image: '/birds2/bird_12.gif',
+            rarity: 'Special',
+            name: 'Fire Phoenix Skin'
+          };
         }
         return item;
       });

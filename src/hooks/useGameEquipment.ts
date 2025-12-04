@@ -618,15 +618,21 @@ export const useGameEquipment = () => {
 
 
   return {
-    ...equipment,
-    activatePowerUp,
-    useExtraLife,
-    getPowerUpStatus,
-    isPowerUpActive,
-    getActiveEffects,
-    refreshEquipment,
-    loadEquipment,
-    resetGameSession,
-    validatePowerUpUsage
-  };
+      ...equipment,
+      // Always normalize Fire Phoenix equipped skin ID
+      equippedSkin:
+        equipment.equippedSkin &&
+        (equipment.equippedSkin.id === 'inferno_phoenix' || equipment.equippedSkin.id === 'inferno-phoenix')
+          ? { ...equipment.equippedSkin, id: 'inferno_phoenix', image: '/birds2/bird_12.gif' }
+          : equipment.equippedSkin,
+      activatePowerUp,
+      useExtraLife,
+      getPowerUpStatus,
+      isPowerUpActive,
+      getActiveEffects,
+      refreshEquipment,
+      loadEquipment,
+      resetGameSession,
+      validatePowerUpUsage
+    };
 }; 
