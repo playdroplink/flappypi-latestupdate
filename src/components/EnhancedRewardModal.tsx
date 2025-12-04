@@ -110,7 +110,15 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
   }, [planId, open, onClose]);
 
   if (!open) return null;
-  if (shouldSuppress) return null;
+  if (shouldSuppress) {
+    toast({
+      title: 'Rewards Already Claimed',
+      description: 'You have already claimed or own all rewards for this plan.',
+      variant: 'default',
+      duration: 3500
+    });
+    return null;
+  }
 
   const handleClose = () => {
     if (!claimed && !isPreview && planId && rewards.length > 0) {
@@ -223,40 +231,7 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
     setPreviewReward(null);
   };
 
-  // Move the claimed rewards check to useEffect to avoid calling onClose during render
-  // Deduplicate rewards by id+name+type and sum quantity (ALT)
-  const dedupedRewardsAlt = React.useMemo(() => {
-    const map = new Map();
-    for (const reward of rewards) {
-      const key = `${reward.id}|${reward.name}|${reward.type}`;
-      if (map.has(key)) {
-        map.get(key).quantity += reward.quantity;
-      } else {
-        map.set(key, { ...reward });
-      }
-    }
-    return Array.from(map.values());
-  }, [rewards]);
-  // If suppressIfAllOwned is true, check inventory and suppress modal if all rewards are already owned (ALT)
-  const shouldSuppressAlt = React.useMemo(() => {
-    if (!dedupedRewardsAlt.length || !suppressIfAllOwned) return false;
-    try {
-      const inv = inventoryService.getInventory ? inventoryService.getInventory() : [];
-      return dedupedRewardsAlt.every(r => inv.some(i => i.id === r.id));
-    } catch {
-      return false;
-    }
-  }, [dedupedRewardsAlt, suppressIfAllOwned]);
-
-  useEffect(() => {
-    if (planId && inventoryService.hasClaimedPlanRewards(planId) && open) {
-      onClose();
-    }
-  }, [planId, open, onClose]);
-
-  // Early returns after all hooks
-  if (!open) return null;
-  if (shouldSuppressAlt) return null;
+  // All hooks are declared above; no more hooks below this point
 
   // Navigation to inventory
   const goToInventory = () => {
@@ -393,7 +368,6 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
                   src={previewReward.image}
                   alt={previewReward.name}
                   className="w-32 h-32 object-contain bg-gray-50 rounded-xl p-4 border-2 border-gray-200 shadow-lg"
-                  fallbackSrc="/icons/icon-128x128.png"
                   lazy={false}
                 />
                 <div className="absolute -top-2 -right-2">

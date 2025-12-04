@@ -341,7 +341,7 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ open, onClose }) => {
                             })()}
                             alt={item.name}
                             className="w-12 h-12 sm:w-16 sm:h-16 object-contain"
-                            fallbackSrc="/powerups/Extra life.png"
+                            fallbackSrc="/powerups/extra-life.png"
                           />
                         </div>
                         <div className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">

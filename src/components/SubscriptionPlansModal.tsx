@@ -827,6 +827,12 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({ isOpen,
     
     setRewards(planRewards);
     setShowRewardModal(true);
+    toast({
+      title: 'Reward Modal Triggered',
+      description: `Rewards modal should now appear for ${paymentPlan.name}.`,
+      variant: 'default',
+      duration: 3000
+    });
     // Payment modal removed - using direct payments
     // Update subscription status in UI
     const status = inventoryService.getSubscriptionStatus();

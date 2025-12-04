@@ -292,25 +292,25 @@ export default function FullFlappyWikiPage({ musicEnabled, setMusicEnabled, soun
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 32, marginBottom: 0 }}>
                 {/* Extra Life */}
                 <div style={{ flex: '1 1 220px', minWidth: 220, maxWidth: 260, background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px #e2c29033', padding: 20, textAlign: 'center' }}>
-                  <img src="/powerups/Extra life.png" alt="Extra Life" style={{ width: 64, height: 64, marginBottom: 12 }} />
+                  <img src="/powerups/extra-life.png" alt="Extra Life" style={{ width: 64, height: 64, marginBottom: 12 }} />
                   <div style={{ fontWeight: 700, fontSize: 18, color: '#10b981', marginBottom: 6 }}>Extra Life</div>
                   <div style={{ fontSize: 15 }}>Revive instantly after crashing. Gives you a second chance to keep flapping!</div>
                 </div>
                 {/* Coin Magnet */}
                 <div style={{ flex: '1 1 220px', minWidth: 220, maxWidth: 260, background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px #e2c29033', padding: 20, textAlign: 'center' }}>
-                  <img src="/powerups/Coin Magnet.png" alt="Coin Magnet" style={{ width: 64, height: 64, marginBottom: 12 }} />
+                  <img src="/powerups/coin-magnet.png" alt="Coin Magnet" style={{ width: 64, height: 64, marginBottom: 12 }} />
                   <div style={{ fontWeight: 700, fontSize: 18, color: '#f59e42', marginBottom: 6 }}>Coin Magnet</div>
                   <div style={{ fontSize: 15 }}>Attracts all nearby coins to your bird for a limited time. Great for boosting your score!</div>
                 </div>
                 {/* 2x Coin Multiplier */}
                 <div style={{ flex: '1 1 220px', minWidth: 220, maxWidth: 260, background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px #e2c29033', padding: 20, textAlign: 'center' }}>
-                  <img src="/powerups/2x Coin Multiplier.png" alt="2x Coin Multiplier" style={{ width: 64, height: 64, marginBottom: 12 }} />
+                  <img src="/powerups/2x-coin-multiplier.png" alt="2x Coin Multiplier" style={{ width: 64, height: 64, marginBottom: 12 }} />
                   <div style={{ fontWeight: 700, fontSize: 18, color: '#6366f1', marginBottom: 6 }}>2x Coin Multiplier</div>
                   <div style={{ fontSize: 15 }}>Doubles all coins you collect for a short period. Perfect for high-score runs!</div>
                 </div>
                 {/* Shield */}
                 <div style={{ flex: '1 1 220px', minWidth: 220, maxWidth: 260, background: '#fff', borderRadius: 12, boxShadow: '0 2px 8px #e2c29033', padding: 20, textAlign: 'center' }}>
-                  <img src="/powerups/Shield.png" alt="Shield" style={{ width: 64, height: 64, marginBottom: 12 }} />
+                  <img src="/powerups/shield.png" alt="Shield" style={{ width: 64, height: 64, marginBottom: 12 }} />
                   <div style={{ fontWeight: 700, fontSize: 18, color: '#60a5fa', marginBottom: 6 }}>Shield</div>
                   <div style={{ fontSize: 15 }}>Protects you from one obstacle. Stay safe and keep flying!</div>
                 </div>

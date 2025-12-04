@@ -58,20 +58,20 @@ export const ICON_MAPPINGS = {
     "dark": "/subscriptionplanbutton-dark.png"
   },
   "powerups_Shield_png": {
-    "light": "/powerups/Shield.png",
-    "dark": "/powerups\\Shield-dark.png"
+    "light": "/powerups/shield.png",
+    "dark": "/powerups\\shield-dark.png"
   },
   "powerups_Coin Magnet_png": {
-    "light": "/powerups/Coin Magnet.png",
-    "dark": "/powerups\\Coin Magnet-dark.png"
+    "light": "/powerups/coin-magnet.png",
+    "dark": "/powerups\\coin-magnet-dark.png"
   },
   "powerups_Extra life_png": {
-    "light": "/powerups/Extra life.png",
-    "dark": "/powerups\\Extra life-dark.png"
+    "light": "/powerups/extra-life.png",
+    "dark": "/powerups\\extra-life-dark.png"
   },
   "powerups_2x Coin Multiplier_png": {
-    "light": "/powerups/2x Coin Multiplier.png",
-    "dark": "/powerups\\2x Coin Multiplier-dark.png"
+    "light": "/powerups/2x-coin-multiplier.png",
+    "dark": "/powerups\\2x-coin-multiplier-dark.png"
   },
   "powerups_turbo_start_png": {
     "light": "/powerups/turbo-start.png",

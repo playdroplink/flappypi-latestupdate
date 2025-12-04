@@ -523,15 +523,15 @@ const getPowerUpDescription = (id: string): string => {
 
 const getPowerUpIcon = (id: string): string => {
   const icons: { [key: string]: string } = {
-    shield: '/powerups/Shield.png',
+    shield: '/powerups/shield.png',
     speed: '/powerups/Speed Boost.png',
-    magnet: '/powerups/Coin Magnet.png',
-    extraLife: '/powerups/Extra life.png',
+    magnet: '/powerups/coin-magnet.png',
+    extraLife: '/powerups/extra-life.png',
     doubleCoins: '/powerups/Double Coins.png',
     slowMotion: '/powerups/Slow Motion.png',
-    turbo_start: '/powerups/Turbo Start.png',
-    coin_multiplier: '/powerups/2x Coin Multiplier.png',
-    extra_life: '/powerups/Extra life.png'
+    turbo_start: '/powerups/turbo-start.png',
+    coin_multiplier: '/powerups/2x-coin-multiplier.png',
+    extra_life: '/powerups/extra-life.png'
   };
   return icons[id] || '/icons/default.png';
 };

@@ -13,15 +13,15 @@ export const getItemImage = (itemId: string): string => {
   if (itemId.startsWith('powerup_')) {
     const powerupType = itemId.replace('powerup_', '');
     const powerupImages: { [key: string]: string } = {
-      'shield': '/powerups/Shield.png',
-      'magnet': '/powerups/Coin Magnet.png',
-      'extra_life': '/powerups/Extra life.png',
+      'shield': '/powerups/shield.png',
+      'magnet': '/powerups/coin-magnet.png',
+      'extra_life': '/powerups/extra-life.png',
       'turbo_start': '/powerups/turbo-start.png',
-      'coin_multiplier': '/powerups/2x Coin Multiplier.png',
-      '2x_coins': '/powerups/2x Coin Multiplier.png',
-      'coin_multiplier_2x': '/powerups/2x Coin Multiplier.png'
+      'coin_multiplier': '/powerups/2x-coin-multiplier.png',
+      '2x_coins': '/powerups/2x-coin-multiplier.png',
+      'coin_multiplier_2x': '/powerups/2x-coin-multiplier.png'
     };
-    return powerupImages[powerupType] || '/powerups/Shield.png';
+    return powerupImages[powerupType] || '/powerups/shield.png';
   }
 
   // Mystery boxes: use exact image paths from /boxes/ directory

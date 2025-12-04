@@ -432,17 +432,17 @@ const InventoryPage: React.FC = () => {
                         <ImageWithFallback
                           src={(() => {
                             switch (item.id) {
-                              case 'shield': return '/powerups/Shield.png';
-                              case 'magnet': return '/powerups/Coin Magnet.png';
-                              case 'extra_life': return '/powerups/Extra life.png';
-                              case 'coin_multiplier': return '/powerups/2x Coin Multiplier.png';
+                              case 'shield': return '/powerups/shield.png';
+                              case 'magnet': return '/powerups/coin-magnet.png';
+                              case 'extra_life': return '/powerups/extra-life.png';
+                              case 'coin_multiplier': return '/powerups/2x-coin-multiplier.png';
                               case 'turbo_start': return '/powerups/turbo-start.png';
-                              default: return item.image || `/powerups/${item.name.replace(/ /g, '_')}.png` || '/powerups/Shield.png';
+                              default: return item.image || `/powerups/${item.name.replace(/ /g, '-')}.png` || '/powerups/shield.png';
                             }
                           })()}
                           alt={item.name}
                           className="w-full h-full object-cover rounded-lg bg-gray-100"
-                          fallbackSrc="/powerups/Extra life.png"
+                          fallbackSrc="/powerups/extra-life.png"
                         />
                       </div>
                       <div className="text-xs sm:text-sm text-gray-600 mb-3 text-center truncate">

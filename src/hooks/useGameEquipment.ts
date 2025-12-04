@@ -69,13 +69,13 @@ export const useGameEquipment = () => {
             name: getPowerUpName(powerUpId),
             icon: (() => {
               switch (powerUpId) {
-                case 'shield': return '/powerups/Shield.png';
-                case 'magnet': return '/powerups/Coin Magnet.png';
-                case 'extra_life': return '/powerups/Extra life.png';
-                case 'coin_multiplier': return '/powerups/2x Coin Multiplier.png';
+                case 'shield': return '/powerups/shield.png';
+                case 'magnet': return '/powerups/coin-magnet.png';
+                case 'extra_life': return '/powerups/extra-life.png';
+                case 'coin_multiplier': return '/powerups/2x-coin-multiplier.png';
                 case 'turbo_start': return '/powerups/turbo-start.png';
                 default:
-                  return `/powerups/${powerUpId.replace('_', ' ')}.png` || '/powerups/Shield.png';
+                  return `/powerups/${powerUpId.replace('_', '-')}.png` || '/powerups/shield.png';
               }
             })(),
             quantity: quantity as number,
@@ -122,14 +122,14 @@ export const useGameEquipment = () => {
           name: item.name,
           icon: (() => {
             switch (item.id) {
-              case 'shield': return '/powerups/Shield.png';
-              case 'magnet': return '/powerups/Coin Magnet.png';
-              case 'extra_life': return '/powerups/Extra life.png';
-              case 'coin_multiplier': return '/powerups/2x Coin Multiplier.png';
+              case 'shield': return '/powerups/shield.png';
+              case 'magnet': return '/powerups/coin-magnet.png';
+              case 'extra_life': return '/powerups/extra-life.png';
+              case 'coin_multiplier': return '/powerups/2x-coin-multiplier.png';
               case 'turbo_start': return '/powerups/turbo-start.png';
               default:
-                // Fallback to default icon
-                return `/powerups/${item.name.replace(/ /g, '_')}.png` || '/powerups/Shield.png';
+                // Fallback for unknown power-ups
+                return `/powerups/${item.name.replace(/ /g, '-')}.png` || '/powerups/shield.png';
             }
           })(),
           quantity: item.quantity,
@@ -243,10 +243,10 @@ export const useGameEquipment = () => {
         const powerUpName = getPowerUpName(powerUpId);
         const powerUpIcon = (() => {
           switch (powerUpId) {
-            case 'shield': return '/powerups/Shield.png';
-            case 'magnet': return '/powerups/Coin Magnet.png';
-            case 'extra_life': return '/powerups/Extra life.png';
-            case 'coin_multiplier': return '/powerups/2x Coin Multiplier.png';
+            case 'shield': return '/powerups/shield.png';
+            case 'magnet': return '/powerups/coin-magnet.png';
+            case 'extra_life': return '/powerups/extra-life.png';
+            case 'coin_multiplier': return '/powerups/2x-coin-multiplier.png';
             case 'turbo_start': return '/powerups/turbo-start.png';
             default: return `/powerups/${powerUpId.replace('_', ' ')}.png`;
           }

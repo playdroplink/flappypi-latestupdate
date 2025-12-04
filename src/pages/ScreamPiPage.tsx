@@ -540,7 +540,7 @@ const ScreamPiPage: React.FC = () => {
     {
       title: "Power-up System",
       content: "Collect power-ups like shields, magnets, and extra lives to help you survive longer and earn more rewards!",
-      image: "/powerups/Shield.png"
+      image: "/powerups/shield.png"
     },
     {
       title: "Ready to Scream! 🚀",

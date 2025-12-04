@@ -8,6 +8,7 @@ interface ImageWithFallbackProps extends React.ImgHTMLAttributes<HTMLImageElemen
   onError?: React.ReactEventHandler<HTMLImageElement>;
   retryAttempts?: number;
   retryDelay?: number;
+  strict?: boolean;
 }
 
 const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
@@ -21,6 +22,7 @@ const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   onError,
   retryAttempts = 0,
   retryDelay = 1000,
+  strict = false,
   ...props
 }) => {
   const [imgSrc, setImgSrc] = useState(src);
@@ -38,11 +40,12 @@ const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
         setHasError(false);
         setIsLoading(true);
       }, retryDelay);
-    } else if (!hasError && fallbackSrc) {
+    } else if (!strict && !hasError && fallbackSrc) {
       setImgSrc(fallbackSrc);
       setHasError(true);
       setIsLoading(false);
     } else {
+      setHasError(true);
       setIsLoading(false);
     }
   };
@@ -62,16 +65,27 @@ const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   return (
     <>
       {isLoading && placeholder}
-      <img
-        src={imgSrc}
-        alt={alt}
-        className={className}
-        onError={handleError}
-        onLoad={handleLoad}
-        loading={lazy ? "lazy" : "eager"}
-        style={{ display: isLoading ? 'none' : 'block' }}
-        {...props}
-      />
+      {!isLoading && hasError && strict && (
+        <div
+          className={className}
+          aria-label={alt || 'image unavailable'}
+          style={{ display: 'block' }}
+        >
+          {placeholder || null}
+        </div>
+      )}
+      {(!strict || !hasError) && (
+        <img
+          src={imgSrc}
+          alt={alt}
+          className={className}
+          onError={handleError}
+          onLoad={handleLoad}
+          loading={lazy ? "lazy" : "eager"}
+          style={{ display: isLoading ? 'none' : 'block' }}
+          {...props}
+        />
+      )}
     </>
   );
 };

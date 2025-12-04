@@ -61,20 +61,32 @@ const NavigationDrawer: React.FC<NavigationDrawerProps> = ({ onNavigate, onOpenT
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="text-blue-700 bg-white hover:bg-gray-100 mt-16 p-0 relative" 
-          style={{ width: 48, height: 48, background: 'transparent' }}
-          onClick={() => console.log('NavigationDrawer Debug - Menu button clicked')}
-        >
-          <img src="/menu.png" alt="Menu" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
-          {hasUnclaimedRewards && (
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center">
-              <span className="text-xs text-white font-bold">!</span>
-            </div>
-          )}
-        </Button>
+        <div className="flex gap-2 items-center mt-16">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-blue-700 p-0 relative"
+            style={{ width: 48, height: 48, background: 'none' }}
+            onClick={() => console.log('NavigationDrawer Debug - Menu button clicked')}
+          >
+            <img src="/menu.png" alt="Menu" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
+            {hasUnclaimedRewards && (
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center">
+                <span className="text-xs text-white font-bold">!</span>
+              </div>
+            )}
+          </Button>
+          {/* Bell icon with no background */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-blue-700 p-0"
+            style={{ width: 48, height: 48, background: 'none', boxShadow: 'none', border: 'none' }}
+            aria-label="Notifications"
+          >
+            <Bell className="w-6 h-6" style={{ background: 'none', boxShadow: 'none', border: 'none' }} />
+          </Button>
+        </div>
       </SheetTrigger>
               <SheetContent side="left" className="w-80 bg-gradient-to-b from-blue-100 via-indigo-50 to-indigo-100 text-blue-900 border-none flex flex-col">
         <SheetHeader className="mb-8">

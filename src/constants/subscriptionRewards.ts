@@ -37,9 +37,9 @@ export const subscriptionPlanRewards: SubscriptionPlanRewards[] = [
         type: 'powerup',
         quantity: 1,
         rarity: 'Common',
-        image: '/powerups/Shield.png',
+        image: '/powerups/shield.png',
         description: 'Protects you from one collision with obstacles.',
-        previewImage: '/powerups/Shield.png'
+        previewImage: '/powerups/shield.png'
       },
       {
         id: 'magnet',
@@ -47,9 +47,9 @@ export const subscriptionPlanRewards: SubscriptionPlanRewards[] = [
         type: 'powerup',
         quantity: 1,
         rarity: 'Common',
-        image: '/powerups/Coin Magnet.png',
+        image: '/powerups/coin-magnet.png',
         description: 'Attracts coins from a distance automatically.',
-        previewImage: '/powerups/Coin Magnet.png'
+        previewImage: '/powerups/coin-magnet.png'
       },
       {
         id: 'extra_life',
@@ -57,9 +57,9 @@ export const subscriptionPlanRewards: SubscriptionPlanRewards[] = [
         type: 'powerup',
         quantity: 1,
         rarity: 'Common',
-        image: '/powerups/Extra life.png',
+        image: '/powerups/extra-life.png',
         description: 'Gives you an extra life when you die.',
-        previewImage: '/powerups/Extra life.png'
+        previewImage: '/powerups/extra-life.png'
       },
       {
         id: 'turbo_start',
@@ -77,9 +77,9 @@ export const subscriptionPlanRewards: SubscriptionPlanRewards[] = [
         type: 'powerup',
         quantity: 1,
         rarity: 'Common',
-        image: '/powerups/2x Coin Multiplier.png',
+        image: '/powerups/2x-coin-multiplier.png',
         description: 'Doubles your coin earnings for a limited time.',
-        previewImage: '/powerups/2x Coin Multiplier.png'
+        previewImage: '/powerups/2x-coin-multiplier.png'
       },
       {
         id: 'flappy_coins',
@@ -113,9 +113,9 @@ export const subscriptionPlanRewards: SubscriptionPlanRewards[] = [
         type: 'powerup',
         quantity: 5,
         rarity: 'Rare',
-        image: '/powerups/Shield.png',
+        image: '/powerups/shield.png',
         description: '5 Shield power-ups to protect you from collisions.',
-        previewImage: '/powerups/Shield.png'
+        previewImage: '/powerups/shield.png'
       },
       {
         id: 'magnet',
@@ -123,9 +123,9 @@ export const subscriptionPlanRewards: SubscriptionPlanRewards[] = [
         type: 'powerup',
         quantity: 5,
         rarity: 'Rare',
-        image: '/powerups/Coin Magnet.png',
+        image: '/powerups/coin-magnet.png',
         description: '5 Coin Magnet power-ups to attract coins.',
-        previewImage: '/powerups/Coin Magnet.png'
+        previewImage: '/powerups/coin-magnet.png'
       },
       {
         id: 'extra_life',
@@ -133,9 +133,9 @@ export const subscriptionPlanRewards: SubscriptionPlanRewards[] = [
         type: 'powerup',
         quantity: 5,
         rarity: 'Rare',
-        image: '/powerups/Extra life.png',
+        image: '/powerups/extra-life.png',
         description: '5 Extra Life power-ups for survival.',
-        previewImage: '/powerups/Extra life.png'
+        previewImage: '/powerups/extra-life.png'
       },
       {
         id: 'turbo_start',
@@ -153,9 +153,9 @@ export const subscriptionPlanRewards: SubscriptionPlanRewards[] = [
         type: 'powerup',
         quantity: 5,
         rarity: 'Rare',
-        image: '/powerups/2x Coin Multiplier.png',
+        image: '/powerups/2x-coin-multiplier.png',
         description: '5 Coin Multiplier power-ups for double earnings.',
-        previewImage: '/powerups/2x Coin Multiplier.png'
+        previewImage: '/powerups/2x-coin-multiplier.png'
       },
       {
         id: 'flappy_coins',
@@ -199,9 +199,9 @@ export const subscriptionPlanRewards: SubscriptionPlanRewards[] = [
         type: 'powerup',
         quantity: 7,
         rarity: 'Legendary',
-        image: '/powerups/Shield.png',
+        image: '/powerups/shield.png',
         description: '7 Shield power-ups for maximum protection.',
-        previewImage: '/powerups/Shield.png'
+        previewImage: '/powerups/shield.png'
       },
       {
         id: 'magnet',
@@ -209,9 +209,9 @@ export const subscriptionPlanRewards: SubscriptionPlanRewards[] = [
         type: 'powerup',
         quantity: 7,
         rarity: 'Legendary',
-        image: '/powerups/Coin Magnet.png',
+        image: '/powerups/coin-magnet.png',
         description: '7 Coin Magnet power-ups for maximum coin attraction.',
-        previewImage: '/powerups/Coin Magnet.png'
+        previewImage: '/powerups/coin-magnet.png'
       },
       {
         id: 'extra_life',
@@ -219,9 +219,9 @@ export const subscriptionPlanRewards: SubscriptionPlanRewards[] = [
         type: 'powerup',
         quantity: 7,
         rarity: 'Legendary',
-        image: '/powerups/Extra life.png',
+        image: '/powerups/extra-life.png',
         description: '7 Extra Life power-ups for maximum survival.',
-        previewImage: '/powerups/Extra life.png'
+        previewImage: '/powerups/extra-life.png'
       },
       {
         id: 'turbo_start',
@@ -239,9 +239,9 @@ export const subscriptionPlanRewards: SubscriptionPlanRewards[] = [
         type: 'powerup',
         quantity: 7,
         rarity: 'Legendary',
-        image: '/powerups/2x Coin Multiplier.png',
+        image: '/powerups/2x-coin-multiplier.png',
         description: '7 Coin Multiplier power-ups for maximum earnings.',
-        previewImage: '/powerups/2x Coin Multiplier.png'
+        previewImage: '/powerups/2x-coin-multiplier.png'
       },
       {
         id: 'flappy_coins',

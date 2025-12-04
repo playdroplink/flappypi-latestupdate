@@ -1802,13 +1802,13 @@ class InventoryService {
   // Helper method to get power-up icon
   private getPowerUpIcon(powerUpId: string): string {
     const icons = {
-      'shield': '/powerups/Shield.png',
-      'magnet': '/powerups/Coin Magnet.png',
-      'extra_life': '/powerups/Extra life.png',
-      'coin_multiplier': '/powerups/2x Coin Multiplier.png',
+      'shield': '/powerups/shield.png',
+      'magnet': '/powerups/coin-magnet.png',
+      'extra_life': '/powerups/extra-life.png',
+      'coin_multiplier': '/powerups/2x-coin-multiplier.png',
       'turbo_start': '/powerups/turbo-start.png'
     };
-    return icons[powerUpId as keyof typeof icons] || `/powerups/${powerUpId.replace('_', ' ')}.png`;
+    return icons[powerUpId as keyof typeof icons] || `/powerups/${powerUpId.replace('_', '-')}.png`;
   }
 
   // Add test skins to inventory for testing
@@ -1899,10 +1899,10 @@ class InventoryService {
 
     // 2. Add 1-3 random powerups with exact images
     const powerupTypes = [
-      { id: 'shield', name: 'Shield', image: '/powerups/Shield.png', rarity: 'Common' },
-      { id: 'magnet', name: 'Coin Magnet', image: '/powerups/Coin Magnet.png', rarity: 'Common' },
-      { id: 'extra_life', name: 'Extra Life', image: '/powerups/Extra life.png', rarity: 'Common' },
-      { id: 'coin_multiplier', name: '2x Coin Multiplier', image: '/powerups/2x Coin Multiplier.png', rarity: 'Common' },
+      { id: 'shield', name: 'Shield', image: '/powerups/shield.png', rarity: 'Common' },
+      { id: 'magnet', name: 'Coin Magnet', image: '/powerups/coin-magnet.png', rarity: 'Common' },
+      { id: 'extra_life', name: 'Extra Life', image: '/powerups/extra-life.png', rarity: 'Common' },
+      { id: 'coin_multiplier', name: '2x Coin Multiplier', image: '/powerups/2x-coin-multiplier.png', rarity: 'Common' },
       { id: 'turbo_start', name: 'Turbo Start', image: '/powerups/turbo-start.png', rarity: 'Common' }
     ];
     const numPowerups = 1 + Math.floor(Math.random() * 3); // 1-3
@@ -2043,7 +2043,7 @@ class InventoryService {
         type: 'powerup',
         quantity: 15,
         rarity: 'Common',
-        image: '/powerups/Shield.png'
+        image: '/powerups/shield.png'
       }];
     }
     // Single power-up bundles (e.g., 'extra-life', 'coin-magnet', etc.)

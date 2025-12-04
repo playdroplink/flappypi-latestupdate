@@ -36,11 +36,11 @@ export const CRITICAL_IMAGES = [
   '/npc gif/npc-12.gif.gif',
   
   // Powerup images
-  '/powerups/Shield.png',
-  '/powerups/Coin Magnet.png',
-  '/powerups/Extra life.png',
+  '/powerups/shield.png',
+  '/powerups/coin-magnet.png',
+  '/powerups/extra-life.png',
   '/powerups/turbo-start.png',
-  '/powerups/2x Coin Multiplier.png',
+  '/powerups/2x-coin-multiplier.png',
   
   // Box images
   '/boxes/basic-box.png',
@@ -101,11 +101,11 @@ export const FALLBACK_MAPPING: Record<string, string> = {
   'npc-12': '/flappy pi gif/flappy-2.gif.gif',
   
   // Powerup fallbacks
-  'shield': '/powerups/Shield.png',
-  'coin_magnet': '/powerups/Coin Magnet.png',
-  'extra_life': '/powerups/Extra life.png',
+  'shield': '/powerups/shield.png',
+  'coin_magnet': '/powerups/coin-magnet.png',
+  'extra_life': '/powerups/extra-life.png',
   'turbo_start': '/powerups/turbo-start.png',
-  'coin_multiplier': '/powerups/2x Coin Multiplier.png',
+  'coin_multiplier': '/powerups/2x-coin-multiplier.png',
   
   // Box fallbacks
   'basic-box': '/boxes/basic-box.png',

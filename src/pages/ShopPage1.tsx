@@ -1461,10 +1461,10 @@ const ShopPage: React.FC = () => {
               </TabsContent>
               <TabsContent value="bundles">
                 <div className="flex flex-col gap-6">
-                  {[{ id: 'extra-life', name: 'Extra Life', image: '/powerups/Extra life.png', piPrice: 8, flappyCoinPrice: 8000 },
-                    { id: 'coin-magnet', name: 'Coin Magnet', image: '/powerups/Coin Magnet.png', piPrice: 8, flappyCoinPrice: 8000 },
-                    { id: '2x-coin-multiplier', name: '2x Coin Multiplier', image: '/powerups/2x Coin Multiplier.png', piPrice: 8, flappyCoinPrice: 8000 },
-                    { id: 'shield', name: 'Shield', image: '/powerups/Shield.png', piPrice: 8, flappyCoinPrice: 8000 },
+                  {[{ id: 'extra-life', name: 'Extra Life', image: '/powerups/extra-life.png', piPrice: 8, flappyCoinPrice: 8000 },
+                    { id: 'coin-magnet', name: 'Coin Magnet', image: '/powerups/coin-magnet.png', piPrice: 8, flappyCoinPrice: 8000 },
+                    { id: '2x-coin-multiplier', name: '2x Coin Multiplier', image: '/powerups/2x-coin-multiplier.png', piPrice: 8, flappyCoinPrice: 8000 },
+                    { id: 'shield', name: 'Shield', image: '/powerups/shield.png', piPrice: 8, flappyCoinPrice: 8000 },
                     { id: 'turbo-start', name: 'Turbo Start', image: '/powerups/turbo-start.png', piPrice: 8, flappyCoinPrice: 8000 }
                   ].map((bundle) => {
                     const quantity = getQuantity(bundle.id);
