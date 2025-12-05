@@ -150,6 +150,22 @@ const THEME_MAP = {
   'flappy-stack': { theme: 'morning', pipe: '/assets/pipe.png' },
 };
 
+// Challenge-specific theme mapping
+const CHALLENGE_THEME_MAP: Record<string, string> = {
+  precision: 'morning',        // Precision Mode - bright and clear
+  timebomb: 'storm',           // Time Bomb - dramatic storm
+  gravityflip: 'space',        // Gravity Flip - space theme
+  windstorm: 'storm',          // Wind Storm - stormy weather
+  nightflight: 'night',        // Night Flight - dark with limited visibility
+  speedrush: 'sunny',          // Speed Rush - bright and fast
+  reverse: 'rainbow',          // Reverse Control - colorful and disorienting
+  iceslide: 'winter',          // Ice Slide - winter/snow theme
+  lavaescape: 'lava',          // Lava Escape - lava/fire theme
+  shieldrun: 'garden',         // Shield Run - green/nature theme
+  mystery: 'space',            // Mystery - space/unknown theme
+  screampi: 'rainbow',         // Scream Pi - colorful and energetic
+};
+
 const themeColorMap = {
   classic: '#4CAF50',
   bamboo: '#A3D977',
@@ -4278,8 +4294,18 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
             paddingBottom: window.innerWidth <= 768 ? '60px' : '0px'
           }}
         >
-          {/* Background - Only use Background component for special effects */}
-          {mode !== 'classic' && <Background mode={toClassicChallengeEndlessMode(mode)} scene={selectedSeason} effect={effect} />}
+          {/* Background - Use mode-specific themes: Classic=morning, Endless=night, Challenge=(varies by challenge type) */}
+          {mode !== 'classic' && (
+            <Background 
+              mode={toClassicChallengeEndlessMode(mode)} 
+              scene={
+                safeMode === 'challenge' && safeChallenge?.id 
+                  ? CHALLENGE_THEME_MAP[safeChallenge.id] || 'lava' 
+                  : THEME_MAP[toClassicChallengeEndlessMode(mode)]?.theme || 'morning'
+              } 
+              effect={effect} 
+            />
+          )}
           
           
           {/* Ice Slide Mode - Winter Effects */}
