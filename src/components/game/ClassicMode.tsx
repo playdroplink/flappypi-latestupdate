@@ -636,16 +636,21 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
 
   // Load selected season from localStorage
   useEffect(() => {
-    const savedSeason = localStorage.getItem('flappy-pi-current-season');
-    if (savedSeason) {
-      setSelectedSeason(savedSeason);
+    // IMPORTANT: Game should ALWAYS use the REAL season from seasonManager
+    // NOT the user's selected season from profile (flappypi-selected-season)
+    // The seasonManager maintains the real season in 'flappy-pi-current-season'
+    const realSeason = localStorage.getItem('flappy-pi-current-season');
+    if (realSeason) {
+      setSelectedSeason(realSeason);
+      console.log(`🎮 Game loaded with real season: ${realSeason}`);
     }
 
-    // Listen for season changes from settings modal
+    // Listen for season changes from seasonManager (real season rotations only)
     const handleSeasonChange = () => {
-      const newSeason = localStorage.getItem('flappy-pi-current-season');
-      if (newSeason) {
-        setSelectedSeason(newSeason);
+      const newRealSeason = localStorage.getItem('flappy-pi-current-season');
+      if (newRealSeason) {
+        setSelectedSeason(newRealSeason);
+        console.log(`🎮 Game updated to real season: ${newRealSeason}`);
       }
     };
 

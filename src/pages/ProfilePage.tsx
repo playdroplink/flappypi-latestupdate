@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Settings, Calendar, Star, AlertTriangle, Upload, Package, ShoppingCart, Trophy, RefreshCw, Lock } from 'lucide-react';
+import { ArrowLeft, X, User, Settings, Calendar, Star, AlertTriangle, Upload, Package, ShoppingCart, Trophy, RefreshCw, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserProfile } from '@/types/gameTypes';
 import { inventoryService } from '@/services/inventoryService';
@@ -667,15 +667,26 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
       <div className="w-full max-w-2xl mx-auto flex flex-col items-center justify-center min-h-screen">
         <div className="w-full flex flex-col items-center justify-start p-2 sm:p-6 relative z-10 bg-white/95 rounded-3xl shadow-2xl border border-blue-200 overflow-y-auto max-h-[90vh] sm:max-h-[85vh]">
           
-          {/* Back Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleBack}
-            className="absolute top-4 sm:top-6 left-4 sm:left-6 text-blue-700 hover:bg-blue-100 rounded-full p-2 z-20"
-          >
-            <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
-          </Button>
+          {/* Back and Close Buttons */}
+          <div className="absolute top-4 sm:top-6 left-4 sm:left-6 flex gap-2 z-20">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleBack}
+              className="text-blue-700 hover:bg-blue-100 rounded-full p-2"
+            >
+              <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/')}
+              className="text-blue-700 hover:bg-blue-100 rounded-full p-2"
+              title="Close"
+            >
+              <X className="h-5 w-5 sm:h-6 sm:w-6" />
+            </Button>
+          </div>
 
           {/* Animated Background Elements */}
           <div className="absolute inset-0 pointer-events-none z-0">
