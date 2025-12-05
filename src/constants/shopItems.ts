@@ -22,7 +22,7 @@ export const shopItems: ShopItem[] = [
   {
     id: "bird-0",
     name: "Sky Blue Flappy",
-    image: "/flappy pi gif/flappy-2.gif.gif",
+    image: "/birds2/bird_0.gif",
     piPrice: 0,
     flappyCoinPrice: 0,
     isDefault: true,

@@ -69,14 +69,14 @@ export const getItemImage = (itemId: string): string => {
     const birdNumber = itemId.split(/[-_]/)[1];
     // Special case for bird-0 (Sky Blue Flappy) - use GIF
     if (birdNumber === '0') {
-      return '/flappy pi gif/flappy-2.gif.gif';
+      return '/birds2/bird_0.gif';
     }
     // Check if the bird image exists, otherwise use bird_0 as fallback
     const birdImages = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
     if (birdImages.includes(birdNumber)) {
       return `/birds2/bird_${birdNumber}.gif`;
     }
-    return '/flappy pi gif/flappy-2.gif.gif'; // Fallback to GIF
+    return '/birds2/bird_0.gif'; // Fallback to default bird
   }
 
   // Coins
