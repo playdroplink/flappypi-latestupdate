@@ -1625,32 +1625,6 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
               <span className="text-2xl">🔒</span>
               <span>Scream Pi Mode (Locked)</span>
             </button>
-              {/* Mock Pi Payment for Scream Pi Skin */}
-              <button
-                onClick={() => {
-                  // Mock Pi payment for Scream Pi skin
-                  import('../utils/piPayment').then(({ createPiPayment }) => {
-                    createPiPayment(
-                      { amount: 1, memo: 'Unlock Scream Pi Skin', metadata: { skin: 'scream-pi' } },
-                      {
-                        onServerApproval: (paymentId) => {
-                          // Simulate unlock
-                          localStorage.setItem('screamPiUnlocked', 'true');
-                          alert('Scream Pi skin unlocked!');
-                        },
-                        onServerCompletion: () => {},
-                        onCancel: () => { alert('Payment cancelled'); },
-                        onError: () => { alert('Payment error'); }
-                      }
-                    );
-                  });
-                }}
-                className="w-full flex items-center justify-center gap-3 py-3 rounded-2xl font-bold text-lg shadow-md transition-all duration-200 bg-yellow-400 hover:bg-yellow-500 text-black mt-2"
-                style={{ minHeight: '44px', pointerEvents: 'auto' }}
-              >
-                <span className="text-xl">🪙</span>
-                <span>Mock Pi Payment (Unlock Scream Pi)</span>
-              </button>
             
             {/* Flappy Pi Toons Button - DISABLED */}
             {/* 
