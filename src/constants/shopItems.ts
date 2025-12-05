@@ -31,7 +31,7 @@ export const shopItems: ShopItem[] = [
     description: "[Common 🟦] The classic blue bird that started it all - free for everyone!",
   },
   {
-    id: "inferno-phoenix",
+    id: "inferno_phoenix",
     name: "🔥 Fire Phoenix",
     image: "/birds2/bird_12.gif",
     piPrice: 0,

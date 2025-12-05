@@ -2,7 +2,7 @@
 import { shopItems } from '@/constants/shopItems';
 
 export function getBirdImageSrc(skin: { id?: string; image?: string } | string | undefined | null): string {
-  if (!skin) return '/flappy pi gif/flappy-2.gif.gif';
+  if (!skin) return '/flappy pi gif/bird_12.gif';
   if (typeof skin === 'string') {
     // Handle Fire Phoenix special cases
     if (skin === 'inferno_phoenix' || skin === 'inferno-phoenix') {
@@ -10,7 +10,7 @@ export function getBirdImageSrc(skin: { id?: string; image?: string } | string |
     }
     // Try to find in shopItems
     const shopItem = shopItems.find(item => item.id === skin);
-    return shopItem?.image || `/birds2/${skin.replace('bird-', 'bird_')}.gif` || '/flappy pi gif/flappy-2.gif.gif';
+    return shopItem?.image || `/birds2/${skin.replace('bird-', 'bird_')}.gif` || '/flappy pi gif/bird_12.gif';
   }
   // If object, check image property
   if (skin.image && typeof skin.image === 'string' && skin.image.trim() !== '') {
@@ -24,5 +24,5 @@ export function getBirdImageSrc(skin: { id?: string; image?: string } | string |
     const shopItem = shopItems.find(item => item.id === skin.id);
     return shopItem?.image || `/birds2/${skin.id.replace('bird-', 'bird_')}.gif` || '/flappy pi gif/flappy-2.gif.gif';
   }
-  return '/flappy pi gif/flappy-2.gif.gif';
+  return '/flappy pi gif/bird_12.gif';
 } 
