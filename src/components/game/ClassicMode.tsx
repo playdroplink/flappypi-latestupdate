@@ -5454,7 +5454,7 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
           />
           
           {/* Enhanced Powerup Effects Around Bird */}
-          {activePowerUps['shield'] && (
+          {(activePowerUps['shield'] || challengeShield) && (
             <>
               {/* Enhanced Shield Bubble with Multiple Layers */}
               <div
@@ -5465,9 +5465,15 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
                   width: BIRD_WIDTH + 70,
                   height: BIRD_HEIGHT + 70,
                   borderRadius: '50%',
-                  background: 'radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, rgba(99, 102, 241, 0.2) 50%, transparent 80%)',
-                  border: '4px solid rgba(99, 102, 241, 0.9)',
-                  boxShadow: '0 0 40px rgba(99, 102, 241, 0.8), 0 0 80px rgba(99, 102, 241, 0.4), inset 0 0 20px rgba(99, 102, 241, 0.3)',
+                  background: challengeShield 
+                    ? 'radial-gradient(circle, rgba(34, 197, 94, 0.4) 0%, rgba(34, 197, 94, 0.2) 50%, transparent 80%)'
+                    : 'radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, rgba(99, 102, 241, 0.2) 50%, transparent 80%)',
+                  border: challengeShield 
+                    ? '4px solid rgba(34, 197, 94, 0.9)' 
+                    : '4px solid rgba(99, 102, 241, 0.9)',
+                  boxShadow: challengeShield
+                    ? '0 0 40px rgba(34, 197, 94, 0.8), 0 0 80px rgba(34, 197, 94, 0.4), inset 0 0 20px rgba(34, 197, 94, 0.3)'
+                    : '0 0 40px rgba(99, 102, 241, 0.8), 0 0 80px rgba(99, 102, 241, 0.4), inset 0 0 20px rgba(99, 102, 241, 0.3)',
                   zIndex: 14,
                   pointerEvents: 'none',
                   animation: 'enhancedShieldPulse 2.5s infinite',
@@ -5485,8 +5491,12 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
                     width: BIRD_WIDTH + 60 + i * 24,
                     height: BIRD_HEIGHT + 60 + i * 24,
                     borderRadius: '50%',
-                    border: `3px solid rgba(99, 102, 241, ${0.7 - i * 0.15})`,
-                    background: 'radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%)',
+                    border: challengeShield 
+                      ? `3px solid rgba(34, 197, 94, ${0.7 - i * 0.15})` 
+                      : `3px solid rgba(99, 102, 241, ${0.7 - i * 0.15})`,
+                    background: challengeShield
+                      ? 'radial-gradient(circle, rgba(34, 197, 94, 0.1) 0%, transparent 70%)'
+                      : 'radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%)',
                     zIndex: 13 + i,
                     pointerEvents: 'none',
                     animation: `enhancedShieldRingPulse ${2.5 + i * 0.5}s infinite`,
@@ -5510,13 +5520,17 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
                       top: birdY + BIRD_HEIGHT / 2 + y - 4,
                       width: 8,
                       height: 8,
-                      background: 'radial-gradient(circle, #6366f1, #4f46e5)',
+                      background: challengeShield 
+                        ? 'radial-gradient(circle, #22c55e, #16a34a)' 
+                        : 'radial-gradient(circle, #6366f1, #4f46e5)',
                       borderRadius: '50%',
                       zIndex: 15,
                       pointerEvents: 'none',
                       animation: `enhancedShieldParticleFloat ${3 + i * 0.2}s infinite linear`,
                       animationDelay: `${i * 0.2}s`,
-                      boxShadow: '0 0 12px #6366f1, 0 0 24px rgba(99, 102, 241, 0.6)',
+                      boxShadow: challengeShield
+                        ? '0 0 12px #22c55e, 0 0 24px rgba(34, 197, 94, 0.6)'
+                        : '0 0 12px #6366f1, 0 0 24px rgba(99, 102, 241, 0.6)',
                     }}
                   />
                 );
@@ -5533,7 +5547,9 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
                     width: BIRD_WIDTH + 80 + i * 30,
                     height: BIRD_HEIGHT + 80 + i * 30,
                     borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, rgba(99, 102, 241, 0.1) 50%, transparent 70%)',
+                    background: challengeShield
+                      ? 'radial-gradient(circle, rgba(34, 197, 94, 0.3) 0%, rgba(34, 197, 94, 0.1) 50%, transparent 70%)'
+                      : 'radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, rgba(99, 102, 241, 0.1) 50%, transparent 70%)',
                     zIndex: 12 + i,
                     pointerEvents: 'none',
                     animation: `enhancedShieldWave ${4 + i}s infinite`,
@@ -6584,11 +6600,112 @@ if (typeof window !== 'undefined' && document) {
         transform: translateY(-4px) rotate(1deg);
       }
     }
+    
+    /* Modern Power-up Effect Animations */
+    @keyframes magnetPulseModern {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.6;
+      }
+      50% {
+        transform: scale(1.08);
+        opacity: 0.8;
+      }
+    }
+    
+    @keyframes magnetLineModern {
+      0% {
+        transform: translateY(0) scaleY(1);
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(-20px) scaleY(0.5);
+        opacity: 0;
+      }
+    }
+    
+    @keyframes coinMultiplierPulseModern {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.6;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.9;
+      }
+    }
+    
+    @keyframes floatingCoinModern {
+      0% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 1;
+      }
+      50% {
+        transform: translate(10px, -15px) rotate(180deg);
+        opacity: 0.7;
+      }
+      100% {
+        transform: translate(0, 0) rotate(360deg);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes coinSpike {
+      0%, 100% {
+        transform: scaleY(0);
+        opacity: 0;
+      }
+      50% {
+        transform: scaleY(1);
+        opacity: 0.8;
+      }
+    }
+    
+    @keyframes turboLinesModern {
+      0% {
+        transform: translateX(0%);
+        opacity: 0;
+      }
+      50% {
+        opacity: 0.15;
+      }
+      100% {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+    
+    @keyframes turboTrail {
+      0% {
+        transform: scaleX(1) translateX(0);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scaleX(0.3) translateX(-50px);
+        opacity: 0;
+      }
+    }
+    
     @keyframes comboGradient {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
+    
+    @keyframes magnetWave {
+      0% {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      50% {
+        opacity: 0.4;
+      }
+      100% {
+        transform: scale(1.5);
+        opacity: 0;
+      }
+    }
+    
     @keyframes particleShield {
       0% { transform: scale(0) rotate(0deg); opacity: 1; }
       100% { transform: scale(2) rotate(360deg); opacity: 0; }
@@ -6678,6 +6795,56 @@ if (typeof window !== 'undefined' && document) {
     @keyframes turboLines {
       0% { transform: translateX(-100%); }
       100% { transform: translateX(100%); }
+    }
+    
+    /* Enhanced Shield Animations for Power-ups and Challenge Mode */
+    @keyframes enhancedShieldPulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.8;
+        box-shadow: 0 0 40px rgba(99, 102, 241, 0.8), 0 0 80px rgba(99, 102, 241, 0.4);
+      }
+      50% {
+        transform: scale(1.05);
+        opacity: 1;
+        box-shadow: 0 0 60px rgba(99, 102, 241, 1), 0 0 120px rgba(99, 102, 241, 0.6);
+      }
+    }
+    
+    @keyframes enhancedShieldRingPulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.7;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.3;
+      }
+    }
+    
+    @keyframes enhancedShieldParticleFloat {
+      0% {
+        transform: rotate(0deg) translateX(0);
+        opacity: 1;
+      }
+      100% {
+        transform: rotate(360deg) translateX(0);
+        opacity: 0.8;
+      }
+    }
+    
+    @keyframes enhancedShieldWave {
+      0% {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      50% {
+        opacity: 0.3;
+      }
+      100% {
+        transform: scale(1.5);
+        opacity: 0;
+      }
     }
   `;
   document.head.appendChild(style);
