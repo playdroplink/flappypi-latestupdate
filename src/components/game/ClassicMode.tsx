@@ -48,6 +48,7 @@ import StarField from './StarField';
 import ParticleSystem from './ParticleSystem';
 import Bomb from './Bomb';
 import { mobilePerformanceOptimizer } from '../../utils/mobilePerformanceOptimizer';
+import { SEASON_CONFIGS } from '@/utils/seasonManager';
 
 
 
@@ -1066,8 +1067,7 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
       setScoreMultiplier(1); // Reset score multiplier
       setTurboActive(false);
       setPowerUpNotification('⚡ Turbo expired - normal speed restored!');
-      const turboTimeout = setTimeout(() => setPowerUpNotification(null), 3000);
-      notificationTimeouts.push(turboTimeout);
+      setTimeout(() => setPowerUpNotification(null), 3000);
     }, 12000); // 12 seconds turbo effect (matches useGameEquipment duration)
     
     return () => {
@@ -4269,7 +4269,7 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
             minHeight: 400, // fallback for iOS Safari viewport issues
             margin: '0 auto',
             overflow: 'hidden',
-            background: 'linear-gradient(to bottom, #87CEEB, #98D8E8)', // Unified background
+            background: SEASON_CONFIGS[selectedSeason]?.background || 'linear-gradient(to bottom, #87CEEB, #98D8E8)', // Use real season background
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
