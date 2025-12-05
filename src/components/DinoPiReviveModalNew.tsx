@@ -520,7 +520,34 @@ const DinoPiReviveModal: React.FC<DinoPiReviveModalProps> = ({
           {/* Watch Ad to Revive (only for non-subscribers and Pi Browser users) */}
           {!hasActiveSubscription && (
             <div className="border-2 border-green-200 rounded-lg sm:rounded-xl p-3 sm:p-4 flex flex-col items-center">
-              <img src={watchAdsImg} alt="Watch Ads" className="w-16 h-16 sm:w-20 sm:h-20 mb-2 rounded-lg shadow" />
+              {/* GIF with loading state */}
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 mb-2 bg-gray-100 rounded-lg shadow flex items-center justify-center">
+                <img 
+                  src={watchAdsImg} 
+                  alt="Watch Ads" 
+                  className="w-full h-full rounded-lg shadow object-cover"
+                  loading="lazy"
+                  decoding="async"
+                  onError={(e) => {
+                    // Fallback to emoji if GIF fails to load
+                    (e.target as HTMLImageElement).style.display = 'none';
+                    const parent = (e.target as HTMLImageElement).parentElement;
+                    if (parent) {
+                      parent.innerHTML = '<div className="text-3xl">🎬</div>';
+                    }
+                  }}
+                />
+                {/* Loading skeleton */}
+                <style>{`
+                  @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.5; }
+                  }
+                  .loading-skeleton {
+                    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                  }
+                `}</style>
+              </div>
               <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-100 rounded-full flex items-center justify-center">
                   <Play className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />

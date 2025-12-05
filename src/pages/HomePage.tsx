@@ -65,7 +65,7 @@ const getAutoTheme = () => {
   return (hour >= 19 || hour < 7) ? 'night' : 'light';
 };
 
-import { seasonManager, Season } from '../utils/seasonManager';
+import { seasonManager, Season, SEASON_CONFIGS } from '../utils/seasonManager';
 import { useSeasonManager } from '../hooks/useSeasonManager';
 
 const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEnabled, setMusicEnabled }) => {
@@ -118,8 +118,12 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
 
   // Update seasonal weather when season changes
   useEffect(() => {
-    const seasonInfo = seasonManager.getSeasonInfo();
-    setSeasonalWeather(seasonInfo.config);
+    // Use the currentSeason from useSeasonManager, which respects user's selected season
+    const config = SEASON_CONFIGS[currentSeason];
+    if (config) {
+      setSeasonalWeather(config);
+      console.log(`🌍 HomePage updated to season: ${currentSeason}`);
+    }
   }, [currentSeason]);
 
   // Scroll indicator state

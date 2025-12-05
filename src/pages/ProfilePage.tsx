@@ -1340,7 +1340,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
                         </Button>
                       </div>
                     ) : (
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-96 overflow-y-auto p-2">
+                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 w-full">
                         {[
                           { name: 'spring', emoji: '🌸', color: 'from-green-200 to-green-400', desc: 'Fresh spring blooms' },
                           { name: 'summer', emoji: '☀️', color: 'from-yellow-200 to-yellow-400', desc: 'Warm sunny days' },
@@ -1397,25 +1397,27 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
                                     title: "Seasonal Weather Selected!",
                                     description: `${season.desc} will appear in your next game!`,
                                   });
+                                  // Dispatch event so home page updates
+                                  window.dispatchEvent(new CustomEvent('seasonChanged'));
                                 }
                               }}
                               disabled={!isAvailable}
-                              className={`relative rounded-lg p-3 border-2 transition-all duration-200 flex flex-col items-center justify-center gap-2 ${
+                              className={`relative rounded-lg p-2 border-2 transition-all duration-200 flex flex-col items-center justify-center gap-1 ${
                                 isAvailable
                                   ? 'border-blue-200 bg-white hover:border-blue-400 hover:shadow-md cursor-pointer'
-                                  : 'border-gray-300 bg-gray-100 opacity-60 cursor-not-allowed'
+                                  : 'border-gray-300 bg-gray-100 opacity-50 cursor-not-allowed'
                               }`}
                             >
-                              <div className={`w-full h-16 rounded-md bg-gradient-to-br ${season.color} flex items-center justify-center text-2xl border border-opacity-30`}>
+                              <div className={`w-full h-12 rounded-md bg-gradient-to-br ${season.color} flex items-center justify-center text-lg border border-opacity-30`}>
                                 {season.emoji}
                               </div>
                               
-                              <span className="text-xs sm:text-sm font-semibold capitalize text-gray-800 text-center line-clamp-2">
+                              <span className="text-xs font-semibold capitalize text-gray-800 text-center line-clamp-1">
                                 {season.name}
                               </span>
                               
                               {!isAvailable && (
-                                <div className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1">
+                                <div className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5">
                                   <Lock className="w-3 h-3" />
                                 </div>
                               )}
