@@ -127,6 +127,18 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return () => window.removeEventListener('focus', handleFocus);
   }, [profile, refreshProfile]);
 
+  // Listen for wallet updates from mystery boxes and other sources
+  useEffect(() => {
+    const handleWalletUpdate = () => {
+      const currentCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
+      console.log(`💰 [WalletContext] Wallet updated event received, setting balance to ${currentCoins}`);
+      setBalance(currentCoins);
+    };
+
+    window.addEventListener('wallet-updated', handleWalletUpdate);
+    return () => window.removeEventListener('wallet-updated', handleWalletUpdate);
+  }, []);
+
   // Handle user authentication changes
   useEffect(() => {
     if (isAuthenticated && username) {

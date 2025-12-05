@@ -15,7 +15,7 @@ interface ItemReceiveModalProps {
   item: {
     id: string;
     name: string;
-    type: 'skin' | 'powerup' | 'subscription' | 'mystery-box' | 'bundle';
+    type: 'skin' | 'powerup' | 'subscription' | 'mystery-box' | 'bundle' | 'coins';
     quantity: number;
     rarity?: 'Common' | 'Rare' | 'Epic' | 'Special' | 'Legendary';
     image?: string;
@@ -42,30 +42,35 @@ const ItemReceiveModal: React.FC<ItemReceiveModalProps> = ({ isOpen, onClose, it
   const handleClaim = async () => {
     if (!item) return;
     try {
-      inventoryService.saveToInventory({
-        id: item.id,
-        name: item.name,
-        type: item.type || 'powerup', // fallback for missing type
-        quantity: typeof item.quantity === 'number' && item.quantity > 0 ? item.quantity : 1, // fallback for missing/invalid quantity
-        rarity: item.rarity,
-        image: item.image,
-        description: item.description
-      });
-
-      // If item is coins, update wallet balance
-      if (item.id === 'coins') {
+      // Handle coins specially - add to wallet instead of inventory
+      if (item.type === 'coins') {
         const prevCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
         const addAmount = typeof item.quantity === 'number' && item.quantity > 0 ? item.quantity : 1;
         const newCoins = prevCoins + addAmount;
         localStorage.setItem('flappypi-coins', newCoins.toString());
+        console.log(`💰 Added ${addAmount} coins to wallet. Total: ${newCoins}`);
+        
         // Dispatch event so wallet UI updates
-        window.dispatchEvent(new Event('wallet-updated'));
+        window.dispatchEvent(new CustomEvent('wallet-updated', { 
+          detail: { coinsAdded: addAmount } 
+        }));
+      } else {
+        // For non-coin items, save to inventory
+        inventoryService.saveToInventory({
+          id: item.id,
+          name: item.name,
+          type: item.type || 'powerup', // fallback for missing type
+          quantity: typeof item.quantity === 'number' && item.quantity > 0 ? item.quantity : 1, // fallback for missing/invalid quantity
+          rarity: item.rarity,
+          image: item.image,
+          description: item.description
+        });
       }
 
       setClaimed(true);
       toast({
         title: 'Item Claimed! 🎉',
-        description: `${item.name} has been added to your inventory!`,
+        description: `${item.name} has been added to your ${item.type === 'coins' ? 'wallet' : 'inventory'}!`,
         duration: 3000
       });
     } catch (error) {
@@ -141,7 +146,7 @@ const ItemReceiveModal: React.FC<ItemReceiveModalProps> = ({ isOpen, onClose, it
             {claimed ? '🎉 Item Claimed!' : '🎁 You Got a New Item!'}
           </h2>
           <p className="text-gray-600">
-            {claimed ? 'Your item has been added to your inventory!' : 'Here is your reward from the shop!'}
+            {claimed ? (item.type === 'coins' ? 'Your coins have been added to your wallet!' : 'Your item has been added to your inventory!') : 'Here is your reward from the shop!'}
           </p>
         </div>
         <div className="space-y-4 mb-6">

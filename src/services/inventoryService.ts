@@ -2208,17 +2208,56 @@ class InventoryService {
       image: p.image,
       equipped: true // Bundle powerups should be equipped by default
     }));
-    // Fallback: if allPowerUps is empty, add a default power-up
+    // Fallback: if allPowerUps is empty, add default power-ups to ensure bundle has items
     if (allPowerUps.length === 0) {
-      allPowerUps = [{
-        id: 'shield',
-        name: 'Shield',
-        type: 'powerup',
-        quantity: 15,
-        rarity: 'Common',
-        image: '/powerups/shield.png',
-        equipped: true // Bundle powerups should be equipped by default
-      }];
+      console.warn('⚠️ No powerUpItems found, using fallback powerups');
+      allPowerUps = [
+        {
+          id: 'shield',
+          name: 'Shield',
+          type: 'powerup',
+          quantity: 15,
+          rarity: 'Common',
+          image: '/powerups/shield.png',
+          equipped: true
+        },
+        {
+          id: 'magnet',
+          name: 'Coin Magnet',
+          type: 'powerup',
+          quantity: 15,
+          rarity: 'Common',
+          image: '/powerups/coin-magnet.png',
+          equipped: true
+        },
+        {
+          id: 'extra_life',
+          name: 'Extra Life',
+          type: 'powerup',
+          quantity: 15,
+          rarity: 'Common',
+          image: '/powerups/extra-life.png',
+          equipped: true
+        },
+        {
+          id: 'coin_multiplier',
+          name: '2x Coin Multiplier',
+          type: 'powerup',
+          quantity: 15,
+          rarity: 'Common',
+          image: '/powerups/2x-coin-multiplier.png',
+          equipped: true
+        },
+        {
+          id: 'turbo_start',
+          name: 'Turbo Start',
+          type: 'powerup',
+          quantity: 15,
+          rarity: 'Common',
+          image: '/powerups/turbo-start.png',
+          equipped: true
+        }
+      ];
     }
     // Single power-up bundles (e.g., 'extra-life', 'coin-magnet', etc.)
     const singlePowerUpBundles: { [key: string]: string } = {

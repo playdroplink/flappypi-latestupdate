@@ -1248,6 +1248,49 @@ const ShopPage: React.FC = () => {
     }
   };
 
+  // Create wrapper for payment confirmation to handle receive modal
+  const handlePaymentConfirmationWrapper = useCallback(async () => {
+    try {
+      const result = await handlePaymentConfirmation();
+      
+      // Show receive modal for successful payments
+      if (result.success && paymentModal.item) {
+        const item = paymentModal.item;
+        const quantity = item.quantity || 1;
+        
+        if (item.type === 'coins' && item.coins) {
+          // For coins, show the total amount earned
+          const totalCoins = item.coins * quantity;
+          setReceiveItem({
+            id: item.id,
+            name: `${totalCoins} Flappy Coins`,
+            type: 'coins',
+            quantity: totalCoins,  // This is the coin amount, not quantity
+            image: item.image || '/flappycoins.png',
+            description: `You received ${totalCoins} Flappy Coins!`,
+            price: item.piPrice,
+            currency: paymentModal.type === 'pi' ? 'pi' : 'coins',
+            message: `Congrats! You bought ${totalCoins} Flappy Coins. Claim your coins below.`
+          });
+          setShowReceiveModal(true);
+        } else {
+          // For other items, show the standard receive modal
+          setReceiveItem({
+            ...item,
+            price: item.piPrice || item.coinPrice || 0,
+            currency: paymentModal.type === 'pi' ? 'pi' : 'coins'
+          });
+          setShowReceiveModal(true);
+        }
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Payment confirmation error:', error);
+      throw error;
+    }
+  }, [handlePaymentConfirmation, paymentModal]);
+
   // Sale logic
   const { isSaleDay, msLeft, periodEnd } = getSaleState();
   const salePeriod = Math.floor((Date.now() - Date.UTC(2025, 5, 1, 0, 0, 0, 0)) / (24 * 60 * 60 * 1000));
@@ -1951,14 +1994,17 @@ const ShopPage: React.FC = () => {
       {/* Item Receive Modal */}
       <ItemReceiveModal
         isOpen={showReceiveModal}
-        onClose={() => setShowReceiveModal(false)}
+        onClose={() => {
+          setShowReceiveModal(false);
+          closePaymentModal(); // Also close the payment modal
+        }}
         item={receiveItem}
       />
       
       {/* Unified Payment Modal */}
       <UnifiedPaymentModal
         paymentModal={paymentModal}
-        onConfirm={handlePaymentConfirmation}
+        onConfirm={handlePaymentConfirmationWrapper}
         onClose={closePaymentModal}
         onCancel={cancelPayment}
       />

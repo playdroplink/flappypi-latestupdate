@@ -34,22 +34,41 @@ const MysteryBoxRewardModal: React.FC<MysteryBoxRewardModalProps> = ({
   const autoClaimRewards = () => {
     if (!claimed && rewards.length > 0) {
       try {
+        let totalCoinsEarned = 0;
+        
         rewards.forEach(reward => {
-          inventoryService.saveToInventory({
-            id: reward.id,
-            name: reward.name,
-            type: reward.type,
-            quantity: reward.quantity,
-            rarity: reward.rarity,
-            image: reward.image,
-            description: reward.description
-          });
+          // Handle coins specially - add to wallet instead of inventory
+          if (reward.type === 'coins' && reward.id === 'flappy_coins') {
+            const currentCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
+            const newCoins = currentCoins + reward.quantity;
+            localStorage.setItem('flappypi-coins', newCoins.toString());
+            totalCoinsEarned += reward.quantity;
+            console.log(`💰 Added ${reward.quantity} coins to wallet. Total: ${newCoins}`);
+          } else {
+            // For other items, save to inventory
+            inventoryService.saveToInventory({
+              id: reward.id,
+              name: reward.name,
+              type: reward.type,
+              quantity: reward.quantity,
+              rarity: reward.rarity,
+              image: reward.image,
+              description: reward.description
+            });
+          }
         });
+        
         setClaimed(true);
         if (onClaim) onClaim();
+        
+        // Dispatch wallet update event so UI reflects new coin balance
+        window.dispatchEvent(new CustomEvent('wallet-updated', { 
+          detail: { coinsAdded: totalCoinsEarned } 
+        }));
+        
         toast({
           title: 'Rewards Claimed! 🎉',
-          description: `Successfully claimed ${rewards.length} item(s) from your mystery box!`,
+          description: `Successfully claimed ${rewards.length} item(s) from your mystery box!${totalCoinsEarned > 0 ? ` (+${totalCoinsEarned} coins)` : ''}`,
           duration: 3000
         });
       } catch (error) {
