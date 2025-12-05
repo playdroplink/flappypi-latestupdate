@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import FooterNPC from '../components/FooterNPC';
 import EnhancedFooter from '../components/EnhancedFooter';
 import SkyBackground from '../components/SkyBackground';
@@ -20,6 +21,7 @@ const ReservePage: React.FC = () => {
   // Local state for music and sound toggles
   const [musicEnabled, setMusicEnabled] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [showImportantNote, setShowImportantNote] = useState(true);
 
   const theme = settings.theme === 'night' ? 'night' : (settings.theme === 'dark' ? 'dark' : 'light');
 
@@ -88,6 +90,9 @@ const ReservePage: React.FC = () => {
           <h2 className="text-xl font-bold mb-2 text-gray-900 mt-6">⚠️ {t('reserveNoteTitle')}</h2>
           <div className="mb-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
             <p className="text-gray-700 font-medium">{t('reserveNoteText')}</p>
+            <p className="text-gray-700 font-semibold mt-3">
+              Important: All funds from the Flappy Pi Reserve are exclusively dedicated to Flappy Pi and future mrwain organization projects within the Pi ecosystem. Funds will not be used for any purposes outside Pi ecosystem development.
+            </p>
           </div>
           
           <div className={`text-center text-lg font-bold mt-6 ${theme === 'night' ? 'text-white' : 'text-yellow-700'}`}>Coming Soon</div>
@@ -98,6 +103,21 @@ const ReservePage: React.FC = () => {
           
 
         </div>
+
+        {/* Important Note Modal */}
+        <Dialog open={showImportantNote} onOpenChange={setShowImportantNote}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>⚠️ Important Reserve Note</DialogTitle>
+              <DialogDescription>
+                All funds from the Flappy Pi Reserve are exclusively dedicated to the development of Flappy Pi and future mrwain organization projects within the Pi ecosystem. These funds will not be used for any purposes outside of Pi ecosystem development.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button onClick={() => setShowImportantNote(false)} className="w-full sm:w-auto">Got it</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         {/* FooterNPC above the footer */}
         <FooterNPC
           npcType="default"

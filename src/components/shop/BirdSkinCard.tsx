@@ -66,6 +66,7 @@ const BirdSkinCard: React.FC<BirdSkinCardProps> = ({
   let statusColor = '';
   const isDefault = item.id === 'bird-0';
   const isInfernoPhoenix = item.id === 'inferno_phoenix' || item.id === 'inferno-phoenix';
+  const isGoldenPhoenix = item.id === 'golden_phoenix' || item.id === 'golden-phoenix';
   const isSoldOut = isLimited && supply !== undefined && supply <= 0; // Check for sold out
 
   if (isDefault) {
@@ -74,6 +75,9 @@ const BirdSkinCard: React.FC<BirdSkinCardProps> = ({
   } else if (isInfernoPhoenix) {
     statusText = 'Not for Sale';
     statusColor = 'bg-orange-500 text-white font-bold';
+  } else if (isGoldenPhoenix) {
+    statusText = isOwned ? 'Owned' : 'Available';
+    statusColor = isOwned ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700';
   } else if (isSoldOut) {
     statusText = 'Sold Out';
     statusColor = 'bg-red-500 text-white';
@@ -185,12 +189,6 @@ const BirdSkinCard: React.FC<BirdSkinCardProps> = ({
             Special
           </div>
         )}
-        {/* Fire Phoenix Marketing Message */}
-        {isInfernoPhoenix && !isOwned && (
-          <div className="absolute left-1/2 top-12 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold bg-yellow-300 text-red-700 z-20 animate-bounce shadow-lg border border-yellow-500">
-            🔥 Fire Phoenix is exclusive! Subscribe to Ultimate Pack for 30 Pi to unlock.
-          </div>
-        )}
         
         {/* Image with enhanced preview and fixed glow effect */}
         <div className="h-32 flex items-center justify-center w-full bg-blue-50/50 rounded-lg mb-2 relative overflow-hidden">
@@ -261,7 +259,7 @@ const BirdSkinCard: React.FC<BirdSkinCardProps> = ({
         </div>
         
         {/* Price Section */}
-        {!isInfernoPhoenix ? (
+        {(!isInfernoPhoenix || isGoldenPhoenix) ? (
           <div className="flex flex-col items-center mt-2 mb-4">
             {promoActive ? (
               <>
@@ -281,7 +279,7 @@ const BirdSkinCard: React.FC<BirdSkinCardProps> = ({
         ) : null}
         
         {/* Price and Actions */}
-        {!isInfernoPhoenix && !isOwned && !isDefault && !isSoldOut && (
+        {(!isInfernoPhoenix || isGoldenPhoenix) && !isOwned && !isDefault && !isSoldOut && (
           <div className="mt-4 flex flex-col gap-2">
             {item.piPrice > 0 && (
               <Button

@@ -31,13 +31,13 @@ const SPLASH_DURATION = 8000; // 8 seconds
 // NPC Characters for Scream Pi splash
 const npcCharacters = [
   {
-    name: "Nicolas",
-    image: "/npc/nicolas.png",
+    name: "Nic",
+    image: "/npc/nic.png",
     description: "The mysterious guide"
   },
   {
-    name: "Chengdiao",
-    image: "/npc/chengdiao.png", 
+    name: "Che",
+    image: "/npc/che.png", 
     description: "The wise mentor"
   },
   {

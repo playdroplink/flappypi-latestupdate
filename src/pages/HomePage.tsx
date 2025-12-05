@@ -976,7 +976,10 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
       return;
     }
     setDevRedeemError('');
-    await addCoins(1, 'Dev Redeem - 1 Coins'); // Changed to 1
+    // Sanitize coin value and update wallet
+    const coinsToAdd = Math.max(1, Number.isFinite(1) ? 1 : 0);
+    await addCoins(coinsToAdd, 'Dev Redeem - 1 Coins');
+    window.dispatchEvent(new CustomEvent('wallet-updated', { detail: { coinsAdded: coinsToAdd } }));
     setDevRedeemSuccess(true);
     setTimeout(() => {
       setShowDevRedeem(false);
@@ -1613,14 +1616,41 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
               <span className="text-2xl">🌐</span> {t('flappyPiCommunity')}
             </button>
             {/* Scream Pi Button */}
+            {/* Scream Pi Button Locked for now */}
             <button
-              onClick={() => handleGameModeSelect('scream-pi')}
-              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl shadow-lg transition-all duration-200 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-200 border-2 border-red-400"
-              style={{ minHeight: '56px', pointerEvents: 'auto' }}
+              disabled
+              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl shadow-lg transition-all duration-200 bg-gradient-to-r from-gray-400 to-gray-500 text-white opacity-60 cursor-not-allowed border-2 border-gray-400"
+              style={{ minHeight: '56px', pointerEvents: 'none' }}
             >
-              <span className="text-2xl">🎤</span>
-              <span>Scream Pi Mode</span>
+              <span className="text-2xl">🔒</span>
+              <span>Scream Pi Mode (Locked)</span>
             </button>
+              {/* Mock Pi Payment for Scream Pi Skin */}
+              <button
+                onClick={() => {
+                  // Mock Pi payment for Scream Pi skin
+                  import('../utils/piPayment').then(({ createPiPayment }) => {
+                    createPiPayment(
+                      { amount: 1, memo: 'Unlock Scream Pi Skin', metadata: { skin: 'scream-pi' } },
+                      {
+                        onServerApproval: (paymentId) => {
+                          // Simulate unlock
+                          localStorage.setItem('screamPiUnlocked', 'true');
+                          alert('Scream Pi skin unlocked!');
+                        },
+                        onServerCompletion: () => {},
+                        onCancel: () => { alert('Payment cancelled'); },
+                        onError: () => { alert('Payment error'); }
+                      }
+                    );
+                  });
+                }}
+                className="w-full flex items-center justify-center gap-3 py-3 rounded-2xl font-bold text-lg shadow-md transition-all duration-200 bg-yellow-400 hover:bg-yellow-500 text-black mt-2"
+                style={{ minHeight: '44px', pointerEvents: 'auto' }}
+              >
+                <span className="text-xl">🪙</span>
+                <span>Mock Pi Payment (Unlock Scream Pi)</span>
+              </button>
             
             {/* Flappy Pi Toons Button - DISABLED */}
             {/* 
@@ -1691,9 +1721,9 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
               <img src="/settings.png" alt={t('settings')} className="h-14 w-14 mb-1 group-hover:scale-110 transition-transform" />
               <span className={`text-base font-bold group-hover:text-blue-600 ${theme === 'night' ? 'text-white' : 'text-gray-700'}`}>{t('settings')}</span>
             </button>
-            <button onClick={() => navigateToPublic(ROUTES.RESERVE)} className="flex flex-col items-center group" style={{ background: 'none', border: 'none' }}>
-              <img src="/reserve.png" alt={t('reserve')} className="h-14 w-14 mb-1 group-hover:scale-110 transition-transform" />
-              <span className={`text-base font-bold group-hover:text-blue-600 ${theme === 'night' ? 'text-white' : 'text-gray-700'}`}>{t('reserve') || 'Reserve'}</span>
+            <button disabled className="flex flex-col items-center group opacity-60 cursor-not-allowed" style={{ background: 'none', border: 'none' }}>
+              <img src="/reserve.png" alt={t('reserve')} className="h-14 w-14 mb-1" />
+              <span className={`text-base font-bold ${theme === 'night' ? 'text-white' : 'text-gray-700'}`}>{t('reserve') || 'Reserve (Locked)'}</span>
             </button>
             <button onClick={() => navigateToPublic(ROUTES.MERCH)} className="flex flex-col items-center group" style={{ background: 'none', border: 'none' }}>
               <img src="/merch.png" alt={t('merch')} className="h-14 w-14 mb-1 group-hover:scale-110 transition-transform" />

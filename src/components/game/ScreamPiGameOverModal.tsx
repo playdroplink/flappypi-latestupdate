@@ -87,11 +87,11 @@ const ScreamPiGameOverModal: React.FC<ScreamPiGameOverModalProps> = ({
           {characterImage && (
             <img 
               src={characterImage} 
-              alt={`${characterName} Character`} 
+              alt={`${characterName.replace('Nicolas', 'Nic').replace('Chengdiao', 'Che')} Character`} 
               className="w-16 h-16 sm:w-20 sm:h-20 mb-2 drop-shadow-lg animate-bounce" 
               onError={(e) => {
                 console.log('❌ Character image failed to load:', characterImage);
-                e.currentTarget.src = '/npc/nicolas.png';
+                e.currentTarget.src = characterImage && characterImage.includes('chengdiao') ? '/npc/che.png' : '/npc/nic.png';
               }}
             />
           )}
