@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import BirdSkinCard from './BirdSkinCard';
 import { useNavigate } from 'react-router-dom';
 import { ShopItem } from '@/constants/shopItems';
 import { UserProfile } from '@/types/gameTypes';
+import { inventoryService, type InventoryItem } from '@/services/inventoryService';
 
 interface BirdCharactersSectionProps {
   shopItems: ShopItem[];
@@ -30,8 +31,30 @@ const BirdCharactersSection: React.FC<BirdCharactersSectionProps> = ({
   onSubscribe,
 }) => {
   const navigate = useNavigate();
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
 
-  const isOwned = (itemId: string) => profile?.owned_skins?.includes(itemId);
+  // Load inventory on mount and listen for updates
+  useEffect(() => {
+    setInventory(inventoryService.getInventory());
+    
+    const handleInventoryUpdate = () => {
+      setInventory(inventoryService.getInventory());
+    };
+    
+    window.addEventListener('inventory-updated', handleInventoryUpdate);
+    return () => window.removeEventListener('inventory-updated', handleInventoryUpdate);
+  }, []);
+
+  // Check if skin is owned in profile or in inventory
+  const isOwned = (itemId: string) => {
+    // Check profile first
+    if (profile?.owned_skins?.includes(itemId)) {
+      return true;
+    }
+    // Also check inventory for Fire Phoenix and other skins
+    return inventory.some(item => item.type === 'skin' && (item.id === itemId || item.id === itemId.replace('bird-', 'bird_')));
+  };
+  
   const isEquipped = (itemId: string) => profile?.selected_bird_skin === itemId;
   const isCharacterAffordable = (item: ShopItem, method: 'pi' | 'coins') => {
     if (!profile) return false;
@@ -77,7 +100,6 @@ const BirdCharactersSection: React.FC<BirdCharactersSectionProps> = ({
             profilePiBalance={profile?.pi_balance || 0}
             isLimited={item.isLimited}
             supply={item.supply}
-            isPiBrowser={isPiBrowser}
             onSubscribe={onSubscribe}
           />
         ))}

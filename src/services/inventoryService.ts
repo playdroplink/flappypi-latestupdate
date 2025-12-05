@@ -775,10 +775,10 @@ class InventoryService {
   // Equip an item (for skins, only one can be equipped at a time)
   equipItem(itemId: string, type: InventoryItem['type']): boolean {
     try {
-      // Normalize Fire Phoenix ID to ensure consistency
+      // Normalize Fire Phoenix ID to ensure consistency (use underscore version)
       let normalizedItemId = itemId;
       if (type === 'skin' && (itemId === 'inferno_phoenix' || itemId === 'inferno-phoenix')) {
-        normalizedItemId = 'inferno-phoenix';
+        normalizedItemId = 'inferno_phoenix';
         console.log('🔥 [Fire Phoenix] Normalized Fire Phoenix ID for equipping:', normalizedItemId);
       }
 
@@ -800,7 +800,7 @@ class InventoryService {
         });
         console.log(`🔄 Unequipped all other skins`);
         // If Fire Phoenix, set selected_bird_skin in profile
-        if (normalizedItemId === 'inferno-phoenix') {
+        if (normalizedItemId === 'inferno_phoenix') {
           type ProfileType = { selected_bird_skin?: string; [key: string]: any };
           let profile: ProfileType = {};
           const savedProfile = localStorage.getItem('flappypi-profile');
@@ -809,9 +809,9 @@ class InventoryService {
               profile = JSON.parse(savedProfile);
             } catch {}
           }
-          profile.selected_bird_skin = 'inferno-phoenix';
+          profile.selected_bird_skin = 'inferno_phoenix';
           localStorage.setItem('flappypi-profile', JSON.stringify(profile));
-          window.dispatchEvent(new CustomEvent('profile-updated', { detail: { selected_bird_skin: 'inferno-phoenix' } }));
+          window.dispatchEvent(new CustomEvent('profile-updated', { detail: { selected_bird_skin: 'inferno_phoenix' } }));
         }
       }
 

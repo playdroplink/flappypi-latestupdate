@@ -326,8 +326,8 @@ const BirdSkinCard: React.FC<BirdSkinCardProps> = ({
           </button>
         )}
         
-        {/* Remove equip/select button for Fire Phoenix */}
-        {(!isInfernoPhoenix && (isOwned || isDefault) && !isSelected) && (
+        {/* Equip/Select button for owned skins (including Fire Phoenix if owned) */}
+        {((isOwned || isDefault) && !isSelected) && (
           <Button
             className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg text-lg mt-4 shadow-md transition-transform duration-150 hover:scale-105"
             onClick={onSelect}
@@ -335,7 +335,7 @@ const BirdSkinCard: React.FC<BirdSkinCardProps> = ({
             Select Character <Check className="ml-2 h-5 w-5" />
           </Button>
         )}
-        {(!isInfernoPhoenix && isSelected) && (
+        {isSelected && (
           <Button
             className="w-full bg-gray-300 text-gray-700 font-bold py-3 px-6 rounded-lg text-lg mt-4 cursor-default"
             disabled
