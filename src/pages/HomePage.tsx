@@ -97,12 +97,65 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     date: 'December 2, 2025'
   };
 
+  // Modal queue system to prevent spam
+  const [modalQueue, setModalQueue] = useState<Array<() => void>>([]);
+  const [isShowingModal, setIsShowingModal] = useState(false);
+  const [lastModalShownTime, setLastModalShownTime] = useState(0);
+  const MODAL_INTERVAL = 10000; // 10 seconds between modals
+
   const handleOpenAnnouncement = () => {
     setShowAnnouncement(true);
     setAnnouncementRead(true);
     localStorage.setItem('flappypi-announcement-read', 'true');
   };
   const handleCloseAnnouncement = () => setShowAnnouncement(false);
+
+  // Function to add modal to queue
+  const queueModal = (modalFunction: () => void) => {
+    setModalQueue(prev => [...prev, modalFunction]);
+  };
+
+  // Process modal queue with intervals
+  useEffect(() => {
+    if (modalQueue.length === 0 || isShowingModal) return;
+
+    const now = Date.now();
+    const timeSinceLastModal = now - lastModalShownTime;
+
+    if (timeSinceLastModal >= MODAL_INTERVAL || lastModalShownTime === 0) {
+      const nextModal = modalQueue[0];
+      setIsShowingModal(true);
+      setLastModalShownTime(now);
+      
+      // Execute the modal function
+      nextModal();
+      
+      // Remove from queue
+      setModalQueue(prev => prev.slice(1));
+      
+      // Reset showing state after a short delay
+      setTimeout(() => {
+        setIsShowingModal(false);
+      }, 1000);
+    } else {
+      // Wait for the remaining interval time
+      const timeToWait = MODAL_INTERVAL - timeSinceLastModal;
+      const timer = setTimeout(() => {
+        const nextModal = modalQueue[0];
+        setIsShowingModal(true);
+        setLastModalShownTime(Date.now());
+        
+        nextModal();
+        setModalQueue(prev => prev.slice(1));
+        
+        setTimeout(() => {
+          setIsShowingModal(false);
+        }, 1000);
+      }, timeToWait);
+
+      return () => clearTimeout(timer);
+    }
+  }, [modalQueue, isShowingModal, lastModalShownTime]);
 
   // Add state to force re-renders when auth changes
   const [authUpdateTrigger, setAuthUpdateTrigger] = useState(0);
@@ -699,9 +752,12 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     const now = Date.now();
     const hoursSince = (now - lastClaimTime) / (1000 * 60 * 60);
     if (hoursSince >= 24 || lastClaimTime === 0) {
-      setShowDailyReward(true);
-      setDailyRewardAmount(streakCount * 10); // Changed from 100 to 10 flappy coins per day
-      setStreak(streakCount);
+      // Queue the modal instead of showing immediately
+      queueModal(() => {
+        setShowDailyReward(true);
+        setDailyRewardAmount(streakCount * 10);
+        setStreak(streakCount);
+      });
     }
     setLastClaim(lastClaimTime);
   }, [isAuthenticated, piUser]); // Added authentication dependencies
@@ -716,8 +772,11 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     
     if (piUser && !piUser.is_subscribed && !hasInventorySubscription && !hasSeenPromo) {
       const timer = setTimeout(() => {
-        setShowSubscriptionPromo(true);
-        localStorage.setItem('hasSeenSubscriptionPromo', 'true'); // Mark as seen
+        // Queue the modal instead of showing immediately
+        queueModal(() => {
+          setShowSubscriptionPromo(true);
+          localStorage.setItem('hasSeenSubscriptionPromo', 'true'); // Mark as seen
+        });
       }, 5000); // Show after 5 seconds
 
       return () => clearTimeout(timer);
@@ -738,9 +797,16 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     const { isSaleDay, periodEnd } = getSaleState();
     const salePeriod = Math.floor((Date.now() - Date.UTC(2025, 5, 1, 0, 0, 0, 0)) / (24 * 60 * 60 * 1000));
     if (isSaleDay && lastSalePeriod !== salePeriod) {
-      setShowSaleModal(true);
-      setLastSalePeriod(salePeriod);
-      localStorage.setItem('lastSalePeriod', salePeriod.toString());
+      // Queue the modal with 10 second delay
+      const timer = setTimeout(() => {
+        queueModal(() => {
+          setShowSaleModal(true);
+          setLastSalePeriod(salePeriod);
+          localStorage.setItem('lastSalePeriod', salePeriod.toString());
+        });
+      }, 10000); // Show after 10 seconds
+      
+      return () => clearTimeout(timer);
     }
   }, [isAuthenticated, piUser, lastSalePeriod]);
 
@@ -759,9 +825,12 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     const now = Date.now();
     const hoursSince = (now - lastClaimTime) / (1000 * 60 * 60);
     if (hoursSince >= 24 || lastClaimTime === 0) {
-      setShowDailyReward(true);
-      setDailyRewardAmount(streakCount * 10); // Changed from 100 to 10 flappy coins per day
-      setStreak(streakCount);
+      // Queue the modal instead of showing immediately
+      queueModal(() => {
+        setShowDailyReward(true);
+        setDailyRewardAmount(streakCount * 10);
+        setStreak(streakCount);
+      });
     }
     setLastClaim(lastClaimTime);
   }, [isAuthenticated, piUser]);
@@ -781,7 +850,10 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
       const timer = setTimeout(() => {
         // Only show if user hasn't dismissed it manually
         if (!localStorage.getItem('flappy-tutorial-dismissed')) {
-          setShowTutorial(true);
+          // Queue the modal instead of showing immediately
+          queueModal(() => {
+            setShowTutorial(true);
+          });
         }
       }, 5000); // Show after 5 seconds, not blocking
 
@@ -811,7 +883,10 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     if (!dismissed) {
       // Show FLPY notification after a brief delay
       const timer = setTimeout(() => {
-        setShowFLPYModal(true);
+        // Queue the modal instead of showing immediately
+        queueModal(() => {
+          setShowFLPYModal(true);
+        });
       }, 2000);
       return () => clearTimeout(timer);
     }

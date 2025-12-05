@@ -10,8 +10,9 @@ const WalletBalance = ({ className = "", showBackground = true }) => {
   
   // Sync balance with profile to prevent glitches
   const syncBalance = useCallback(() => {
-    if (profile && typeof profile.total_coins === 'number' && balance !== profile.total_coins) {
-      console.log(`🪙 Balance sync: wallet=${balance}, profile=${profile.total_coins}`);
+    // Only sync if profile has MORE coins (prevents overwriting fresh localStorage updates)
+    if (profile && typeof profile.total_coins === 'number' && profile.total_coins > balance) {
+      console.log(`🪙 Balance sync: wallet=${balance}, profile=${profile.total_coins} (upgrading)`);
       setBalance(profile.total_coins);
     }
   }, [profile, balance, setBalance]);

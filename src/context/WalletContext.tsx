@@ -45,17 +45,29 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // Initialize balance from localStorage if available
   useEffect(() => {
-    if (!isAuthenticated) {
-      // For non-authenticated users, use default key
-      const savedBalance = loadWalletBalance();
-      if (savedBalance > 0 && !isVip) {
-        setBalance(savedBalance);
-      }
-    } else if (username) {
-      // For authenticated users, use user-specific key
-      const savedBalance = loadWalletBalance(username);
-      if (savedBalance > 0 && !isVip) {
-        setBalance(savedBalance);
+    if (!isVip) {
+      if (!isAuthenticated) {
+        // For non-authenticated users, try both keys
+        const savedBalance = loadWalletBalance();
+        const legacyCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
+        const actualBalance = Math.max(savedBalance, legacyCoins);
+        if (actualBalance > 0) {
+          setBalance(actualBalance);
+          // Sync both keys
+          localStorage.setItem('flappypi-coins', actualBalance.toString());
+          saveWalletBalance(actualBalance);
+        }
+      } else if (username) {
+        // For authenticated users, try both keys
+        const savedBalance = loadWalletBalance(username);
+        const legacyCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
+        const actualBalance = Math.max(savedBalance, legacyCoins);
+        if (actualBalance > 0) {
+          setBalance(actualBalance);
+          // Sync both keys
+          localStorage.setItem('flappypi-coins', actualBalance.toString());
+          saveWalletBalance(actualBalance, username);
+        }
       }
     }
   }, [username, isAuthenticated, isVip]);
@@ -72,6 +84,8 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   useEffect(() => {
     if (!isVip) {
       saveWalletBalance(balance, username);
+      // Also update flappypi-coins for consistency
+      localStorage.setItem('flappypi-coins', balance.toString());
     }
   }, [balance, isVip, username]);
 
@@ -161,10 +175,17 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const addCoins = async (amount: number, reason = 'Earned') => {
     if (!isVip) {
       setBalance((prev) => {
-      const newBal = prev + amount;
+        const newBal = prev + amount;
+        // Update both the new key (flappypi-balance) and legacy key (flappypi-coins)
         saveWalletBalance(newBal, username);
-      return newBal;
-    });
+        localStorage.setItem('flappypi-coins', newBal.toString());
+        return newBal;
+      });
+      
+      // Dispatch event so all wallet displays update
+      window.dispatchEvent(new CustomEvent('wallet-updated', { 
+        detail: { coinsAdded: amount } 
+      }));
     }
     
     addTransaction({
@@ -188,9 +209,16 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     
     setBalance((prev) => {
       const newBal = prev - amount;
+      // Update both the new key (flappypi-balance) and legacy key (flappypi-coins)
       saveWalletBalance(newBal, username);
+      localStorage.setItem('flappypi-coins', newBal.toString());
       return newBal;
     });
+    
+    // Dispatch event so all wallet displays update
+    window.dispatchEvent(new CustomEvent('wallet-updated', { 
+      detail: { coinsSpent: amount } 
+    }));
     
     addTransaction({
       id: `${Date.now()}-${Math.random()}`,

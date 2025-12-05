@@ -1272,14 +1272,16 @@ const ShopPage: React.FC = () => {
             currency: paymentModal.type === 'pi' ? 'pi' : 'coins',
             message: `Congrats! You bought ${totalCoins} Flappy Coins. Claim your coins below.`
           });
+          closePaymentModal(); // Close payment modal before showing receive modal
           setShowReceiveModal(true);
         } else {
-          // For other items, show the standard receive modal
+          // For other items (subscriptions, etc.), show the standard receive modal
           setReceiveItem({
             ...item,
             price: item.piPrice || item.coinPrice || 0,
             currency: paymentModal.type === 'pi' ? 'pi' : 'coins'
           });
+          closePaymentModal(); // Close payment modal before showing receive modal
           setShowReceiveModal(true);
         }
       }
