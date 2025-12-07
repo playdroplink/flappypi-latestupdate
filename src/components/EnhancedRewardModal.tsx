@@ -141,12 +141,34 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
       if (planId) {
         const claimedRewards = inventoryService.claimSubscriptionRewards(planId);
         if (claimedRewards) {
+          // Process coin rewards specially
+          let totalCoinsAdded = 0;
+          claimedRewards.forEach(reward => {
+            if (reward.type === 'coins' && reward.id === 'flappy_coins') {
+              const currentCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
+              const newCoins = currentCoins + reward.quantity;
+              localStorage.setItem('flappypi-coins', newCoins.toString());
+              totalCoinsAdded += reward.quantity;
+              console.log(`💰 [EnhancedReward] Added ${reward.quantity} coins to wallet. Total: ${newCoins}`);
+            }
+          });
+          
+          // Dispatch wallet update events if coins were added
+          if (totalCoinsAdded > 0) {
+            window.dispatchEvent(new CustomEvent('wallet-updated', {
+              detail: { coinsAdded: totalCoinsAdded }
+            }));
+            window.dispatchEvent(new CustomEvent('coins-claimed', {
+              detail: { amount: totalCoinsAdded, source: 'subscription' }
+            }));
+          }
+          
           setClaimed(true);
           if (onClaim) onClaim();
           
           toast({
             title: 'Rewards Claimed! 🎉',
-            description: `Successfully claimed ${claimedRewards.length} item(s) from your ${planName}!`,
+            description: `Successfully claimed ${claimedRewards.length} item(s) from your ${planName}!${totalCoinsAdded > 0 ? ` (+${totalCoinsAdded} coins)` : ''}`,
             duration: 3000
           });
           
@@ -164,31 +186,33 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
         }
       } else {
         // Fallback for cases without planId (should not happen in normal flow)
+        let totalCoinsAdded = 0;
+        
         rewards.forEach(reward => {
-          const inventoryItem = {
-            id: reward.id,
-            name: reward.name,
-            type: reward.type as any,
-            quantity: reward.quantity,
-            rarity: reward.rarity,
-            image: reward.image,
-            description: reward.description,
-            // Auto-equip Fire Phoenix skin when claimed
-            ...(reward.type === 'skin' && (reward.id === 'inferno_phoenix' || reward.id === 'inferno-phoenix') ? { equipped: true } : {}),
-            // Auto-equip powerups by default
-            ...(reward.type === 'powerup' ? { equipped: true } : {})
-          };
-          
-          inventoryService.saveToInventory(inventoryItem);
-          
-          if (reward.type === 'coins') {
-            inventoryService.logDailyReward(
-              reward.id,
-              reward.name,
-              reward.type,
-              reward.quantity
-            );
+          // Handle coins specially - add to wallet
+          if (reward.type === 'coins' && reward.id === 'flappy_coins') {
+            const currentCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
+            const newCoins = currentCoins + reward.quantity;
+            localStorage.setItem('flappypi-coins', newCoins.toString());
+            totalCoinsAdded += reward.quantity;
+            console.log(`💰 [EnhancedReward] Added ${reward.quantity} coins to wallet. Total: ${newCoins}`);
           } else {
+            const inventoryItem = {
+              id: reward.id,
+              name: reward.name,
+              type: reward.type as any,
+              quantity: reward.quantity,
+              rarity: reward.rarity,
+              image: reward.image,
+              description: reward.description,
+              // Auto-equip Fire Phoenix skin when claimed
+              ...(reward.type === 'skin' && (reward.id === 'inferno_phoenix' || reward.id === 'inferno-phoenix') ? { equipped: true } : {}),
+              // Auto-equip powerups by default
+              ...(reward.type === 'powerup' ? { equipped: true } : {})
+            };
+            
+            inventoryService.saveToInventory(inventoryItem);
+            
             inventoryService.logTransaction(
               reward.id,
               reward.name,
@@ -203,12 +227,22 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
           }
         });
         
+        // Dispatch wallet update events if coins were added
+        if (totalCoinsAdded > 0) {
+          window.dispatchEvent(new CustomEvent('wallet-updated', {
+            detail: { coinsAdded: totalCoinsAdded }
+          }));
+          window.dispatchEvent(new CustomEvent('coins-claimed', {
+            detail: { amount: totalCoinsAdded, source: 'subscription' }
+          }));
+        }
+        
         setClaimed(true);
         if (onClaim) onClaim();
         
         toast({
           title: 'Rewards Claimed! 🎉',
-          description: `Successfully claimed ${rewards.length} item(s) from your ${planName}!`,
+          description: `Successfully claimed ${rewards.length} item(s) from your ${planName}!${totalCoinsAdded > 0 ? ` (+${totalCoinsAdded} coins)` : ''}`,
           duration: 3000
         });
         

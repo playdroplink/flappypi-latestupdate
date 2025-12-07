@@ -35,6 +35,7 @@ const MysteryBoxRewardModal: React.FC<MysteryBoxRewardModalProps> = ({
     if (!claimed && rewards.length > 0) {
       try {
         let totalCoinsEarned = 0;
+        let itemsClaimedCount = 0;
         
         rewards.forEach(reward => {
           // Handle coins specially - add to wallet instead of inventory
@@ -43,7 +44,7 @@ const MysteryBoxRewardModal: React.FC<MysteryBoxRewardModalProps> = ({
             const newCoins = currentCoins + reward.quantity;
             localStorage.setItem('flappypi-coins', newCoins.toString());
             totalCoinsEarned += reward.quantity;
-            console.log(`💰 Added ${reward.quantity} coins to wallet. Total: ${newCoins}`);
+            console.log(`💰 [MysteryBox] Added ${reward.quantity} coins to wallet. Total: ${newCoins}`);
           } else {
             // For other items, save to inventory
             inventoryService.saveToInventory({
@@ -55,6 +56,8 @@ const MysteryBoxRewardModal: React.FC<MysteryBoxRewardModalProps> = ({
               image: reward.image,
               description: reward.description
             });
+            itemsClaimedCount++;
+            console.log(`📦 [MysteryBox] Added ${reward.name} (x${reward.quantity}) to inventory`);
           }
         });
         
@@ -62,13 +65,20 @@ const MysteryBoxRewardModal: React.FC<MysteryBoxRewardModalProps> = ({
         if (onClaim) onClaim();
         
         // Dispatch wallet update event so UI reflects new coin balance
-        window.dispatchEvent(new CustomEvent('wallet-updated', { 
-          detail: { coinsAdded: totalCoinsEarned } 
-        }));
+        if (totalCoinsEarned > 0) {
+          window.dispatchEvent(new CustomEvent('wallet-updated', { 
+            detail: { coinsAdded: totalCoinsEarned } 
+          }));
+          
+          // Also dispatch coins-claimed event for coin display updates
+          window.dispatchEvent(new CustomEvent('coins-claimed', {
+            detail: { amount: totalCoinsEarned, source: 'mystery-box' }
+          }));
+        }
         
         toast({
           title: 'Rewards Claimed! 🎉',
-          description: `Successfully claimed ${rewards.length} item(s) from your mystery box!${totalCoinsEarned > 0 ? ` (+${totalCoinsEarned} coins)` : ''}`,
+          description: `Successfully claimed ${rewards.length} item(s)!${totalCoinsEarned > 0 ? ` (+${totalCoinsEarned} coins)` : ''}`,
           duration: 3000
         });
       } catch (error) {

@@ -157,29 +157,33 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ open, onClose }) => {
 
   const handleClaimCoins = async (coinItem: InventoryItem) => {
     try {
-      const { loadWalletBalance, saveWalletBalance } = require('@/utils/walletUtils');
-      const savedUsername = localStorage.getItem('flappypi-username');
-      const currentBalance = loadWalletBalance(savedUsername);
       const coinsToAdd = coinItem.quantity || 0;
-      const newBalance = currentBalance + coinsToAdd;
       
-      // Save updated wallet balance
-      saveWalletBalance(newBalance, savedUsername);
-      localStorage.setItem('flappypi-coins', newBalance.toString());
-      
-      // Dispatch wallet update event
-      window.dispatchEvent(new CustomEvent('wallet-balance-updated', { 
-        detail: { balance: newBalance, added: coinsToAdd } 
-      }));
-      
-      // Remove coin item from inventory
+      // Remove coin item from inventory FIRST
       const success = inventoryService.useItem(coinItem.id, 'coins', coinsToAdd);
       
       if (success) {
+        // Update localStorage directly for immediate UI feedback
+        const currentCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
+        const newBalance = currentCoins + coinsToAdd;
+        localStorage.setItem('flappypi-coins', newBalance.toString());
+        
+        // Dispatch wallet update event to all listeners
+        window.dispatchEvent(new CustomEvent('wallet-updated', { 
+          detail: { coinsAdded: coinsToAdd, newBalance } 
+        }));
+        
+        // Also dispatch custom event for coin claim modal if needed
+        window.dispatchEvent(new CustomEvent('coins-claimed', {
+          detail: { amount: coinsToAdd, newTotal: newBalance }
+        }));
+        
         toast({
           title: 'Coins Claimed! 💰',
           description: `${coinsToAdd} Flappy Coins have been added to your wallet!`,
         });
+        
+        // Refresh inventory to show updated balance
         loadInventoryData();
       } else {
         toast({

@@ -149,8 +149,20 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setBalance(currentCoins);
     };
 
+    const handleCoinsClaimed = (event: CustomEvent) => {
+      const { amount } = event.detail;
+      const currentCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
+      console.log(`🪙 [WalletContext] Coins claimed event received: +${amount}, new balance: ${currentCoins}`);
+      setBalance(currentCoins);
+    };
+
     window.addEventListener('wallet-updated', handleWalletUpdate);
-    return () => window.removeEventListener('wallet-updated', handleWalletUpdate);
+    window.addEventListener('coins-claimed', handleCoinsClaimed as EventListener);
+    
+    return () => {
+      window.removeEventListener('wallet-updated', handleWalletUpdate);
+      window.removeEventListener('coins-claimed', handleCoinsClaimed as EventListener);
+    };
   }, []);
 
   // Handle user authentication changes

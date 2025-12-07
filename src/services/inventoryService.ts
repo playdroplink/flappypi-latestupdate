@@ -2163,7 +2163,38 @@ class InventoryService {
       });
     }
 
-    // 3. Bundle chance based on box type
+    // 3. GUARANTEED SKIN based on box type with exact images
+    const skins = [
+      { id: 'bird-1', name: 'Red Bird', type: 'skin', quantity: 1, rarity: 'Common', image: '/birds2/bird_1.gif' },
+      { id: 'bird-2', name: 'Green Bird', type: 'skin', quantity: 1, rarity: 'Common', image: '/birds2/bird_2.gif' },
+      { id: 'bird-3', name: 'Blue Bird', type: 'skin', quantity: 1, rarity: 'Rare', image: '/birds2/bird_3.gif' },
+      { id: 'bird-4', name: 'Yellow Bird', type: 'skin', quantity: 1, rarity: 'Rare', image: '/birds2/bird_4.gif' },
+      { id: 'bird-5', name: 'Purple Bird', type: 'skin', quantity: 1, rarity: 'Epic', image: '/birds2/bird_5.gif' },
+      { id: 'bird-6', name: 'Phoenix Bird', type: 'skin', quantity: 1, rarity: 'Legendary', image: '/birds2/bird_6.gif' },
+      { id: 'bird-7', name: 'Golden Bird', type: 'skin', quantity: 1, rarity: 'Legendary', image: '/birds2/bird_7.gif' },
+      { id: 'bird-8', name: 'Rainbow Bird', type: 'skin', quantity: 1, rarity: 'Epic', image: '/birds2/bird_8.gif' },
+      { id: 'bird-9', name: 'Crystal Bird', type: 'skin', quantity: 1, rarity: 'Legendary', image: '/birds2/bird_9.gif' },
+      { id: 'bird-10', name: 'Dragon Bird', type: 'skin', quantity: 1, rarity: 'Legendary', image: '/birds2/bird_10.gif' },
+      { id: 'bird-11', name: 'Shadow Bird', type: 'skin', quantity: 1, rarity: 'Epic', image: '/birds2/bird_11.gif' },
+      { id: 'bird-12', name: 'Fire Phoenix', type: 'skin', quantity: 1, rarity: 'Special', image: '/birds2/bird_12.gif' }
+    ];
+    
+    // Determine allowed rarity for guaranteed skin
+    let allowedRarity: string;
+    if (boxType === 'basic') allowedRarity = 'Common';
+    else if (boxType === 'rare') allowedRarity = 'Rare';
+    else if (boxType === 'epic') allowedRarity = 'Epic';
+    else if (boxType === 'legendary') allowedRarity = 'Legendary';
+    else allowedRarity = 'Common';
+    
+    // Always include a skin matching the box rarity
+    const filteredSkins = skins.filter(s => s.rarity === allowedRarity);
+    if (filteredSkins.length > 0) {
+      const skin = filteredSkins[Math.floor(Math.random() * filteredSkins.length)];
+      rewards.push({ ...skin, name: getSkinNameById(skin.id), quantity: 1 });
+    }
+
+    // 4. Bundle chance based on box type (optional bonus)
     const bundleChance = boxType === 'legendary' ? 0.25 : boxType === 'rare' ? 0.15 : 0.05;
     if (Math.random() < bundleChance) {
       const bundles = [
@@ -2175,36 +2206,6 @@ class InventoryService {
       ];
       const bundle = bundles[Math.floor(Math.random() * bundles.length)];
       rewards.push(bundle);
-    }
-
-    // 4. Skin chance based on box type with exact images
-    const skinChance = boxType === 'legendary' ? 0.20 : boxType === 'rare' ? 0.15 : boxType === 'epic' ? 0.10 : 0.05;
-    if (Math.random() < skinChance) {
-      const skins = [
-        { id: 'bird-1', name: 'Red Bird', type: 'skin', quantity: 1, rarity: 'Common', image: '/birds2/bird_1.gif' },
-        { id: 'bird-2', name: 'Green Bird', type: 'skin', quantity: 1, rarity: 'Common', image: '/birds2/bird_2.gif' },
-        { id: 'bird-3', name: 'Blue Bird', type: 'skin', quantity: 1, rarity: 'Rare', image: '/birds2/bird_3.gif' },
-        { id: 'bird-4', name: 'Yellow Bird', type: 'skin', quantity: 1, rarity: 'Rare', image: '/birds2/bird_4.gif' },
-        { id: 'bird-5', name: 'Purple Bird', type: 'skin', quantity: 1, rarity: 'Epic', image: '/birds2/bird_5.gif' },
-        { id: 'bird-6', name: 'Phoenix Bird', type: 'skin', quantity: 1, rarity: 'Legendary', image: '/birds2/bird_6.gif' },
-        { id: 'bird-7', name: 'Golden Bird', type: 'skin', quantity: 1, rarity: 'Legendary', image: '/birds2/bird_7.gif' },
-        { id: 'bird-8', name: 'Rainbow Bird', type: 'skin', quantity: 1, rarity: 'Epic', image: '/birds2/bird_8.gif' },
-        { id: 'bird-9', name: 'Crystal Bird', type: 'skin', quantity: 1, rarity: 'Legendary', image: '/birds2/bird_9.gif' },
-        { id: 'bird-10', name: 'Dragon Bird', type: 'skin', quantity: 1, rarity: 'Legendary', image: '/birds2/bird_10.gif' },
-        { id: 'bird-11', name: 'Shadow Bird', type: 'skin', quantity: 1, rarity: 'Epic', image: '/birds2/bird_11.gif' },
-        { id: 'bird-12', name: 'Fire Phoenix', type: 'skin', quantity: 1, rarity: 'Special', image: '/birds2/bird_12.gif' }
-      ];
-      let allowedRarity: string;
-      if (boxType === 'basic') allowedRarity = 'Common';
-      else if (boxType === 'rare') allowedRarity = 'Rare';
-      else if (boxType === 'epic') allowedRarity = 'Epic';
-      else if (boxType === 'legendary') allowedRarity = 'Legendary';
-      else allowedRarity = 'Common';
-      const filteredSkins = skins.filter(s => s.rarity === allowedRarity);
-      if (filteredSkins.length > 0) {
-        const skin = filteredSkins[Math.floor(Math.random() * filteredSkins.length)];
-        rewards.push({ ...skin, name: getSkinNameById(skin.id), quantity: 1 });
-      }
     }
 
     // Shuffle rewards for variety
