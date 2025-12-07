@@ -48,10 +48,10 @@ const SubscriptionPaymentModal = ({ isOpen, onClose, plan, onSuccess }) => {
     setShowPayConfirmModal(true);
   };
 
-  const handleConfirmPay = () => {
+  const handleConfirmPay = async () => {
     setShowPayConfirmModal(false);
-    setPaying(true);
-    setTimeout(() => { setPaying(false); setSuccess(true); }, 1200);
+    // Use real Pi payment - disabled mock payment flow
+    await handleBuyWithPi(paymentPlan);
   };
 
   const handleCancelPay = () => {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
+import { Button } from '@/components/ui/button';
 
 interface ScreamPiChallengePageProps {
   musicEnabled: boolean;
@@ -17,18 +18,25 @@ const ScreamPiChallengePage: React.FC<ScreamPiChallengePageProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  // Redirect to the actual Scream Pi game
+  // Scream Pi is locked in challenge mode
   React.useEffect(() => {
-    navigate(ROUTES.SCREAM_PI);
-  }, [navigate]);
+    // Don't allow access to Scream Pi in challenge mode
+    console.warn('🔒 Scream Pi is locked in challenge mode');
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-pink-500 to-purple-600">
       <div className="text-center text-white">
-        <div className="text-6xl mb-4">🎤</div>
-        <h1 className="text-2xl font-bold mb-2">Scream Pi Challenge</h1>
-        <p className="text-lg mb-4">Redirecting to Scream Pi game...</p>
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+        <div className="text-6xl mb-4">🔒</div>
+        <h1 className="text-3xl font-bold mb-2">Scream Pi - Locked</h1>
+        <p className="text-lg mb-4">Scream Pi is not available in Challenge Mode.</p>
+        <p className="text-md mb-6 max-w-xs mx-auto">Play Scream Pi in normal game mode to unlock your voice power!</p>
+        <Button
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl"
+          onClick={() => navigate(ROUTES.CHALLENGE)}
+        >
+          Back to Challenges
+        </Button>
       </div>
     </div>
   );
