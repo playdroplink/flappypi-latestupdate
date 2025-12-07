@@ -157,13 +157,22 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setBalance(currentCoins);
     };
 
+    const handleForceWalletRefresh = (event: CustomEvent) => {
+      const { newBalance } = event.detail;
+      const currentCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
+      console.log(`🔄 [WalletContext] force-wallet-refresh event - current: ${currentCoins}, forcing sync`);
+      setBalance(currentCoins);
+    };
+
     // Listen for both event types
     window.addEventListener('wallet-updated', handleWalletUpdate as EventListener);
     window.addEventListener('coins-claimed', handleCoinsClaimed as EventListener);
+    window.addEventListener('force-wallet-refresh', handleForceWalletRefresh as EventListener);
     
     return () => {
       window.removeEventListener('wallet-updated', handleWalletUpdate as EventListener);
       window.removeEventListener('coins-claimed', handleCoinsClaimed as EventListener);
+      window.removeEventListener('force-wallet-refresh', handleForceWalletRefresh as EventListener);
     };
   }, []);
 

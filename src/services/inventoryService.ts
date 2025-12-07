@@ -2097,9 +2097,12 @@ class InventoryService {
       let rewards = this.generateMysteryBoxRewards(boxType);
       // Filter out any mystery boxes from rewards
       rewards = rewards.filter(r => r.type !== 'mystery-box');
-      // Add rewards to inventory
+      // Add rewards to inventory (but NOT coins - those are handled by the modal)
       rewards.forEach(reward => {
-        this.saveToInventory(reward);
+        // Skip coins - they'll be added to wallet by the modal
+        if (reward.type !== 'coins') {
+          this.saveToInventory(reward);
+        }
       });
       // Log the mystery box opening as a transaction
       this.logTransaction(
@@ -2116,7 +2119,8 @@ class InventoryService {
           rewardType: 'mystery_box_opening'
         }
       );
-      console.log(`🎁 Opened ${boxType} mystery box, got ${rewards.length} rewards`);
+      console.log(`🎁 [MysteryBox] Opened ${boxType} mystery box, got ${rewards.length} rewards`);
+      console.log(`💰 [MysteryBox] Coins will be processed by modal, not stored in inventory`);
       return { rewards, success: true };
     } catch (error) {
       console.error('Error opening mystery box:', error);

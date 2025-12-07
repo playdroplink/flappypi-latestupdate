@@ -66,14 +66,24 @@ const MysteryBoxRewardModal: React.FC<MysteryBoxRewardModalProps> = ({
         
         // Dispatch wallet update event so UI reflects new coin balance
         if (totalCoinsEarned > 0) {
+          console.log(`💰 [MysteryBox] Dispatching wallet-updated event for ${totalCoinsEarned} coins`);
           window.dispatchEvent(new CustomEvent('wallet-updated', { 
-            detail: { coinsAdded: totalCoinsEarned } 
+            detail: { coinsAdded: totalCoinsEarned, source: 'mystery-box' } 
           }));
           
           // Also dispatch coins-claimed event for coin display updates
+          console.log(`🪙 [MysteryBox] Dispatching coins-claimed event for ${totalCoinsEarned} coins`);
           window.dispatchEvent(new CustomEvent('coins-claimed', {
             detail: { amount: totalCoinsEarned, source: 'mystery-box' }
           }));
+          
+          // Force a sync to WalletContext by triggering a focus event
+          console.log(`🔄 [MysteryBox] Forcing wallet balance refresh`);
+          setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('force-wallet-refresh', {
+              detail: { newBalance: parseInt(localStorage.getItem('flappypi-coins') || '0', 10) }
+            }));
+          }, 100);
         }
         
         toast({
