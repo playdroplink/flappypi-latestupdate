@@ -321,16 +321,7 @@ const SubscriptionPaymentModal = ({ isOpen, onClose, plan, onSuccess }) => {
                   <ShieldCheck className="w-6 h-6 mr-2 text-white drop-shadow" />
                   {paying ? 'Processing...' : `Pay ${plan.price} with Pi`}
                 </Button>
-                <Button
-                  className="w-full bg-green-500 text-white font-extrabold py-3 rounded-xl shadow-lg text-lg mb-3 flex items-center justify-center gap-2 hover:bg-green-600 active:scale-95 border-2 border-green-700"
-                  onClick={() => {
-                    // MOCK: Simulate successful Pi payment and trigger reward modal
-                    setSuccess(true);
-                    setShowRewardModal(true);
-                  }}
-                >
-                  🧪 Mock Pi Payment (Test)
-                </Button>
+                {/* Mock payments disabled - only real Pi Network mainnet payments enabled */}
                 {/* Pi Network security note */}
                 <div className="w-full flex items-center justify-center mt-2 mb-4">
                   <span className="flex items-center gap-2 text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 shadow-sm">
@@ -1084,72 +1075,7 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({ isOpen,
                           'Pay with Pi'
                         )}
                       </Button>
-                      {/* Mock Pi Payment for Subscription */}
-                      <button
-                        className="ml-2 px-2 py-1 bg-green-500 text-white rounded font-bold text-xs hover:bg-green-600"
-                        onClick={() => {
-                          // Calculate expiration date based on plan period
-                          const now = new Date();
-                          let durationDays = 7; // default
-                          if (plan.id === 'starter') durationDays = 7;
-                          else if (plan.id === 'premium') durationDays = 15;
-                          else if (plan.id === 'ultimate') durationDays = 30;
-                          
-                          const expiresAt = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000);
-                          
-                          // Extract Pi amount from price string
-                          const piAmount = parseFloat(plan.price.split(' ')[0]) || 0;
-                          
-                          // Use inventoryService.processMockPayment to save subscription
-                          inventoryService.processMockPayment({
-                            id: plan.id + '-subscription',
-                            name: plan.name,
-                            type: 'subscription',
-                            quantity: 1,
-                            price: piAmount,
-                            currency: 'pi',
-                            rarity: 'Special',
-                            description: `${plan.name} subscription (${plan.period})`,
-                            expiresAt: expiresAt.toISOString(),
-                          });
-                          
-                          // Add coins to wallet
-                          if (plan.coinReward) {
-                            addCoins(plan.coinReward, `Subscription Plan Reward: ${plan.name}`);
-                          }
-                          
-                          // Get rewards and save as unclaimed so they can be claimed properly
-                          const planRewards = getPlanRewards(plan.id);
-                          inventoryService.saveUnclaimedSubscriptionRewards(plan.id, plan.name, planRewards);
-                          
-                          // Show reward modal for claiming
-                          setRewards(planRewards);
-                          setSuccess(true);
-                          setShowRewardModal(true);
-                          
-                          // Call onPurchase callback
-                          if (typeof onPurchase === 'function') onPurchase(plan);
-                          
-                          // Show success toast
-                          toast({
-                            title: 'Mock Subscription Activated! 🎉',
-                            description: `${plan.name} subscription is now active. Claim your rewards!`
-                          });
-                          
-                          // Auto-close subscription modal immediately on successful activation
-                          // so user can see the reward modal
-                          setTimeout(() => {
-                            onClose();
-                          }, 500);
-                          
-                          // Dispatch subscription activated event
-                          window.dispatchEvent(new CustomEvent('subscription-activated', {
-                            detail: { plan, subscriptionItem: { id: plan.id + '-subscription', name: plan.name } }
-                          }));
-                        }}
-                      >
-                        🧪 Mock Pi Payment
-                      </button>
+                      {/* Mock payments disabled - only real Pi Network mainnet payments enabled */}
                     </div>
                   </div>
                   
