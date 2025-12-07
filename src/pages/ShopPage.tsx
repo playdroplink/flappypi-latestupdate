@@ -1715,14 +1715,34 @@ const ShopPage: React.FC = () => {
 
   // Add a helper to check if a skin is owned
   const isSkinOwned = (skinId: string) => {
+    const normalizedId =
+      skinId === 'golden_phoenix' || skinId === 'golden-phoenix' || skinId === 'goldenphoenix' ? 'bird-6' : skinId;
     const inventory = inventoryService.getInventoryByType('skin');
-    return inventory.some(item => item.id === skinId);
+    return inventory.some(item => {
+      if (
+        item.id === 'bird-6' &&
+        (skinId === 'golden_phoenix' || skinId === 'golden-phoenix' || skinId === 'goldenphoenix' || skinId === 'bird-6')
+      ) {
+        return true;
+      }
+      return item.id === normalizedId;
+    });
   };
 
   // Add a helper to check if a skin is equipped
   const isSkinEquipped = (skinId: string) => {
+    const normalizedId =
+      skinId === 'golden_phoenix' || skinId === 'golden-phoenix' || skinId === 'goldenphoenix' ? 'bird-6' : skinId;
     const inventory = inventoryService.getInventoryByType('skin');
-    return inventory.some(item => item.id === skinId && item.equipped);
+    return inventory.some(item => {
+      if (
+        item.id === 'bird-6' && item.equipped &&
+        (skinId === 'golden_phoenix' || skinId === 'golden-phoenix' || skinId === 'goldenphoenix' || skinId === 'bird-6')
+      ) {
+        return true;
+      }
+      return item.id === normalizedId && item.equipped;
+    });
   };
 
   // Add state for receive modal
@@ -1934,7 +1954,7 @@ const ShopPage: React.FC = () => {
                                     {/* Price Display */}
                                     {!isDefaultSkin && !soldOut && !isInfernoPhoenix && (
                                       <div className="flex justify-center gap-2 mb-3">
-                                        {item.flappyCoinPrice && (
+                                        {false && item.flappyCoinPrice && (
                                           <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
                                             <img src="/flappycoins.png" alt="FC" className="w-4 h-4" />
                                             {item.flappyCoinPrice.toFixed(0)}
@@ -1999,26 +2019,7 @@ const ShopPage: React.FC = () => {
                                         </ShopButton>
                                       ) : item.isDefault ? null : (
                                         <>
-                                          {/* Flappy Coin Payment - Prominently Displayed */}
-                                          <Tooltip>
-                                            <TooltipTrigger asChild>
-                                              <ShopButton 
-                                                type="coins" 
-                                                onClick={() => handleConfirmCoinPayment(item, 1)}
-                                                disabled={balance < item.flappyCoinPrice}
-                                                icon="/flappycoins.png"
-                                                price={item.flappyCoinPrice?.toFixed(0)}
-                                                className="w-full"
-                                              >
-                                                Buy with FC
-                                              </ShopButton>
-                                            </TooltipTrigger>
-                                            {balance < item.flappyCoinPrice && (
-                                              <TooltipContent>
-                                                {t('notEnoughFlappyCoins')}
-                                              </TooltipContent>
-                                            )}
-                                          </Tooltip>
+                                          {/* Flappy Coin Payment disabled */}
                                           {/* Pi Payment */}
                                           <Tooltip>
                                             <TooltipTrigger asChild>

@@ -229,21 +229,19 @@ const InventoryModal: React.FC<InventoryModalProps> = ({ open, onClose }) => {
     // Remove accidental merges: filter out items with same id but different canonical skin
     const seen = new Set();
     return items.filter(item => {
-      if (item.id === 'inferno_phoenix' || item.id === 'inferno-phoenix' || item.name === 'Fire Phoenix Skin') {
-        // Only allow one Fire Phoenix card (normalize to inferno_phoenix)
+      // Only allow one Fire Phoenix card (by exact ID)
+      if (item.id === 'inferno_phoenix' || item.id === 'inferno-phoenix') {
         if (seen.has('inferno_phoenix')) return false;
         seen.add('inferno_phoenix');
-        // Normalize ID to underscore version
-        item.id = 'inferno_phoenix';
         return true;
       }
+      // Only allow one Sky Blue Flappy card
       if (item.id === 'classic' || item.name === 'Sky Blue Flappy') {
-        // Only allow one Sky Blue Flappy card
         if (seen.has('classic')) return false;
         seen.add('classic');
         return true;
       }
-      // Allow all other skins
+      // Allow all other skins (including Golden Phoenix)
       if (seen.has(item.id)) return false;
       seen.add(item.id);
       return true;

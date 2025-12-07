@@ -45,13 +45,23 @@ const BirdCharactersSection: React.FC<BirdCharactersSectionProps> = ({
     return () => window.removeEventListener('inventory-updated', handleInventoryUpdate);
   }, []);
 
-  // Check if skin is owned in profile or in inventory
+  // Check if skin is owned in profile or in inventory (robust for Golden Phoenix)
   const isOwned = (itemId: string) => {
     // Check profile first
     if (profile?.owned_skins?.includes(itemId)) {
       return true;
     }
-    // Also check inventory for Fire Phoenix and other skins
+    // Golden Phoenix ID variants
+    const goldenPhoenixIds = ['bird-6', 'golden_phoenix', 'golden-phoenix', 'goldenphoenix'];
+    if (goldenPhoenixIds.includes(itemId)) {
+      return inventory.some(item => item.type === 'skin' && goldenPhoenixIds.includes(item.id));
+    }
+    // Fire Phoenix ID variants
+    const firePhoenixIds = ['inferno_phoenix', 'inferno-phoenix'];
+    if (firePhoenixIds.includes(itemId)) {
+      return inventory.some(item => item.type === 'skin' && firePhoenixIds.includes(item.id));
+    }
+    // Default: check for direct match or bird_ variant
     return inventory.some(item => item.type === 'skin' && (item.id === itemId || item.id === itemId.replace('bird-', 'bird_')));
   };
   

@@ -8,6 +8,10 @@ export function getBirdImageSrc(skin: { id?: string; image?: string } | string |
     if (skin === 'inferno_phoenix' || skin === 'inferno-phoenix') {
       return '/birds2/bird_12.gif';
     }
+    // Golden Phoenix normalization
+    if (skin === 'golden_phoenix' || skin === 'golden-phoenix' || skin === 'goldenphoenix') {
+      return '/birds2/bird_6.gif';
+    }
     // Try to find in shopItems
     const shopItem = shopItems.find(item => item.id === skin);
     return shopItem?.image || `/birds2/${skin.replace('bird-', 'bird_')}.gif` || '/birds2/bird_0.gif';
@@ -20,6 +24,9 @@ export function getBirdImageSrc(skin: { id?: string; image?: string } | string |
     // Handle Fire Phoenix special cases
     if (skin.id === 'inferno_phoenix' || skin.id === 'inferno-phoenix') {
       return '/birds2/bird_12.gif';
+    }
+    if (skin.id === 'golden_phoenix' || skin.id === 'golden-phoenix' || skin.id === 'goldenphoenix' || skin.id === 'bird-6') {
+      return '/birds2/bird_6.gif';
     }
     const shopItem = shopItems.find(item => item.id === skin.id);
     return shopItem?.image || `/birds2/${skin.id.replace('bird-', 'bird_')}.gif` || '/birds2/bird_0.gif';

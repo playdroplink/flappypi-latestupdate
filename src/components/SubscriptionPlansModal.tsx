@@ -581,6 +581,12 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({ isOpen,
           setShowRewardModal(true);
           onPurchase?.(plan);
           
+          // Auto-close subscription modal immediately on successful activation
+          // so user can see the reward modal
+          setTimeout(() => {
+            onClose();
+          }, 500);
+          
           // Remove event listener
           window.removeEventListener('subscription-activated', handleSubscriptionActivated as EventListener);
         };
@@ -843,6 +849,12 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({ isOpen,
       title: 'Subscription Activated!',
       description: `Your ${paymentPlan.name} subscription is now active until ${expiresAt.toISOString().slice(0, 10)}. Flappy Coins have been credited to your wallet.`
     });
+    
+    // Auto-close subscription modal immediately on successful activation
+    // so user can see the reward modal
+    setTimeout(() => {
+      onClose();
+    }, 500);
   };
 
   const handleClaimPlanReward = (planId: string) => {
@@ -1124,6 +1136,12 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({ isOpen,
                             description: `${plan.name} subscription is now active. Claim your rewards!`
                           });
                           
+                          // Auto-close subscription modal immediately on successful activation
+                          // so user can see the reward modal
+                          setTimeout(() => {
+                            onClose();
+                          }, 500);
+                          
                           // Dispatch subscription activated event
                           window.dispatchEvent(new CustomEvent('subscription-activated', {
                             detail: { plan, subscriptionItem: { id: plan.id + '-subscription', name: plan.name } }
@@ -1242,14 +1260,12 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({ isOpen,
               <EnhancedRewardModal
           open={showRewardModal}
           onClose={() => {
-            // Close reward modal first
+            // Close reward modal and clean up state
             setShowRewardModal(false);
-            // Then close subscription modal after a brief delay for smooth transition
-            setTimeout(() => {
-              setPaymentPlan(null);
-              setRewards([]);
-              onClose();
-            }, 300);
+            setPaymentPlan(null);
+            setRewards([]);
+            // Note: Subscription modal is already closed via auto-close timer
+            // when subscription was activated
           }}
           rewards={rewards}
           planName={paymentPlan?.name}
