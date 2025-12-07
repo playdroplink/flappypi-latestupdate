@@ -141,34 +141,25 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
       if (planId) {
         const claimedRewards = inventoryService.claimSubscriptionRewards(planId);
         if (claimedRewards) {
-          // Process coin rewards specially
-          let totalCoinsAdded = 0;
-          claimedRewards.forEach(reward => {
-            if (reward.type === 'coins' && reward.id === 'flappy_coins') {
-              const currentCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
-              const newCoins = currentCoins + reward.quantity;
-              localStorage.setItem('flappypi-coins', newCoins.toString());
-              totalCoinsAdded += reward.quantity;
-              console.log(`💰 [EnhancedReward] Added ${reward.quantity} coins to wallet. Total: ${newCoins}`);
-            }
-          });
-          
-          // Dispatch wallet update events if coins were added
-          if (totalCoinsAdded > 0) {
-            window.dispatchEvent(new CustomEvent('wallet-updated', {
-              detail: { coinsAdded: totalCoinsAdded }
-            }));
-            window.dispatchEvent(new CustomEvent('coins-claimed', {
-              detail: { amount: totalCoinsAdded, source: 'subscription' }
-            }));
-          }
+          // NOTE: inventoryService.claimSubscriptionRewards already handles:
+          // - Adding coins to wallet
+          // - Dispatching wallet update events
+          // - Logging transactions
+          // - Removing from unclaimed rewards
+          // DO NOT process coins again here - it causes double claiming!
           
           setClaimed(true);
           if (onClaim) onClaim();
           
+          // Count coins in rewards for display purposes only
+          let coinCount = 0;
+          claimedRewards.forEach(reward => {
+            if (reward.type === 'coins') coinCount += reward.quantity;
+          });
+          
           toast({
             title: 'Rewards Claimed! 🎉',
-            description: `Successfully claimed ${claimedRewards.length} item(s) from your ${planName}!${totalCoinsAdded > 0 ? ` (+${totalCoinsAdded} coins)` : ''}`,
+            description: `Successfully claimed ${claimedRewards.length} item(s) from your ${planName}!${coinCount > 0 ? ` (+${coinCount} coins)` : ''}`,
             duration: 3000
           });
           
@@ -186,6 +177,7 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
         }
       } else {
         // Fallback for cases without planId (should not happen in normal flow)
+        // This path is for preview mode or manual reward claims
         let totalCoinsAdded = 0;
         
         rewards.forEach(reward => {
@@ -195,7 +187,7 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
             const newCoins = currentCoins + reward.quantity;
             localStorage.setItem('flappypi-coins', newCoins.toString());
             totalCoinsAdded += reward.quantity;
-            console.log(`💰 [EnhancedReward] Added ${reward.quantity} coins to wallet. Total: ${newCoins}`);
+            console.log(`💰 [EnhancedReward-Fallback] Added ${reward.quantity} coins to wallet. Total: ${newCoins}`);
           } else {
             const inventoryItem = {
               id: reward.id,
@@ -227,13 +219,13 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
           }
         });
         
-        // Dispatch wallet update events if coins were added
+        // Dispatch wallet update events if coins were added in fallback
         if (totalCoinsAdded > 0) {
           window.dispatchEvent(new CustomEvent('wallet-updated', {
             detail: { coinsAdded: totalCoinsAdded }
           }));
           window.dispatchEvent(new CustomEvent('coins-claimed', {
-            detail: { amount: totalCoinsAdded, source: 'subscription' }
+            detail: { amount: totalCoinsAdded, source: 'subscription-fallback' }
           }));
         }
         

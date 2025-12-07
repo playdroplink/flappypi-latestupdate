@@ -2618,7 +2618,7 @@ class InventoryService {
       const planRewards = unclaimedRewards.find(r => r.planId === planId);
       
       if (!planRewards) {
-        console.log('No unclaimed rewards found for plan:', planId);
+        console.log('❌ No unclaimed rewards found for plan:', planId);
         return null;
       }
 
@@ -2630,9 +2630,11 @@ class InventoryService {
       );
 
       if (alreadyClaimed) {
-        console.log('Rewards already claimed for plan:', planId);
+        console.log('❌ [DoubleClaim Protection] Rewards already claimed for plan:', planId, planRewards.planName);
         return null;
       }
+
+      console.log(`✅ [ClaimSubscriptionRewards] Starting claim for plan: ${planId} (${planRewards.planName})`);
 
       // Import wallet utilities
       const { loadWalletBalance, saveWalletBalance } = require('@/utils/walletUtils');
@@ -2646,8 +2648,12 @@ class InventoryService {
           const currentBalance = loadWalletBalance(savedUsername);
           const newBalance = currentBalance + reward.quantity;
           saveWalletBalance(newBalance, savedUsername);
+          
+          // Also update localStorage key for immediate UI feedback
+          localStorage.setItem('flappypi-coins', newBalance.toString());
+          
           totalCoinsAwarded += reward.quantity;
-          console.log(`💰 Added ${reward.quantity} coins to wallet. New balance: ${newBalance}`);
+          console.log(`💰 [SubscriptionRewards] Added ${reward.quantity} coins to wallet. New balance: ${newBalance}`);
           
           // Log coin reward transaction
           this.logDailyReward(
@@ -2657,9 +2663,14 @@ class InventoryService {
             reward.quantity
           );
 
-          // Dispatch wallet update event so UI updates immediately
-          window.dispatchEvent(new CustomEvent('wallet-balance-updated', { 
-            detail: { balance: newBalance, added: reward.quantity } 
+          // Dispatch BOTH wallet-updated and coins-claimed events
+          // This ensures WalletContext and all listeners are notified
+          window.dispatchEvent(new CustomEvent('wallet-updated', { 
+            detail: { coinsAdded: reward.quantity, newBalance, source: 'subscription' } 
+          }));
+          
+          window.dispatchEvent(new CustomEvent('coins-claimed', { 
+            detail: { amount: reward.quantity, source: 'subscription', newBalance } 
           }));
         } else {
           // For non-coin rewards (items, skins, powerups), save to inventory
@@ -2706,18 +2717,18 @@ class InventoryService {
         }
       });
 
-      // Remove from unclaimed rewards
+      // Remove from unclaimed rewards - this prevents double claiming
       const remainingUnclaimed = unclaimedRewards.filter(r => r.planId !== planId);
       localStorage.setItem('flappypi-unclaimed-subscription-rewards', JSON.stringify(remainingUnclaimed));
       
-      console.log(`🎉 Claimed rewards for ${planRewards.planName}:`, planRewards.rewards.length, 'items');
+      console.log(`✅ [ClaimSubscriptionRewards] Claimed rewards for ${planRewards.planName}:`, planRewards.rewards.length, 'items');
       if (totalCoinsAwarded > 0) {
-        console.log(`💰 Total coins awarded: ${totalCoinsAwarded}`);
+        console.log(`💰 [ClaimSubscriptionRewards] Total coins awarded: ${totalCoinsAwarded}`);
       }
       
       // Dispatch event to notify components
       window.dispatchEvent(new CustomEvent('unclaimed-rewards-updated', { 
-        detail: { planId, planName: planRewards.planName, action: 'claimed', coinsAwarded: totalCoinsAwarded } 
+        detail: { planId, planName: planRewards.planName, action: 'claimed', coinsAwarded: totalCoinsAwarded, itemCount: planRewards.rewards.length } 
       }));
       
       return planRewards.rewards;

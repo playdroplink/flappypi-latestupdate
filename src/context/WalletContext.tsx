@@ -141,26 +141,28 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return () => window.removeEventListener('focus', handleFocus);
   }, [profile, refreshProfile]);
 
-  // Listen for wallet updates from mystery boxes and other sources
+  // Listen for wallet updates from subscriptions, mystery boxes, and other sources
   useEffect(() => {
-    const handleWalletUpdate = () => {
+    const handleWalletUpdate = (event?: CustomEvent) => {
       const currentCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
-      console.log(`💰 [WalletContext] Wallet updated event received, setting balance to ${currentCoins}`);
+      const detail = event?.detail || {};
+      console.log(`💰 [WalletContext] wallet-updated event - new balance: ${currentCoins}`, detail);
       setBalance(currentCoins);
     };
 
     const handleCoinsClaimed = (event: CustomEvent) => {
-      const { amount } = event.detail;
+      const { amount, source } = event.detail;
       const currentCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
-      console.log(`🪙 [WalletContext] Coins claimed event received: +${amount}, new balance: ${currentCoins}`);
+      console.log(`🪙 [WalletContext] coins-claimed event from '${source}': +${amount}, new balance: ${currentCoins}`);
       setBalance(currentCoins);
     };
 
-    window.addEventListener('wallet-updated', handleWalletUpdate);
+    // Listen for both event types
+    window.addEventListener('wallet-updated', handleWalletUpdate as EventListener);
     window.addEventListener('coins-claimed', handleCoinsClaimed as EventListener);
     
     return () => {
-      window.removeEventListener('wallet-updated', handleWalletUpdate);
+      window.removeEventListener('wallet-updated', handleWalletUpdate as EventListener);
       window.removeEventListener('coins-claimed', handleCoinsClaimed as EventListener);
     };
   }, []);
