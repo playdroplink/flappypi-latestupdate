@@ -399,27 +399,7 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({ isOpen,
   const [previewRewards, setPreviewRewards] = useState<SubscriptionReward[]>([]);
   const [previewPlanName, setPreviewPlanName] = useState('');
 
-  // Force mainnet mode - no testnet allowed
-  const isTestEnv = false; // Always mainnet
-
-  // Add test payment handler
-  const handleTestPiPayment = async (plan) => {
-    try {
-      const planPrice = parseInt(plan.price.split(' ')[0]);
-      const result = await realPiPaymentService.processSubscriptionPayment({
-        id: plan.id,
-        name: plan.name,
-        price: planPrice.toString()
-      });
-      if (result.success) {
-        toast({ title: `Payment Success`, description: `Payment ID: ${result.paymentId}`, variant: 'default' });
-      } else {
-        toast({ title: `Payment Failed`, description: result.error || 'Unknown error', variant: 'destructive' });
-      }
-    } catch (err) {
-      toast({ title: `Payment Error`, description: err.message || String(err), variant: 'destructive' });
-    }
-  };
+  // Only real Pi Network payments are supported. All mock/test payment logic removed.
 
   // Calculate sale prices if applicable
   const getActualPrice = (basePrice: string, planId: string) => {
@@ -1075,7 +1055,6 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({ isOpen,
                           'Pay with Pi'
                         )}
                       </Button>
-                      {/* Mock payments disabled - only real Pi Network mainnet payments enabled */}
                     </div>
                   </div>
                   

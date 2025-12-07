@@ -28,15 +28,7 @@ const getAutoTheme = () => {
 };
 
 const SubscriptionPlansPage: React.FC = () => {
-    // Mock payment handler for dev/sandbox
-    const handleMockPay = async (plan: any) => {
-      toast({
-        title: 'Mock Payment Successful!',
-        description: `${plan.name} subscription is now active (mock).`
-      });
-      // Simulate subscription activation
-      handlePiPaymentSuccess();
-    };
+    // Mock payment logic removed. Only real Pi payment is available.
   const { toast } = useToast();
   const [selectedPlan, setSelectedPlan] = React.useState<any | null>(null);
   const [showPiModal, setShowPiModal] = React.useState(false);
@@ -599,15 +591,7 @@ const SubscriptionPlansPage: React.FC = () => {
                 >
                   Pay with Pi
                 </Button>
-                {process.env.NODE_ENV !== 'production' && (
-                  <Button
-                    onClick={() => handleMockPay(plan)}
-                    className={`flex-2 bg-yellow-400 text-sm sm:text-base py-2 sm:py-3 shadow-lg ml-2`}
-                    size="lg"
-                  >
-                    Mock Pay
-                  </Button>
-                )}
+                {/* Mock Pay button removed. Only real Pi payment is available. */}
               </div>
             </div>
             
