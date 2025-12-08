@@ -441,103 +441,71 @@ const loadAudioWithRetry = async (url: string, maxRetries: number = 3): Promise<
 export const getTrackForRoute = (pathname: string): string => {
   console.log(`🎵 [ROUTE DEBUG] Getting track for pathname: ${pathname}`);
   
-  // ===== GAME MODES - NO BACKGROUND MUSIC (SFX only to reduce lags) =====
+  // ===== PRIORITY: GAME MODES - ABSOLUTELY NO BACKGROUND MUSIC =====
+  // Check ALL game-related patterns first before any other logic
   
-  // Main game routes - NO BACKGROUND MUSIC
-  if (pathname.includes('/game') || pathname.includes('/play')) {
-    console.log(`🎵 [ROUTE DEBUG] Game route detected, returning 'none' (no background music)`);
+  // ANY route with game/play/mode keywords - NO MUSIC
+  if (pathname.includes('/game') || 
+      pathname.includes('/play') || 
+      pathname.includes('-game') ||
+      pathname.includes('game-')) {
+    console.log(`🎵 [ROUTE DEBUG] Game route detected (${pathname}), returning 'none' (NO MUSIC)`);
     return 'none';
   }
   
   // Endless mode - NO BACKGROUND MUSIC
-  if (pathname.includes('/endless')) {
-    console.log(`🎵 [ROUTE DEBUG] Endless mode detected, returning 'none' (no background music)`);
+  if (pathname.includes('/endless') || pathname.includes('endless')) {
+    console.log(`🎵 [ROUTE DEBUG] Endless mode detected (${pathname}), returning 'none' (NO MUSIC)`);
     return 'none';
   }
   
   // Classic mode - NO BACKGROUND MUSIC
-  if (pathname.includes('/classic')) {
-    console.log(`🎵 [ROUTE DEBUG] Classic mode detected, returning 'none' (no background music)`);
+  if (pathname.includes('/classic') || pathname.includes('classic')) {
+    console.log(`🎵 [ROUTE DEBUG] Classic mode detected (${pathname}), returning 'none' (NO MUSIC)`);
     return 'none';
   }
   
   // Challenge mode - NO BACKGROUND MUSIC
-  if (pathname.includes('/challenge')) {
-    console.log(`🎵 [ROUTE DEBUG] Challenge mode detected, returning 'none' (no background music)`);
+  if (pathname.includes('/challenge') || pathname.includes('challenge')) {
+    console.log(`🎵 [ROUTE DEBUG] Challenge mode detected (${pathname}), returning 'none' (NO MUSIC)`);
     return 'none';
   }
   
   // Dino Pi game routes - NO BACKGROUND MUSIC
-  if (pathname.includes('/dino-pi-game') || 
-      (pathname.includes('/dino-pi') && pathname.includes('game')) ||
-      pathname.includes('/dino-pi/classic') ||
-      pathname.includes('/dino-pi/endless') ||
-      pathname.includes('/dino-pi/challenge')) {
+  if (pathname.includes('dino-pi')) {
+    console.log(`🎵 [ROUTE DEBUG] Dino Pi detected (${pathname}), returning 'none' (NO MUSIC)`);
     return 'none';
   }
   
   // Scream Pi game routes - NO BACKGROUND MUSIC
-  if (pathname.includes('/scream-pi-test') || 
-      (pathname.includes('/scream-pi') && pathname.includes('game')) ||
-      pathname.includes('/scream-pi/classic') ||
-      pathname.includes('/scream-pi/endless') ||
-      pathname.includes('/scream-pi/challenge')) {
+  if (pathname.includes('scream-pi')) {
+    console.log(`🎵 [ROUTE DEBUG] Scream Pi detected (${pathname}), returning 'none' (NO MUSIC)`);
     return 'none';
   }
   
   // PvP and tournament routes - NO BACKGROUND MUSIC
-  if (pathname.includes('/pvp-duels') || pathname.includes('/pvp-tournaments') || 
-      pathname.includes('/pvp-duel-play') || pathname.includes('/time-bomb-challenge')) {
+  if (pathname.includes('pvp') || 
+      pathname.includes('duel') || 
+      pathname.includes('tournament')) {
+    console.log(`🎵 [ROUTE DEBUG] PvP/Duel detected (${pathname}), returning 'none' (NO MUSIC)`);
     return 'none';
   }
   
-  // Precision and challenge routes - NO BACKGROUND MUSIC
-  if (pathname.includes('/precision-challenge') || pathname.includes('/scream-pi-challenge')) {
+  // Any test/debug game routes - NO BACKGROUND MUSIC
+  if ((pathname.includes('test') || pathname.includes('debug')) && 
+      (pathname.includes('game') || pathname.includes('play'))) {
+    console.log(`🎵 [ROUTE DEBUG] Test/debug game route (${pathname}), returning 'none' (NO MUSIC)`);
     return 'none';
   }
   
-  // Test and unlock routes - NO BACKGROUND MUSIC
-  if (pathname.includes('/unlock-test') || pathname.includes('/pi-username-test')) {
-    return 'none';
-  }
-  
-  // Challenge sub-routes - NO BACKGROUND MUSIC
-  if (pathname.includes('/challenge/speed-run') ||
-      pathname.includes('/challenge/endurance') ||
-      pathname.includes('/challenge/precision') ||
-      pathname.includes('/challenge/lava-escape') ||
-      pathname.includes('/challenge/shield-run') ||
-      pathname.includes('/challenge/mystery') ||
-      pathname.includes('/challenge/scream-pi')) {
-    return 'none';
-  }
-  
-  // Additional game-related routes that should have no background music
-  if (pathname.includes('/social-challenge')) {
-    return 'none';
-  }
-  
-  // Enhanced duels and test routes - NO BACKGROUND MUSIC
-  if (pathname.includes('/enhanced-duels') || 
-      pathname.includes('/test-duels') || 
-      pathname.includes('/standalone-duels')) {
-    return 'none';
-  }
-  
-  // Game test and debug routes - NO BACKGROUND MUSIC
-  if (pathname.includes('/game-test') || 
-      pathname.includes('/pi-sdk-test') ||
-      pathname.includes('/test-game')) {
-    return 'none';
-  }
-  
-  // ===== NON-GAME PAGES - BACKGROUND MUSIC ALLOWED =====
-  
-  // CORE PAGES - Main Theme Songs
+  // ===== HOME PAGE - MAIN THEME (STRICT MATCH ONLY) =====
   if (pathname === '/home' || pathname === '/') {
-    console.log(`🎵 [ROUTE DEBUG] Home route detected, returning 'home'`);
-    return 'home'; // Flappy Pi Main Theme Song
+    console.log(`🎵 [ROUTE DEBUG] Home page (exact match: ${pathname}), returning 'home' (Main Theme)`);
+    return 'home'; // Flappy Pi Main Theme Song - ONLY on home
   }
+  
+  // ===== OTHER NON-GAME PAGES - BACKGROUND MUSIC ALLOWED =====
+  
   if (pathname === '/profile') {
     console.log(`🎵 [ROUTE DEBUG] Profile route detected, returning 'profile'`);
     return 'profile'; // Flappy Pi Main Theme Song
@@ -776,7 +744,25 @@ export const useGlobalMusic = (musicEnabled: boolean = true) => {
   // Enhanced play music function with mobile support and retry mechanism
   const playMusic = useCallback(async (trackKey: string) => {
     console.log(`🎵 [MUSIC DEBUG] playMusic called with trackKey: ${trackKey}, musicEnabled: ${musicEnabled}, isAdPlaying: ${isAdPlaying}`);
-    console.log(`🎵 [MUSIC DEBUG] Available tracks:`, Object.keys(MUSIC_TRACKS));
+    console.log(`🎵 [MUSIC DEBUG] Current pathname: ${location.pathname}`);
+    
+    // CRITICAL: Double-check current route for game modes - NEVER play music in game
+    const currentPath = location.pathname;
+    if (currentPath.includes('/game') || 
+        currentPath.includes('/play') || 
+        currentPath.includes('/classic') || 
+        currentPath.includes('/endless') || 
+        currentPath.includes('/challenge') ||
+        currentPath.includes('game-') ||
+        currentPath.includes('-game') ||
+        currentPath.includes('dino-pi') ||
+        currentPath.includes('scream-pi') ||
+        currentPath.includes('pvp') ||
+        currentPath.includes('duel')) {
+      console.log(`🎵 [MUSIC DEBUG] Game route detected in playMusic guard (${currentPath}), stopping music`);
+      stopMusic();
+      return;
+    }
     
     if (!musicEnabled || trackKey === 'none' || isAdPlaying) {
       console.log(`🎵 [MUSIC DEBUG] Music conditions not met, stopping music`);
@@ -923,7 +909,7 @@ export const useGlobalMusic = (musicEnabled: boolean = true) => {
     } finally {
       setIsLoading(false);
     }
-  }, [musicEnabled, volume, instanceId, stopMusic, currentTrack]);
+  }, [musicEnabled, volume, instanceId, stopMusic, currentTrack, location.pathname]);
 
   // Update volume
   const updateVolume = useCallback((newVolume: number) => {
