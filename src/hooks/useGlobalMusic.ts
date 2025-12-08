@@ -753,15 +753,23 @@ export const useGlobalMusic = (musicEnabled: boolean = true) => {
 
   // Stop music function without fade out
   const stopMusic = useCallback(() => {
-    if (globalMusicInstance) {
-      try {
-        // Stop immediately without fade
-        globalMusicInstance.pause();
-        globalMusicInstance.currentTime = 0;
-        setIsPlaying(false);
-      } catch (error) {
-        setIsPlaying(false);
-      }
+    if (!globalMusicInstance) {
+      setIsPlaying(false);
+      return;
+    }
+
+    // Idempotent stop: if already paused, avoid toggling state that can retrigger play/pause loops
+    if (globalMusicInstance.paused) {
+      setIsPlaying(false);
+      return;
+    }
+
+    try {
+      globalMusicInstance.pause();
+      // Do not reset currentTime here to avoid audible restarts on rapid toggles
+      setIsPlaying(false);
+    } catch (error) {
+      setIsPlaying(false);
     }
   }, []);
 
@@ -1046,12 +1054,15 @@ export const useGlobalMusic = (musicEnabled: boolean = true) => {
   // Handle visibility changes (pause when app goes to background)
   useEffect(() => {
     const handleVisibilityChange = () => {
+      // If music is intentionally disabled (e.g., game routes) or track is none, never auto-resume
+      const shouldStaySilent = !musicEnabled || currentTrack === 'none';
+
       if (document.hidden) {
         if (globalMusicInstance && !globalMusicInstance.paused) {
           globalMusicInstance.pause();
         }
       } else {
-        if (globalMusicInstance && globalMusicInstance.paused && musicEnabled && !isAdPlaying) {
+        if (globalMusicInstance && globalMusicInstance.paused && !shouldStaySilent && !isAdPlaying) {
           globalMusicInstance.play().catch(() => {});
         }
       }
@@ -1061,7 +1072,7 @@ export const useGlobalMusic = (musicEnabled: boolean = true) => {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [musicEnabled]);
+  }, [musicEnabled, currentTrack]);
 
   return {
     currentTrack,

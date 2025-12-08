@@ -119,6 +119,28 @@ router.get('/incomplete/list', async (_req, res) => {
 	}
 });
 
+// POST /api/payments/incomplete/cancel-all - Cancel all incomplete payments on server
+router.post('/incomplete/cancel-all', async (_req, res) => {
+	try {
+		const pi = getPiService();
+		const payments = await pi.getIncompleteServerPayments();
+		const results = [];
+		for (const p of payments) {
+			const paymentId = p?.identifier || p?.id || p?.payment_id || p?.paymentId;
+			if (!paymentId) continue;
+			try {
+				const cancelled = await pi.cancelPayment(paymentId);
+				results.push({ paymentId, status: 'cancelled', cancelled });
+			} catch (err) {
+				results.push({ paymentId, status: 'failed', error: err?.message || 'cancel failed' });
+			}
+		}
+		return res.json({ success: true, results });
+	} catch (error) {
+		return res.status(400).json({ success: false, error: error.message || 'Failed to cancel incomplete payments' });
+	}
+});
+
 module.exports = router;
 
 

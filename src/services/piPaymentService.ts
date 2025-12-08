@@ -242,11 +242,20 @@ class PiPaymentService {
   // Cancel any incomplete payments on server side before creating a new one
   private async clearIncompletePayments(): Promise<void> {
     try {
+      // Server-side bulk cancel to handle Pi-side pending blockers
+      const bulkRes = await fetch('/api/payments/incomplete/cancel-all', { method: 'POST' });
+      if (bulkRes.ok) {
+        const data = await bulkRes.json();
+        console.log('🔄 Bulk cancel result:', data);
+        return;
+      }
+
+      // Fallback: manual list + cancel loop
       const listRes = await fetch('/api/payments/incomplete/list');
       if (!listRes.ok) return;
       const { payments } = await listRes.json();
       if (Array.isArray(payments) && payments.length > 0) {
-        console.log('🔄 Clearing incomplete payments before new payment:', payments.length);
+        console.log('🔄 Clearing incomplete payments before new payment (fallback):', payments.length);
         for (const p of payments) {
           const paymentId = p?.identifier || p?.payment_id || p?.paymentId || p?.id;
           if (!paymentId) continue;
@@ -328,6 +337,11 @@ class PiPaymentService {
   private async handlePaymentCancel(payment: any): Promise<void> {
     console.log('❌ Handling payment cancellation:', payment);
     // Implement your cancellation logic here
+  }
+
+  // Manual helper to cancel all incomplete payments (can be wired to a debug UI if needed)
+  public async cancelAllIncomplete(): Promise<void> {
+    await fetch('/api/payments/incomplete/cancel-all', { method: 'POST' });
   }
 
   private async handlePaymentError(error: Error, payment?: any): Promise<void> {

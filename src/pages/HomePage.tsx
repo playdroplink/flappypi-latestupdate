@@ -375,7 +375,7 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     };
   }, []);
 
-  // Get user display information - mainnet Pi auth only
+  // Get user display information - prefer real Pi auth even outside pinet subdomains
   const getUserDisplay = () => {
     const extractUsername = (user: any) => {
       if (!user) return 'Pi User';
@@ -389,10 +389,11 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
       return 'Pi User';
     };
 
-    const isPiNet = window.location.hostname.includes('pinet.com');
+    // Treat Pi auth as valid on any mainnet host (pinet, minepi, flappypi.fun)
+    const isPiMainnetHost = ['pinet.com', 'minepi.com', 'flappypi.fun'].some(domain => window.location.hostname.includes(domain));
 
     // 1) AuthContext (mainnet only)
-    if (isPiNet && authPiUser && isPiAuth) {
+    if (authPiUser && isPiAuth && isPiMainnetHost) {
       const username = extractUsername(authPiUser);
       if (username !== 'Pi User') {
         return {
@@ -404,9 +405,9 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     }
 
     // 2) Synced Pi data + SDK auth (mainnet only)
-    const syncedUser = isPiNet ? syncPiUserData() : null;
-    const isPiAuthenticatedFromSDK = isPiNet ? checkPiAuthentication() : false;
-    if (isPiNet && isPiAuthenticatedFromSDK && syncedUser) {
+    const syncedUser = isPiMainnetHost ? syncPiUserData() : null;
+    const isPiAuthenticatedFromSDK = isPiMainnetHost ? checkPiAuthentication() : false;
+    if (isPiMainnetHost && isPiAuthenticatedFromSDK && syncedUser) {
       const username = extractUsername(syncedUser);
       if (username !== 'Pi User') {
         return {
@@ -418,9 +419,9 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     }
 
     // 3) LocalStorage (mainnet only)
-    const storedPiUser = isPiNet ? localStorage.getItem('flappypi-pi-user') : null;
-    const storedPiAuth = isPiNet ? localStorage.getItem('flappypi-pi-auth') : null;
-    if (isPiNet && storedPiAuth === 'true' && storedPiUser) {
+    const storedPiUser = isPiMainnetHost ? localStorage.getItem('flappypi-pi-user') : null;
+    const storedPiAuth = isPiMainnetHost ? localStorage.getItem('flappypi-pi-auth') : null;
+    if (isPiMainnetHost && storedPiAuth === 'true' && storedPiUser) {
       try {
         const parsedUser = JSON.parse(storedPiUser);
         const username = extractUsername(parsedUser);
@@ -437,7 +438,7 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     }
 
     // 4) Prop piUser (mainnet only)
-    if (isPiNet && piUser) {
+    if (isPiMainnetHost && piUser) {
       const username = extractUsername(piUser);
       if (username !== 'Pi User') {
         let avatar = 'flappy-logo.png';
