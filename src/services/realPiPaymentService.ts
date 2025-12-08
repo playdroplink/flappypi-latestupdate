@@ -362,10 +362,12 @@ export class RealPiPaymentService {
           break;
         
         case 'subscription':
-          // Handle subscription through inventoryService
+          // Handle subscription through inventoryService with correct expiration based on plan duration
+          const subscriptionExpirationDate = new Date();
+          subscriptionExpirationDate.setDate(subscriptionExpirationDate.getDate() + (item.durationDays || 30));
           inventoryService.saveToInventory({
             ...inventoryItem,
-            expiresAt: new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)).toISOString() // 30 days
+            expiresAt: subscriptionExpirationDate.toISOString()
           });
           break;
         
@@ -441,7 +443,10 @@ export class RealPiPaymentService {
       const planRewards = getPlanRewards(plan.id);
       console.log('📦 Plan rewards:', planRewards);
 
-      // Create subscription inventory item with expiration
+      // Create subscription inventory item with expiration based on plan duration
+      const expirationDate = new Date();
+      expirationDate.setDate(expirationDate.getDate() + (plan.durationDays || 30));
+      
       const subscriptionItem = {
         id: plan.id,
         name: plan.name,
@@ -449,7 +454,7 @@ export class RealPiPaymentService {
         quantity: 1,
         rarity: 'Special' as const,
         description: 'Premium subscription with ad-free experience and exclusive benefits',
-        expiresAt: new Date(Date.now() + (30 * 24 * 60 * 60 * 1000)).toISOString() // 30 days
+        expiresAt: expirationDate.toISOString()
       };
 
       // Use inventoryService for proper subscription delivery
@@ -459,7 +464,7 @@ export class RealPiPaymentService {
       // This is the key difference - we need to save the rewards so they appear in the reward modal
       if (planRewards && planRewards.length > 0) {
         console.log('💾 Saving unclaimed subscription rewards:', planRewards.length, 'items');
-        inventoryService.saveUnclaimedSubscriptionRewards(plan.id, plan.name, planRewards);
+        inventoryService.saveUnclaimedSubscriptionRewards(plan.id, plan.name, planRewards, expirationDate.toISOString());
       }
 
       // Also set legacy subscription status for backward compatibility
