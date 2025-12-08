@@ -18,9 +18,6 @@ ORG_SUPPORT_EMAIL="support@flappypi.fun"
 [[CURRENCIES.DISPLAY_DECIMALS]]
 value=7
 
-[[CURRENCIES.CONDITIONS]]
-max_supply="21000000"
-is_asset_anchored=false
 
 [[CURRENCIES.METADATA]]
 name="Flappy Pi Team"
