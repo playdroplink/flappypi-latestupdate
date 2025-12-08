@@ -211,37 +211,24 @@ const NewPiPaymentModal: React.FC<NewPiPaymentModalProps> = ({
         },
         onError: async (error: any, payment?: any) => {
           let handled = false;
-          if (error?.message && error.message.includes('already have a pending payment')) {
-            setError('Resolving stuck payment... Please wait.');
-            setIsProcessing(true);
-            try {
-              const resp = await getIncompletePayments();
-              if (resp.success && Array.isArray(resp.data) && resp.data.length > 0) {
-                for (const pending of resp.data) {
-                  await cancelPayment(pending.identifier);
-                }
-                setError('Previous stuck payment was auto-cancelled. Please try again.');
-                setPendingPaymentDetected(true);
-                handled = true;
-              } else {
-                setError('No pending payment found to cancel. Please try again.');
-                setPendingPaymentDetected(true);
-                handled = true;
-              }
-            } catch (cancelErr) {
-              setError('Failed to auto-cancel pending payment. Please try again later.');
-              setPendingPaymentDetected(true);
-              handled = true;
-            }
-            setIsProcessing(false);
+          const errorMsg = error?.message || String(error);
+          
+          // Detect pending payment error (Pi's exact error message)
+          if (errorMsg.includes('already have a pending payment') || 
+              errorMsg.includes('needs an action from the developer')) {
+            setPendingPaymentDetected(true);
             setPaymentStep('error');
+            setError('⚠️ You have a stuck pending payment. Click "Resolve Pending Payment" below to fix it.');
+            setIsProcessing(false);
             toast({
-              title: 'Stuck Payment Resolved',
-              description: 'Previous stuck payment was auto-cancelled. Please try again.',
-              variant: 'default'
+              title: "Pending Payment Detected",
+              description: "A previous payment is stuck. Use the button below to resolve it.",
+              variant: "destructive"
             });
-            onPaymentError('Stuck payment auto-cancelled. Please retry.');
+            onPaymentError('Pending payment detected. Please resolve it using the button.');
+            handled = true;
           }
+          
           if (!handled) {
             setPaymentStep('error');
             setError(error.message || 'Payment failed');
@@ -404,30 +391,85 @@ const NewPiPaymentModal: React.FC<NewPiPaymentModalProps> = ({
                     </Button>
                   </div>
                   {pendingPaymentDetected && (
-                    <Button
-                      onClick={async () => {
-                        setResolvingPending(true);
-                        setError('Resolving pending payment...');
-                        try {
-                          const resp = await getIncompletePayments();
-                          if (resp.success && Array.isArray(resp.data) && resp.data.length > 0) {
-                            for (const pending of resp.data) {
-                              await cancelPayment(pending.identifier);
+                    <div className="space-y-2">
+                      <div className="p-3 bg-yellow-50 border border-yellow-300 rounded-lg">
+                        <p className="text-xs text-yellow-800 font-semibold mb-1">
+                          🚨 Stuck Payment Detected
+                        </p>
+                        <p className="text-xs text-yellow-700">
+                          A previous payment is blocking new purchases. Click below to auto-cancel it.
+                        </p>
+                      </div>
+                      <Button
+                        onClick={async () => {
+                          setResolvingPending(true);
+                          setError('🔄 Resolving pending payment... Please wait.');
+                          try {
+                            // First try to call the backend cancel-all endpoint
+                            const bulkCancelRes = await fetch('/api/payments/incomplete/cancel-all', { 
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' }
+                            });
+                            
+                            if (bulkCancelRes.ok) {
+                              const bulkData = await bulkCancelRes.json();
+                              console.log('✅ Bulk cancel result:', bulkData);
+                              setError('✅ Pending payment resolved! Please try your purchase again.');
+                              setPendingPaymentDetected(false);
+                              
+                              // Wait for Pi Network to process
+                              await new Promise(resolve => setTimeout(resolve, 2000));
+                              
+                              toast({
+                                title: "Pending Payment Resolved! ✅",
+                                description: "You can now make a new purchase. Click 'Try Again'.",
+                                variant: "default"
+                              });
+                              setResolvingPending(false);
+                              return;
                             }
-                            setError('Pending payment was cancelled. Please try again.');
-                          } else {
-                            setError('No pending payment found. Please try again.');
+                            
+                            // Fallback to manual list + cancel
+                            const resp = await getIncompletePayments();
+                            if (resp.success && Array.isArray(resp.data) && resp.data.length > 0) {
+                              for (const pending of resp.data) {
+                                await cancelPayment(pending.identifier);
+                              }
+                              setError('✅ Pending payment cancelled! Please try your purchase again.');
+                              setPendingPaymentDetected(false);
+                              
+                              toast({
+                                title: "Pending Payment Resolved! ✅",
+                                description: "You can now make a new purchase. Click 'Try Again'.",
+                                variant: "default"
+                              });
+                            } else {
+                              setError('No pending payment found. You can try your purchase again.');
+                              setPendingPaymentDetected(false);
+                            }
+                          } catch (e: any) {
+                            setError(`❌ Failed to resolve: ${e?.message || 'Unknown error'}. Please contact support.`);
+                            toast({
+                              title: "Resolution Failed",
+                              description: "Unable to auto-cancel. Please try again or contact support.",
+                              variant: "destructive"
+                            });
                           }
-                        } catch (e) {
-                          setError('Failed to resolve pending payment. Please try again later.');
-                        }
-                        setResolvingPending(false);
-                      }}
-                      className="w-full bg-yellow-500 hover:bg-yellow-600 text-white mt-2"
-                      disabled={resolvingPending}
-                    >
-                      {resolvingPending ? 'Resolving...' : 'Resolve Pending Payment'}
-                    </Button>
+                          setResolvingPending(false);
+                        }}
+                        className="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold shadow-lg"
+                        disabled={resolvingPending}
+                      >
+                        {resolvingPending ? (
+                          <span className="flex items-center justify-center">
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Resolving...
+                          </span>
+                        ) : (
+                          '🔧 Resolve Pending Payment'
+                        )}
+                      </Button>
+                    </div>
                   )}
                 </div>
               )}

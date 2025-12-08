@@ -242,36 +242,90 @@ class PiPaymentService {
   // Cancel any incomplete payments on server side before creating a new one
   private async clearIncompletePayments(): Promise<void> {
     try {
-      // Server-side bulk cancel to handle Pi-side pending blockers
-      const bulkRes = await fetch('/api/payments/incomplete/cancel-all', { method: 'POST' });
-      if (bulkRes.ok) {
-        const data = await bulkRes.json();
-        console.log('🔄 Bulk cancel result:', data);
-        return;
+      console.log('🔄 Starting incomplete payment cleanup...');
+      
+      // Try server-side bulk cancel first (faster)
+      try {
+        const bulkRes = await fetch('/api/payments/incomplete/cancel-all', { 
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        if (bulkRes.ok) {
+          const data = await bulkRes.json();
+          console.log('✅ Bulk cancel succeeded:', data);
+          // Wait a moment for Pi Network to process cancellations
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          return;
+        }
+        console.warn('⚠️ Bulk cancel endpoint not available, using fallback');
+      } catch (bulkErr) {
+        console.warn('⚠️ Bulk cancel failed, using fallback:', bulkErr);
       }
 
-      // Fallback: manual list + cancel loop
-      const listRes = await fetch('/api/payments/incomplete/list');
-      if (!listRes.ok) return;
-      const { payments } = await listRes.json();
-      if (Array.isArray(payments) && payments.length > 0) {
-        console.log('🔄 Clearing incomplete payments before new payment (fallback):', payments.length);
-        for (const p of payments) {
-          const paymentId = p?.identifier || p?.payment_id || p?.paymentId || p?.id;
-          if (!paymentId) continue;
-          try {
-            await fetch('/api/payments/cancel', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ paymentId })
-            });
-          } catch (cancelErr) {
-            console.warn('⚠️ Failed to cancel incomplete payment', paymentId, cancelErr);
+      // Fallback: manual list + cancel loop with retry
+      let retries = 3;
+      while (retries > 0) {
+        try {
+          const listRes = await fetch('/api/payments/incomplete/list');
+          if (!listRes.ok) {
+            retries--;
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            continue;
+          }
+          
+          const { payments } = await listRes.json();
+          if (!Array.isArray(payments) || payments.length === 0) {
+            console.log('✅ No incomplete payments found');
+            return;
+          }
+
+          console.log(`🔄 Found ${payments.length} incomplete payments, cancelling...`);
+          
+          // Cancel all payments with individual error handling
+          const cancelPromises = payments.map(async (p) => {
+            const paymentId = p?.identifier || p?.payment_id || p?.paymentId || p?.id;
+            if (!paymentId) return null;
+            
+            try {
+              const cancelRes = await fetch('/api/payments/cancel', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paymentId })
+              });
+              
+              if (cancelRes.ok) {
+                console.log(`✅ Cancelled payment: ${paymentId}`);
+                return { success: true, paymentId };
+              } else {
+                console.warn(`⚠️ Failed to cancel payment ${paymentId}: ${cancelRes.statusText}`);
+                return { success: false, paymentId, error: cancelRes.statusText };
+              }
+            } catch (cancelErr: any) {
+              console.warn(`⚠️ Error cancelling payment ${paymentId}:`, cancelErr);
+              return { success: false, paymentId, error: cancelErr?.message };
+            }
+          });
+          
+          const results = await Promise.allSettled(cancelPromises);
+          const successful = results.filter(r => r.status === 'fulfilled' && r.value?.success).length;
+          console.log(`✅ Cancelled ${successful}/${payments.length} incomplete payments`);
+          
+          // Wait for Pi Network to process the cancellations
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          return;
+          
+        } catch (listErr) {
+          console.warn(`⚠️ Failed to list/cancel incomplete payments (${retries} retries left):`, listErr);
+          retries--;
+          if (retries > 0) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
           }
         }
       }
+      
+      console.warn('⚠️ All retry attempts exhausted for clearing incomplete payments');
     } catch (err) {
-      console.warn('⚠️ Unable to check/clear incomplete payments:', err);
+      console.error('❌ Critical error in clearIncompletePayments:', err);
     }
   }
 
