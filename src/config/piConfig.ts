@@ -12,7 +12,7 @@ export const DEMO_PI_CONFIG = {
   DOMAIN_VALIDATION_KEY: '312c3da8cf132ea3fd3a8cd40ea7cf4a26da159bbf498808af319e9d6b35e4be5aa50459cd3c81dea595adf9aa4c16428f6dce247015032933797200d1acf156',
   
   // Pi Platform API Key from Pi Developer Portal
-  PI_API_KEY: 'htjotdxpfamsvnshw5yspxjtp9psgvqym5fusybgu4ouuiqobtrcupilytu3pg4w',
+  PI_API_KEY: 'zrt9rwcjrdaejytlu72ha0yi2czvljx6geuwphzueaeybqsyboixukixy0cmogmo',
   
   // Session secret
   SESSION_SECRET: 'abcd1324_TODO',
@@ -36,7 +36,7 @@ export const DEMO_PI_CONFIG = {
   
   // Additional Flappy Pi configuration
   PI_NETWORK_APP_ID: 'flappypi2807',
-  PI_NETWORK_API_KEY: 'htjotdxpfamsvnshw5yspxjtp9psgvqym5fusybgu4ouuiqobtrcupilytu3pg4w',
+  PI_NETWORK_API_KEY: 'zrt9rwcjrdaejytlu72ha0yi2czvljx6geuwphzueaeybqsyboixukixy0cmogmo',
   PI_NETWORK_VALIDATION_KEY: '94e29cc9c70b87c8fc91e496ac630d23664bff7082cca3ad9d6466bba1aa2902caa46a8eb82a64437d272dbcd329c763679c85cfcba91b95e6fb5b4a6f17b2ce',
   
   // Pi Network Environment Settings - MAINNET
