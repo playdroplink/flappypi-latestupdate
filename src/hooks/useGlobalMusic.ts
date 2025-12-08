@@ -443,12 +443,15 @@ export const getTrackForRoute = (pathname: string): string => {
   
   // ===== PRIORITY: GAME MODES - ABSOLUTELY NO BACKGROUND MUSIC =====
   // Check ALL game-related patterns first before any other logic
+  // This is the FIRST check and most important
   
   // ANY route with game/play/mode keywords - NO MUSIC
   if (pathname.includes('/game') || 
       pathname.includes('/play') || 
       pathname.includes('-game') ||
-      pathname.includes('game-')) {
+      pathname.includes('game-') ||
+      pathname.includes('/classic') ||
+      pathname.includes('classic')) {
     console.log(`🎵 [ROUTE DEBUG] Game route detected (${pathname}), returning 'none' (NO MUSIC)`);
     return 'none';
   }
@@ -456,12 +459,6 @@ export const getTrackForRoute = (pathname: string): string => {
   // Endless mode - NO BACKGROUND MUSIC
   if (pathname.includes('/endless') || pathname.includes('endless')) {
     console.log(`🎵 [ROUTE DEBUG] Endless mode detected (${pathname}), returning 'none' (NO MUSIC)`);
-    return 'none';
-  }
-  
-  // Classic mode - NO BACKGROUND MUSIC
-  if (pathname.includes('/classic') || pathname.includes('classic')) {
-    console.log(`🎵 [ROUTE DEBUG] Classic mode detected (${pathname}), returning 'none' (NO MUSIC)`);
     return 'none';
   }
   
@@ -486,8 +483,9 @@ export const getTrackForRoute = (pathname: string): string => {
   // PvP and tournament routes - NO BACKGROUND MUSIC
   if (pathname.includes('pvp') || 
       pathname.includes('duel') || 
-      pathname.includes('tournament')) {
-    console.log(`🎵 [ROUTE DEBUG] PvP/Duel detected (${pathname}), returning 'none' (NO MUSIC)`);
+      pathname.includes('tournament') ||
+      pathname.includes('multiplayer')) {
+    console.log(`🎵 [ROUTE DEBUG] PvP/Duel/Multiplayer detected (${pathname}), returning 'none' (NO MUSIC)`);
     return 'none';
   }
   
@@ -585,10 +583,10 @@ export const getTrackForRoute = (pathname: string): string => {
     return 'homealt';
   }
   if (pathname === '/pi-browser-login') {
-    return 'game';
+    return 'profile'; // Auth page, not a game
   }
   if (pathname === '/pi-auth') {
-    return 'gamealt';
+    return 'profile'; // Auth page, not a game
   }
   
   // ADDITIONAL PAGES - Add missing routes
@@ -620,7 +618,9 @@ export const getTrackForRoute = (pathname: string): string => {
     return 'sky'; // Rise and Flap Theme Song
   }
   if (pathname === '/multiplayer' || pathname === '/pvp') {
-    return 'community'; // Rise and Flap Theme Song
+    // PvP and multiplayer are GAME MODES - should never reach here due to earlier 'pvp' check
+    // But return 'none' just in case as a safety net
+    return 'none'; // NO MUSIC for multiplayer/PvP games
   }
   if (pathname === '/fireside-forum') {
     return 'community'; // Rise and Flap Theme Song
@@ -758,7 +758,9 @@ export const useGlobalMusic = (musicEnabled: boolean = true) => {
         currentPath.includes('dino-pi') ||
         currentPath.includes('scream-pi') ||
         currentPath.includes('pvp') ||
-        currentPath.includes('duel')) {
+        currentPath.includes('duel') ||
+        currentPath.includes('tournament') ||
+        currentPath.includes('multiplayer')) {
       console.log(`🎵 [MUSIC DEBUG] Game route detected in playMusic guard (${currentPath}), stopping music`);
       stopMusic();
       return;

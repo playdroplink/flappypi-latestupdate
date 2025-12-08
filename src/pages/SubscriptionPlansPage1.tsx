@@ -35,6 +35,10 @@ const SubscriptionPlansPage: React.FC = () => {
   const [showRewardPreview, setShowRewardPreview] = useState(false);
   const [previewRewards, setPreviewRewards] = useState<SubscriptionReward[]>([]);
   const [previewPlanName, setPreviewPlanName] = useState('');
+  const [showRewardModal, setShowRewardModal] = useState(false);
+  const [rewards, setRewards] = useState<SubscriptionReward[]>([]);
+  const [rewardPlanName, setRewardPlanName] = useState('');
+  const [rewardPlanId, setRewardPlanId] = useState('');
   const { settings, updateSettings } = useSettings();
 
   const theme = settings.theme === 'night' ? 'night' : 'light';
@@ -87,6 +91,32 @@ const SubscriptionPlansPage: React.FC = () => {
       // });
     });
   }, [onPaymentError]);
+
+  // Listen for subscription activation event from payment completion
+  useEffect(() => {
+    const handleSubscriptionActivated = (event: Event) => {
+      try {
+        const customEvent = event as CustomEvent;
+        console.log('🎉 Subscription activated via payment:', customEvent.detail);
+        
+        // Show rewards modal with the plan rewards
+        if (customEvent.detail?.rewards) {
+          setRewards(customEvent.detail.rewards);
+          setRewardPlanName(customEvent.detail.plan?.name || 'Premium Pack');
+          setRewardPlanId(customEvent.detail.plan?.id || '');
+          setShowRewardModal(true);
+        }
+      } catch (error) {
+        console.warn('⚠️ Error handling subscription-activated event:', error);
+      }
+    };
+
+    window.addEventListener('subscription-activated', handleSubscriptionActivated);
+    
+    return () => {
+      window.removeEventListener('subscription-activated', handleSubscriptionActivated);
+    };
+  }, []);
 
 
 
@@ -780,6 +810,15 @@ const SubscriptionPlansPage: React.FC = () => {
         />
       </div>
 
+
+      <EnhancedRewardModal
+        open={showRewardModal}
+        onClose={() => setShowRewardModal(false)}
+        rewards={rewards}
+        planName={rewardPlanName}
+        planId={rewardPlanId}
+        isPreview={false}
+      />
 
       <EnhancedRewardModal
         open={showRewardPreview}

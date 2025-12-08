@@ -67,6 +67,17 @@ class DirectPaymentService {
         // Save subscription to inventory
         inventoryService.saveToInventory(subscriptionItem);
         
+        // Get the plan rewards so they can be shown in the reward modal
+        const { getPlanRewards } = await import('@/constants/subscriptionRewards');
+        const planRewards = getPlanRewards(item.id);
+        console.log('📦 Plan rewards retrieved:', planRewards);
+        
+        // Save the rewards as unclaimed so they can be claimed via the reward modal
+        if (planRewards && planRewards.length > 0) {
+          console.log('💾 Saving unclaimed subscription rewards:', planRewards.length, 'items');
+          inventoryService.saveUnclaimedSubscriptionRewards(item.id, item.name, planRewards, expiration.toISOString());
+        }
+        
         // Also unlock the Fire Phoenix skin for subscribers
         const infernoPhoenixSkin = {
           id: 'inferno_phoenix',
@@ -94,10 +105,19 @@ class DirectPaymentService {
           });
         }
         
-        // Dispatch subscription activated event
-        window.dispatchEvent(new CustomEvent('subscription-activated', {
-          detail: { plan: item, subscriptionItem, unlockedSkin: infernoPhoenixSkin }
-        }));
+        // Dispatch subscription activated event WITH rewards data so UI can show reward modal
+        try {
+          window.dispatchEvent(new CustomEvent('subscription-activated', {
+            detail: { 
+              plan: item, 
+              subscriptionItem, 
+              unlockedSkin: infernoPhoenixSkin,
+              rewards: planRewards  // Include the plan rewards so modal can display them
+            }
+          }));
+        } catch (eventError) {
+          console.warn('⚠️ Failed to dispatch subscription-activated event:', eventError);
+        }
         
       } else if (item.type === 'shop_item' && item.id) {
         // Create inventory item based on the purchased item

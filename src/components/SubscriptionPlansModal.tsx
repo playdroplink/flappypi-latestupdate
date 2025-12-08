@@ -77,12 +77,9 @@ const SubscriptionPaymentModal = ({ isOpen, onClose, plan, onSuccess }) => {
         const planRewards = getPlanRewards(plan.id);
         setRewards(planRewards);
         
-        // Add coins to wallet
-        if (plan.coins) {
-          addCoins(plan.coins);
-        }
-        
         // Show success and rewards
+        // NOTE: Coins will be added when user claims rewards in the modal
+        // DO NOT add coins here - it causes double distribution!
         setSuccess(true);
         setShowRewardModal(true);
         onSuccess?.(plan);
@@ -535,35 +532,37 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({ isOpen,
         });
         
         // Listen for subscription activation event from payment completion
-        const handleSubscriptionActivated = (event: CustomEvent) => {
-          console.log('🎉 Subscription activated via payment completion:', event.detail);
-          
-          // Get rewards for this plan
-          const planRewards = getPlanRewards(plan.id);
-          setRewards(planRewards);
-          
-          // Add coins to wallet
-          if (plan.coins) {
-            addCoins(plan.coins);
+        const handleSubscriptionActivated = (event: Event) => {
+          try {
+            const customEvent = event as CustomEvent;
+            console.log('🎉 Subscription activated via payment completion:', customEvent.detail);
+            
+            // Get rewards for this plan
+            const planRewards = getPlanRewards(plan.id);
+            setRewards(planRewards);
+            
+            // Show success and rewards
+            // NOTE: Coins will be added when user claims rewards in the modal
+            // DO NOT add coins here - it causes double distribution!
+            setSuccess(true);
+            setShowRewardModal(true);
+            onPurchase?.(plan);
+            
+            // Auto-close subscription modal immediately on successful activation
+            // so user can see the reward modal
+            setTimeout(() => {
+              onClose();
+            }, 500);
+            
+            // Remove event listener
+            window.removeEventListener('subscription-activated', handleSubscriptionActivated);
+          } catch (error) {
+            console.warn('⚠️ Error handling subscription-activated event:', error);
           }
-          
-          // Show success and rewards
-          setSuccess(true);
-          setShowRewardModal(true);
-          onPurchase?.(plan);
-          
-          // Auto-close subscription modal immediately on successful activation
-          // so user can see the reward modal
-          setTimeout(() => {
-            onClose();
-          }, 500);
-          
-          // Remove event listener
-          window.removeEventListener('subscription-activated', handleSubscriptionActivated as EventListener);
         };
         
         // Add event listener for subscription activation
-        window.addEventListener('subscription-activated', handleSubscriptionActivated as EventListener);
+        window.addEventListener('subscription-activated', handleSubscriptionActivated);
         
       } else {
         console.error('❌ [DEBUG] Direct payment failed:', result.error);

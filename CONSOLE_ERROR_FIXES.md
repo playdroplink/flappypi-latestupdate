@@ -85,6 +85,122 @@ res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 - ✅ **Safe error handling**
 - ✅ **Proper request validation**
 
-## **🎉 CONSOLE ERRORS FIXED!**
+## **🎉 CONSOLE ERRORS FIXED - SESSION 2!**
 
 Your payment API endpoints are now error-free and ready for production use! 🚀
+
+---
+
+## ✅ **SUBSCRIPTION REWARD EVENT HANDLING - CONSOLE ERRORS FIXED** (Latest Update)
+
+### **🔍 Issues Found & Fixed:**
+
+#### **1. Event Dispatch Missing Error Handling** ✅
+**Files Modified:**
+- `src/services/realPiPaymentService.ts` (lines 490-510)
+- `src/services/directPaymentService.ts` (line 109)
+
+**Problem:** Custom events dispatched without try-catch. Could throw uncaught errors if event creation failed.
+
+**Solution:** Wrapped all event dispatches:
+```typescript
+try {
+  window.dispatchEvent(new CustomEvent('subscription-activated', { detail: {...} }));
+} catch (eventError) {
+  console.warn('⚠️ Failed to dispatch subscription-activated event:', eventError);
+}
+```
+
+**Impact:** Prevents uncaught event dispatch errors.
+
+---
+
+#### **2. Event Listener Type Safety Issues** ✅
+**Files Modified:**
+- `src/pages/SubscriptionPlansPage1.tsx` (lines 95-115)
+- `src/components/SubscriptionPlansModal.tsx` (lines 535-560)
+
+**Problems Found:**
+1. Event callbacks typed as `CustomEvent` instead of `Event` - incorrect for addEventListener
+2. Used risky `as EventListener` type assertion
+3. Direct property access without null-checking: `event.detail.rewards` (no optional chaining)
+4. No error handling if event detail structure unexpected
+
+**Solutions Applied:**
+
+```typescript
+// ❌ BEFORE (Problematic)
+const handleSubscriptionActivated = (event: CustomEvent) => {
+  console.log('🎉', event.detail);
+  if (event.detail.rewards) { // ⚠️ Could throw if detail is undefined
+    setRewards(event.detail.rewards);
+  }
+};
+window.addEventListener('subscription-activated', handleSubscriptionActivated as EventListener);
+
+// ✅ AFTER (Safe)
+const handleSubscriptionActivated = (event: Event) => {
+  try {
+    const customEvent = event as CustomEvent;
+    console.log('🎉', customEvent.detail);
+    
+    if (customEvent.detail?.rewards) { // ✅ Optional chaining prevents errors
+      setRewards(customEvent.detail.rewards);
+    }
+  } catch (error) {
+    console.warn('⚠️ Error handling subscription-activated event:', error);
+  }
+};
+window.addEventListener('subscription-activated', handleSubscriptionActivated); // ✅ No type assertion
+```
+
+**Key Improvements:**
+- ✅ Event parameter typed as `Event` (correct)
+- ✅ Manual cast to `CustomEvent` inside handler (safe)
+- ✅ Optional chaining `?.` prevents undefined access
+- ✅ Try-catch wraps entire handler
+- ✅ Removed problematic `as EventListener` assertion
+- ✅ Improved TypeScript type safety
+
+**Impact:** 
+- Prevents "Cannot read property 'X' of undefined" errors
+- Graceful degradation if event detail structure changes
+- No more EventListener type assertion warnings
+
+---
+
+### **📋 Files Updated (Latest Session):**
+
+| File | Change | Lines |
+|------|--------|-------|
+| ✅ `src/services/realPiPaymentService.ts` | Added try-catch around event dispatches | 490-510 |
+| ✅ `src/services/directPaymentService.ts` | Added try-catch around subscription-activated | 109-120 |
+| ✅ `src/pages/SubscriptionPlansPage1.tsx` | Fixed event listener type safety | 95-115 |
+| ✅ `src/components/SubscriptionPlansModal.tsx` | Fixed event listener type safety | 535-560 |
+
+---
+
+### **🧪 Console Behavior After Fixes:**
+
+**Expected Console Output (Clean):**
+```
+🎉 Subscription activated via payment: {plan: {...}, rewards: {...}, timestamp: 1234567890}
+```
+
+**Previously Possible Errors (NOW PREVENTED):**
+```
+❌ TypeError: Cannot read property 'rewards' of undefined
+❌ Uncaught CustomEvent dispatch error
+❌ TypeError: event.detail is undefined
+```
+
+---
+
+### **✅ FINAL VERIFICATION:**
+- ✅ No TypeScript compilation errors
+- ✅ All event dispatches wrapped with error handling
+- ✅ All event listeners have proper error handling
+- ✅ Type safety improved throughout subscription flow
+- ✅ Ready for runtime testing
+
+**Status: All console errors fixed and hardened! 🎉**

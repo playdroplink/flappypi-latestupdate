@@ -428,10 +428,18 @@ export class RealPiPaymentService {
 
   /**
    * Deliver subscription rewards using inventoryService
+   * This includes the actual plan rewards (coins, powerups, skins) + subscription item
    */
   private async deliverSubscriptionRewards(plan: { id: string; name: string }): Promise<any[]> {
     try {
       console.log('🎁 Delivering subscription rewards:', plan.name);
+
+      // Import getPlanRewards to get the actual rewards for this subscription plan
+      const { getPlanRewards } = await import('@/constants/subscriptionRewards');
+      
+      // Get the actual subscription plan rewards (coins, powerups, skins, etc.)
+      const planRewards = getPlanRewards(plan.id);
+      console.log('📦 Plan rewards:', planRewards);
 
       // Create subscription inventory item with expiration
       const subscriptionItem = {
@@ -446,6 +454,13 @@ export class RealPiPaymentService {
 
       // Use inventoryService for proper subscription delivery
       inventoryService.saveToInventory(subscriptionItem);
+      
+      // Save the actual plan rewards as unclaimed (so they can be claimed via the reward modal)
+      // This is the key difference - we need to save the rewards so they appear in the reward modal
+      if (planRewards && planRewards.length > 0) {
+        console.log('💾 Saving unclaimed subscription rewards:', planRewards.length, 'items');
+        inventoryService.saveUnclaimedSubscriptionRewards(plan.id, plan.name, planRewards);
+      }
 
       // Also set legacy subscription status for backward compatibility
       const subscriptionData = {
@@ -474,9 +489,27 @@ export class RealPiPaymentService {
       localStorage.setItem('flappypi-transactions', JSON.stringify(transactions));
 
       // Trigger inventory update event
-      window.dispatchEvent(new CustomEvent('inventory-updated', { 
-        detail: { itemId: plan.id, type: 'subscription', action: 'subscribed' } 
-      }));
+      try {
+        window.dispatchEvent(new CustomEvent('inventory-updated', { 
+          detail: { itemId: plan.id, type: 'subscription', action: 'subscribed' } 
+        }));
+      } catch (eventError) {
+        console.warn('⚠️ Failed to dispatch inventory-updated event:', eventError);
+      }
+
+      // Dispatch subscription-activated event with rewards data so UI can show reward modal
+      try {
+        window.dispatchEvent(new CustomEvent('subscription-activated', {
+          detail: {
+            plan,
+            subscriptionItem,
+            rewards: planRewards,
+            timestamp: Date.now()
+          }
+        }));
+      } catch (eventError) {
+        console.warn('⚠️ Failed to dispatch subscription-activated event:', eventError);
+      }
 
       // Show subscription notification
       window.dispatchEvent(new CustomEvent('show-purchase-notification', {
@@ -498,6 +531,7 @@ export class RealPiPaymentService {
         type: 'subscription',
         subscriptionId: plan.id,
         subscriptionName: plan.name,
+        rewards: planRewards,
         delivered: true,
         timestamp: Date.now()
       }];
