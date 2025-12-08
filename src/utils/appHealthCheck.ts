@@ -1,5 +1,6 @@
 // App Health Check
 // This utility checks if the app is working properly and reports any issues
+import React from 'react';
 
 interface HealthStatus {
   isHealthy: boolean;
@@ -28,7 +29,7 @@ class AppHealthCheck {
 
     // Check if React is working
     try {
-      if (typeof React === 'undefined') {
+      if (!React || typeof React !== 'object') {
         issues.push('React is not available');
         isHealthy = false;
       }
