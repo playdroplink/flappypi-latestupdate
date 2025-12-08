@@ -67,6 +67,9 @@ class PiPaymentService {
         throw new Error('User not authenticated');
       }
 
+      // Auto-clear any incomplete/pending payments to unblock new payments
+      await this.clearIncompletePayments();
+
       // For production mode, skip scope validation
       if (piNetworkConfig.pi.productionMode && !piNetworkConfig.pi.sandbox) {
         console.log('✅ Production mode: Completely bypassing scope validation');
@@ -233,6 +236,33 @@ class PiPaymentService {
         success: false, 
         error: error.message || 'Payment creation failed' 
       };
+    }
+  }
+
+  // Cancel any incomplete payments on server side before creating a new one
+  private async clearIncompletePayments(): Promise<void> {
+    try {
+      const listRes = await fetch('/api/payments/incomplete/list');
+      if (!listRes.ok) return;
+      const { payments } = await listRes.json();
+      if (Array.isArray(payments) && payments.length > 0) {
+        console.log('🔄 Clearing incomplete payments before new payment:', payments.length);
+        for (const p of payments) {
+          const paymentId = p?.identifier || p?.payment_id || p?.paymentId || p?.id;
+          if (!paymentId) continue;
+          try {
+            await fetch('/api/payments/cancel', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ paymentId })
+            });
+          } catch (cancelErr) {
+            console.warn('⚠️ Failed to cancel incomplete payment', paymentId, cancelErr);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('⚠️ Unable to check/clear incomplete payments:', err);
     }
   }
 
