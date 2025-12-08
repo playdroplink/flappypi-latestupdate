@@ -452,10 +452,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       const authStatus = await checkAuthStatus();
       
-      // Enhanced Pi authentication check for sandbox environments
+      // Enhanced Pi authentication check (no mock bypass)
       if (!authStatus && typeof window !== 'undefined') {
-        // Use config to ensure we are not in mainnet
-        const isSandbox = false;
+        const isSandbox = window.location.hostname.includes('sandbox.minepi.com');
         const isPiNet = window.location.hostname.includes('pinet.com');
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
@@ -468,29 +467,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           windowPiType: typeof window.Pi,
           windowPiKeys: window.Pi ? Object.keys(window.Pi) : []
         });
-
-        // If sandbox is not available, use mock Pi auth to bypass guard
-        if (!isSandbox && (!PI_CONFIG.isMainnet() || isLocalhost)) {
-          console.log('🟡 Mock Pi Auth: Sandbox not available, bypassing Pi auth guard with mock user.');
-          const mockPiUser = {
-            uid: 'mock-user-001',
-            username: 'MockPiUser',
-            name: 'Mock Pi User',
-            avatar: 'flappy-logo.png',
-            isPiAuth: true
-          };
-          localStorage.setItem('flappypi-username', mockPiUser.username);
-          localStorage.setItem('flappypi-pi-user', JSON.stringify(mockPiUser));
-          localStorage.setItem('flappypi-pi-auth', 'true');
-          await checkAuthStatus();
-          if (window.location.pathname !== '/' && window.location.pathname !== '/home') {
-            window.location.replace('/');
-          }
-          return;
-        }
-
-        // ...existing code for sandbox and PiNet checks...
-        // (rest of the original sandbox/PiNet logic remains unchanged)
+        // No mock user creation; require real Pi auth.
       }
     };
     
@@ -498,9 +475,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const piInitPromiseRef = { current: null as null | Promise<void> };
 
     const ensurePiInit = async () => {
-      // Use config to ensure we are not in mainnet
-      // Pi auth guard temporarily disabled
-      const isSandbox = false;
+      const isSandbox = PI_CONFIG.isSandbox();
       if (isSandbox && !PI_CONFIG.isMainnet() && window.Pi && typeof window.Pi.init === 'function') {
         if (!piInitPromiseRef.current) {
           piInitPromiseRef.current = window.Pi.init({ version: '2.0', sandbox: true })

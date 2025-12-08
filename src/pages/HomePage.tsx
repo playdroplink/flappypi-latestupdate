@@ -375,191 +375,58 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     };
   }, []);
 
-  // Get user display information - optimized for Pi authentication
+  // Get user display information - mainnet Pi auth only
   const getUserDisplay = () => {
-    
-    // Helper function to extract username from user object
     const extractUsername = (user: any) => {
       if (!user) return 'Pi User';
-      
-      // Check for username first (most common in Pi Network)
-      if (user.username && user.username !== 'Player' && user.username.trim() !== '') {
-        return user.username.trim();
-      }
-      
-      // Check for name field
-      if (user.name && user.name !== 'Player' && user.name.trim() !== '') {
-        return user.name.trim();
-      }
-      
-      // Check for displayName
-      if (user.displayName && user.displayName !== 'Player' && user.displayName.trim() !== '') {
-        return user.displayName.trim();
-      }
-      
-      // Check for first_name + last_name combination
+      if (user.username && user.username !== 'Player' && user.username.trim() !== '') return user.username.trim();
+      if (user.name && user.name !== 'Player' && user.name.trim() !== '') return user.name.trim();
+      if (user.displayName && user.displayName !== 'Player' && user.displayName.trim() !== '') return user.displayName.trim();
       if (user.first_name || user.last_name) {
-        const firstName = user.first_name || '';
-        const lastName = user.last_name || '';
-        const fullName = `${firstName} ${lastName}`.trim();
-        if (fullName && fullName !== 'Player') {
-          return fullName;
-        }
+        const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+        if (fullName && fullName !== 'Player') return fullName;
       }
-      
       return 'Pi User';
     };
-    
-    // Check if we're in sandbox environment
-    const isSandbox = window.location.hostname.includes('sandbox.minepi.com');
+
     const isPiNet = window.location.hostname.includes('pinet.com');
-    const isPiBrowser = typeof window !== 'undefined' && !!window.Pi;
-    
-    
-    // Enhanced debugging
-    
-    // ENHANCED SANDBOX SUPPORT - Check window.Pi directly first for sandbox
-    if (isSandbox && typeof window !== 'undefined' && window.Pi) {
-      try {
-        
-        // Try multiple methods to get user from window.Pi
-        let sandboxUser = null;
-        
-        // Method 1: window.Pi.currentUser() function
-        if (typeof window.Pi.currentUser === 'function') {
-          try {
-            sandboxUser = window.Pi.currentUser();
-          } catch (error) {
-            console.warn('⚠️ window.Pi.currentUser() failed:', error);
-          }
-        }
-        
-        // Method 2: window.Pi.currentUser property
-        if (!sandboxUser && window.Pi.currentUser && typeof window.Pi.currentUser === 'object') {
-          sandboxUser = window.Pi.currentUser;
-        }
-        
-        // Method 3: Check if user is already authenticated in window.Pi
-        if (!sandboxUser && window.Pi.user) {
-          sandboxUser = window.Pi.user;
-        }
-        
-        // Method 4: Check for other possible user properties
-        if (!sandboxUser) {
-          const possibleUserKeys = ['user', 'currentUser', 'authenticatedUser', 'me', 'profile'];
-          for (const key of possibleUserKeys) {
-            if (window.Pi[key] && typeof window.Pi[key] === 'object') {
-              sandboxUser = window.Pi[key];
-              break;
-            }
-          }
-        }
-        
-        if (sandboxUser && sandboxUser.uid) {
-          const username = extractUsername(sandboxUser);
-          if (username !== 'Pi User') {
-            // Store in localStorage for consistency
-            localStorage.setItem('flappypi-username', username);
-            localStorage.setItem('flappypi-pi-user', JSON.stringify(sandboxUser));
-            localStorage.setItem('flappypi-pi-auth', 'true');
-            return {
-              username: username,
-              avatar: sandboxUser.avatar || 'flappy-logo.png',
-              isPiAuth: true
-            };
-          }
-        }
-      } catch (error) {
-        //
-      }
-    }
-    
-    // ENHANCED PINET SUPPORT - Check window.Pi directly for PiNet
-    if (isPiNet && typeof window !== 'undefined' && window.Pi) {
-      try {
-        
-        let pinetUser = null;
-        
-        // Try multiple methods to get user from window.Pi
-        if (typeof window.Pi.currentUser === 'function') {
-          try {
-            pinetUser = window.Pi.currentUser();
-          } catch (error) {
-            console.warn('⚠️ window.Pi.currentUser() failed:', error);
-          }
-        }
-        
-        if (!pinetUser && window.Pi.currentUser && typeof window.Pi.currentUser === 'object') {
-          pinetUser = window.Pi.currentUser;
-        }
-        
-        if (pinetUser && pinetUser.uid) {
-          const username = extractUsername(pinetUser);
-          if (username !== 'Pi User') {
-            // Store in localStorage for consistency
-            localStorage.setItem('flappypi-username', username);
-            localStorage.setItem('flappypi-pi-user', JSON.stringify(pinetUser));
-            localStorage.setItem('flappypi-pi-auth', 'true');
-            return {
-              username: username,
-              avatar: pinetUser.avatar || 'flappy-logo.png',
-              isPiAuth: true
-            };
-          }
-        }
-      } catch (error) {
-        //
-      }
-    }
-    
-    // First, check AuthContext (most reliable for real-time data)
-    if (authPiUser && isPiAuth) {
+
+    // 1) AuthContext (mainnet only)
+    if (isPiNet && authPiUser && isPiAuth) {
       const username = extractUsername(authPiUser);
       if (username !== 'Pi User') {
-        console.log('✅ HomePage - Using AuthContext user:', username);
         return {
-          username: username,
+          username,
           avatar: authPiUser.avatar || 'flappy-logo.png',
           isPiAuth: true
         };
       }
     }
-    
-    // Then, try to sync Pi data to ensure we have the latest
-    const syncedUser = syncPiUserData();
-    const isPiAuthenticatedFromSDK = checkPiAuthentication();
-    
-    if (isPiAuthenticatedFromSDK && syncedUser) {
+
+    // 2) Synced Pi data + SDK auth (mainnet only)
+    const syncedUser = isPiNet ? syncPiUserData() : null;
+    const isPiAuthenticatedFromSDK = isPiNet ? checkPiAuthentication() : false;
+    if (isPiNet && isPiAuthenticatedFromSDK && syncedUser) {
       const username = extractUsername(syncedUser);
       if (username !== 'Pi User') {
-        console.log('✅ HomePage - Using synced Pi user:', username);
         return {
-          username: username,
+          username,
           avatar: syncedUser.avatar || 'flappy-logo.png',
           isPiAuth: true
         };
       }
     }
-    
-    // Check localStorage directly for the most up-to-date information
-    const storedPiUser = localStorage.getItem('flappypi-pi-user');
-    const storedPiAuth = localStorage.getItem('flappypi-pi-auth');
-    
-    console.log('🔍 HomePage - localStorage check:', {
-      storedPiUser: storedPiUser ? 'exists' : 'null',
-      storedPiAuth,
-      storedPiUserContent: storedPiUser ? JSON.parse(storedPiUser) : null
-    });
-    
-    if (storedPiAuth === 'true' && storedPiUser) {
+
+    // 3) LocalStorage (mainnet only)
+    const storedPiUser = isPiNet ? localStorage.getItem('flappypi-pi-user') : null;
+    const storedPiAuth = isPiNet ? localStorage.getItem('flappypi-pi-auth') : null;
+    if (isPiNet && storedPiAuth === 'true' && storedPiUser) {
       try {
         const parsedUser = JSON.parse(storedPiUser);
         const username = extractUsername(parsedUser);
-        console.log('🔍 HomePage - Extracted username from localStorage:', username);
         if (username !== 'Pi User') {
-          console.log('✅ HomePage - Using localStorage Pi user:', username);
           return {
-            username: username,
+            username,
             avatar: parsedUser.avatar || 'flappy-logo.png',
             isPiAuth: true
           };
@@ -568,100 +435,27 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
         console.error('❌ Error parsing stored Pi user:', error);
       }
     }
-    
-    // Check Pi SDK localStorage directly
-    const piSDKUser = localStorage.getItem('pi_user');
-    const piSDKToken = localStorage.getItem('pi_access_token');
-    
-    console.log('🔍 HomePage - Pi SDK localStorage check:', {
-      piSDKUser: piSDKUser ? 'exists' : 'null',
-      piSDKToken: piSDKToken ? 'exists' : 'null',
-      piSDKUserContent: piSDKUser ? JSON.parse(piSDKUser) : null
-    });
-    
-    if (piSDKToken && piSDKUser) {
-      try {
-        const parsedPiSDKUser = JSON.parse(piSDKUser);
-        const username = extractUsername(parsedPiSDKUser);
-        console.log('🔍 HomePage - Extracted username from Pi SDK localStorage:', username);
-        if (username !== 'Pi User') {
-          console.log('✅ HomePage - Using Pi SDK localStorage user:', username);
-          return {
-            username: username,
-            avatar: parsedPiSDKUser.avatar || 'flappy-logo.png',
-            isPiAuth: true
-          };
-        }
-      } catch (error) {
-        console.error('❌ Error parsing Pi SDK user:', error);
-      }
-    }
-    
-    // Use prop piUser if available
-    if (piUser) {
+
+    // 4) Prop piUser (mainnet only)
+    if (isPiNet && piUser) {
       const username = extractUsername(piUser);
       if (username !== 'Pi User') {
-        console.log('✅ HomePage - Using prop piUser:', username);
-        // Priority 1: User's selected bird character
         let avatar = 'flappy-logo.png';
         if (profile?.selected_bird_skin) {
           avatar = getBirdImageSrc(profile.selected_bird_skin);
         } else if (piUser.avatar) {
           avatar = piUser.avatar;
         }
-        
         return {
-          username: username,
-          avatar: avatar,
+          username,
+          avatar,
           isPiAuth: piUser.isPiAuth || false
         };
       }
     }
-    
-    // Check if we're in Pi Browser and try to get user from window.Pi
-    if (typeof window !== 'undefined' && window.Pi && window.Pi.currentUser) {
-      try {
-        const currentPiUser = window.Pi.currentUser();
-        if (currentPiUser) {
-          const username = extractUsername(currentPiUser);
-          if (username !== 'Pi User') {
-            console.log('✅ HomePage - Using window.Pi.currentUser:', username);
-            // Priority 1: User's selected bird character
-            let avatar = 'flappy-logo.png';
-            if (profile?.selected_bird_skin) {
-              avatar = getBirdImageSrc(profile.selected_bird_skin);
-            } else if (currentPiUser.avatar) {
-              avatar = currentPiUser.avatar;
-            }
-            
-            return {
-              username: username,
-              avatar: avatar,
-              isPiAuth: true
-            };
-          }
-        }
-      } catch (error) {
-        console.log('ℹ️ window.Pi.currentUser not available:', error);
-      }
-    }
-    
-    // ENHANCED FALLBACK - Better default for Pi environments
-    if (isPiBrowser || isSandbox || isPiNet) {
-      console.log('⚠️ HomePage - Using Pi environment fallback');
-      return {
-        username: 'Pi User',
-        avatar: 'flappy-logo.png',
-        isPiAuth: false
-      };
-    }
-    
-    // Fallback to profile or default
+
+    // 5) Profile/local fallback (works for non-mainnet too)
     const fallbackUsername = extractUsername(profile);
-    console.log('⚠️ HomePage - Using profile fallback username:', fallbackUsername);
-    
-    // Priority 1: User's selected bird character
-    // Priority 2: profile.avatar_url (always highest priority for avatar)
     let avatar = 'flappy-logo.png';
     if (profile?.avatar_url && profile.avatar_url.trim() !== '') {
       avatar = profile.avatar_url;
@@ -670,7 +464,7 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     }
     return {
       username: fallbackUsername,
-      avatar: avatar,
+      avatar,
       isPiAuth: false
     };
   };
@@ -687,16 +481,12 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     return () => clearTimeout(timer);
   }, [authUpdateTrigger]);
 
-  // Periodic authentication check for sandbox environment
+  // Periodic authentication check (disabled for mainnet-only)
   useEffect(() => {
-    const isSandbox = window.location.hostname.includes('sandbox.minepi.com');
-    
+    const isSandbox = false; // mainnet-only
     if (isSandbox) {
       const checkInterval = setInterval(() => {
-        // Force a re-render to check for authentication changes
         setAuthUpdateTrigger(prev => prev + 1);
-        
-        // Also try to sync Pi data periodically
         try {
           const syncedUser = syncPiUserData();
           if (syncedUser) {
@@ -705,8 +495,7 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
         } catch (error) {
           console.warn('⚠️ Periodic sync failed:', error);
         }
-      }, 2000); // Check every 2 seconds in sandbox
-      
+      }, 2000);
       return () => clearInterval(checkInterval);
     }
   }, []);

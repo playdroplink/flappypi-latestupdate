@@ -104,12 +104,9 @@ const PiAuthLogin: React.FC = () => {
   }, [isAuthenticated, isPiAuth, navigate]);
 
   const handlePiLogin = async () => {
-    // Allow localhost for development
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const isSandbox = window.location.hostname.includes('sandbox.minepi.com');
+    // Only allow Pi Browser or mainnet domains for authentication
     const isPiNet = window.location.hostname.includes('.pinet.com');
-    
-    if (!browserInfo?.isPiBrowser && !isSandbox && !isLocalhost && !isPiNet) {
+    if (!browserInfo?.isPiBrowser && !isPiNet) {
       setError('Pi Browser and SDK are required for authentication.');
       return;
     }
