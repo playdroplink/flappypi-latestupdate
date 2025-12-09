@@ -137,10 +137,15 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
 
   const handleClaim = () => {
     try {
+      console.log('🎁 [EnhancedRewardModal] Starting reward claim process...', { planId, planName, rewardCount: rewards.length });
+      
       // Use the proper unclaimed rewards system to prevent double redemption
       if (planId) {
+        console.log('✅ [EnhancedRewardModal] PlanId found, claiming from unclaimed storage:', planId);
         const claimedRewards = inventoryService.claimSubscriptionRewards(planId);
+        
         if (claimedRewards) {
+          console.log('🎉 [EnhancedRewardModal] Successfully claimed rewards:', claimedRewards.length, 'items');
           // NOTE: inventoryService.claimSubscriptionRewards already handles:
           // - Adding coins to wallet
           // - Dispatching wallet update events
@@ -168,6 +173,7 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
             onClose();
           }, 1500);
         } else {
+          console.warn('⚠️ [EnhancedRewardModal] No rewards to claim (already claimed or not found)');
           toast({
             title: 'Already Claimed',
             description: 'You have already claimed the rewards for this subscription plan.',
@@ -176,6 +182,7 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
           });
         }
       } else {
+        console.warn('⚠️ [EnhancedRewardModal] No planId provided, using fallback claim method');
         // Fallback for cases without planId (should not happen in normal flow)
         // This path is for preview mode or manual reward claims
         let totalCoinsAdded = 0;

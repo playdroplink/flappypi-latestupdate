@@ -73,9 +73,14 @@ const SubscriptionPaymentModal = ({ isOpen, onClose, plan, onSuccess }) => {
       if (result.success) {
         console.log('✅ [DEBUG] Direct payment successful:', result);
         
+        // Set the payment plan so EnhancedRewardModal can access planId for claiming
+        setPaymentPlan(plan);
+        console.log('✅ [DEBUG] Payment plan set for reward claiming:', { planId: plan.id, planName: plan.name });
+        
         // Get rewards for this plan
         const planRewards = getPlanRewards(plan.id);
         setRewards(planRewards);
+        console.log('✅ [DEBUG] Rewards loaded for modal:', planRewards.length, 'items');
         
         // Show success and rewards
         // NOTE: Coins will be added when user claims rewards in the modal
@@ -537,9 +542,14 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({ isOpen,
             const customEvent = event as CustomEvent;
             console.log('🎉 Subscription activated via payment completion:', customEvent.detail);
             
+            // Set the payment plan so EnhancedRewardModal can access planId for claiming
+            setPaymentPlan(plan);
+            console.log('✅ [Main Modal] Payment plan set for reward claiming:', { planId: plan.id, planName: plan.name });
+            
             // Get rewards for this plan
             const planRewards = getPlanRewards(plan.id);
             setRewards(planRewards);
+            console.log('✅ [Main Modal] Rewards loaded:', planRewards.length, 'items');
             
             // Show success and rewards
             // NOTE: Coins will be added when user claims rewards in the modal
