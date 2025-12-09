@@ -6,7 +6,7 @@ import { useUserProfile } from '../hooks/useUserProfile';
 import { useLanguage } from '../context/LanguageContext';
 import { useToast } from '../hooks/use-toast';
 import { useSettings } from '../hooks/useSettings';
-// import { useGlobalMusic } from '../hooks/useGlobalMusic'; // DISABLED: No background music in game mode
+import { useGlobalMusicContext } from '../context/GlobalMusicContext';
 import { useSoundEffects } from '../hooks/useSoundEffects';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -106,7 +106,7 @@ const DinoPiGamePage: React.FC = () => {
   const { t } = useLanguage();
   const { settings } = useSettings();
   const { toast } = useToast();
-  // const { isPlaying, currentTrack, playMusic, stopMusic } = useGlobalMusic(settings.musicEnabled); // DISABLED: No background music in game mode
+  const { stopMusic } = useGlobalMusicContext();
   const { playSwoosh, playSound } = useSoundEffects();
   
   // Game state
@@ -115,6 +115,12 @@ const DinoPiGamePage: React.FC = () => {
   const [soundEnabled, setSoundEnabled] = useState(settings.soundEnabled);
   const [showGameModeModal, setShowGameModeModal] = useState(false);
   const [showPiFeaturesModal, setShowPiFeaturesModal] = useState(false);
+
+  // CRITICAL: Stop all music when entering game page
+  useEffect(() => {
+    console.log('🎵 [DinoPiGamePage] Component mounted - stopping all background music');
+    stopMusic();
+  }, [stopMusic]);
 
   // Determine game mode from URL
   useEffect(() => {
@@ -145,11 +151,8 @@ const DinoPiGamePage: React.FC = () => {
   // Handle music toggle
   const toggleMusic = () => {
     setMusicEnabled(!musicEnabled);
-    if (musicEnabled) {
-      stopMusic();
-    } else {
-      playMusic();
-    }
+    // Always stop music in game mode - no background music allowed
+    stopMusic();
     playSound('click');
   };
 

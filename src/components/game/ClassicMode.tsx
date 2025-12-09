@@ -4021,6 +4021,17 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
   // DISABLED: No background music in game mode
   // useGlobalMusic(); // DISABLED: No background music in game mode
 
+  // CRITICAL: Stop all music when entering game mode (component mount)
+  useEffect(() => {
+    console.log('🎵 [ClassicMode] Component mounted - stopping all background music');
+    stopMusic();
+    
+    // Cleanup on unmount
+    return () => {
+      console.log('🎵 [ClassicMode] Component unmounting');
+    };
+  }, [stopMusic]);
+
   // Pi Ad Network support state
   const [adNetworkSupported, setAdNetworkSupported] = useState<boolean>(false);
 
