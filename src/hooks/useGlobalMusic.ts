@@ -959,9 +959,13 @@ export const useGlobalMusic = (musicEnabled: boolean = true) => {
       
       setCurrentTrack(trackKey);
       
+      // CRITICAL: If trackKey is 'none' (game mode), ALWAYS stop music
+      // This takes priority over musicEnabled state
       if (trackKey === 'none') {
-        console.log(`🎵 [MUSIC DEBUG] No music for this route, stopping`);
+        console.log(`🎵 [MUSIC DEBUG] Game mode detected, FORCE STOPPING all music`);
         stopMusic();
+        // Force cleanup to ensure no music plays
+        cleanupGlobalMusic();
       } else {
         console.log(`🎵 [MUSIC DEBUG] Playing music for track: ${trackKey}`);
         // Play music immediately without delay
@@ -974,12 +978,31 @@ export const useGlobalMusic = (musicEnabled: boolean = true) => {
 
   // Handle music enabled/disabled
   useEffect(() => {
+    // If music is disabled, stop it
     if (!musicEnabled) {
       stopMusic();
-    } else if (currentTrack !== 'none' && !isPlaying) {
-      playMusic(currentTrack);
+    } 
+    // CRITICAL: Never auto-play if in game mode (trackKey = 'none')
+    else if (currentTrack !== 'none' && !isPlaying && !isAdPlaying) {
+      // Double-check we're not in a game route before playing
+      const currentPath = location.pathname;
+      const isGameRoute = currentPath.includes('/game') || 
+                         currentPath.includes('/play') || 
+                         currentPath.includes('/classic') || 
+                         currentPath.includes('/endless') || 
+                         currentPath.includes('/challenge') ||
+                         currentPath.includes('dino-pi') ||
+                         currentPath.includes('scream-pi') ||
+                         currentPath.includes('pvp') ||
+                         currentPath.includes('multiplayer');
+      
+      if (!isGameRoute) {
+        playMusic(currentTrack);
+      } else {
+        console.log(`🎵 [MUSIC DEBUG] musicEnabled effect blocked play - in game route`);
+      }
     }
-  }, [musicEnabled, currentTrack, isPlaying, playMusic, stopMusic]);
+  }, [musicEnabled, currentTrack, isPlaying, playMusic, stopMusic, location.pathname]);
 
   // Handle splash screen state
   useEffect(() => {
@@ -1024,6 +1047,14 @@ export const useGlobalMusic = (musicEnabled: boolean = true) => {
       const trackKey = getTrackForRoute(location.pathname);
       console.log(`🎵 [MUSIC DEBUG] Track key for ${location.pathname}: ${trackKey}`);
       
+      // CRITICAL: If trackKey is 'none' (game mode), ensure music is stopped
+      if (trackKey === 'none') {
+        console.log(`🎵 [MUSIC DEBUG] Game mode detected on mount, stopping all music`);
+        stopMusic();
+        cleanupGlobalMusic();
+        return;
+      }
+      
       if (musicEnabled && trackKey !== 'none' && !isAdPlaying) {
         console.log(`🎵 [MUSIC DEBUG] Auto-playing music for track: ${trackKey}`);
         // Small delay to ensure component is fully mounted
@@ -1037,7 +1068,7 @@ export const useGlobalMusic = (musicEnabled: boolean = true) => {
     if (currentInstanceId === instanceId) {
       initializeMusic();
     }
-  }, [musicEnabled, location.pathname, instanceId, playMusic]);
+  }, [musicEnabled, location.pathname, instanceId, playMusic, stopMusic]);
 
   // Handle visibility changes (pause when app goes to background)
   useEffect(() => {
