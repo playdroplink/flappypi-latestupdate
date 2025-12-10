@@ -304,9 +304,51 @@ export class PiA2UPaymentService {
         };
       }
 
-      return response;
+      return {
+        success: false,
+        error: 'Failed to get incomplete payments'
+      };
     } catch (error) {
       console.error('❌ Failed to get incomplete payments:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  /**
+   * Cancel all incomplete server payments via backend
+   * POST /api/payments/incomplete/cancel-all
+   */
+  async cancelAllIncompletePayments(): Promise<any> {
+    try {
+      console.log('🔄 Cancelling all incomplete payments via backend...');
+
+      const response = await fetch('/api/payments/incomplete/cancel-all', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`❌ Failed to cancel incomplete payments: ${errorText}`);
+        return {
+          success: false,
+          error: `Failed to cancel payments: ${errorText}`
+        };
+      }
+
+      const data = await response.json();
+      console.log('✅ Incomplete payments cancellation result:', data);
+      return {
+        success: true,
+        data
+      };
+    } catch (error) {
+      console.error('❌ Error cancelling incomplete payments:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -479,6 +521,8 @@ export const cancelPayment = (paymentId: string) =>
   piA2UPaymentService.cancelPayment(paymentId);
 export const getIncompletePayments = () => 
   piA2UPaymentService.getIncompletePayments();
+export const cancelAllIncompletePayments = () => 
+  piA2UPaymentService.cancelAllIncompletePayments();
 export const verifyRewardedAdStatus = (adId: string) => 
   piA2UPaymentService.verifyRewardedAdStatus(adId);
 export const verifyUserToken = (accessToken: string) => 

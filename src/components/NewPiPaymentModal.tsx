@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
-import { getIncompletePayments, cancelPayment } from '@/services/piA2UPaymentService';
+import { getIncompletePayments, cancelPayment, cancelAllIncompletePayments } from '@/services/piA2UPaymentService';
 
 interface PaymentItem {
   id: string;
@@ -405,15 +405,11 @@ const NewPiPaymentModal: React.FC<NewPiPaymentModalProps> = ({
                           setResolvingPending(true);
                           setError('🔄 Resolving pending payment... Please wait.');
                           try {
-                            // First try to call the backend cancel-all endpoint
-                            const bulkCancelRes = await fetch('/api/payments/incomplete/cancel-all', { 
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' }
-                            });
+                            // Use the new service function to cancel all incomplete payments
+                            const result = await cancelAllIncompletePayments();
                             
-                            if (bulkCancelRes.ok) {
-                              const bulkData = await bulkCancelRes.json();
-                              console.log('✅ Bulk cancel result:', bulkData);
+                            if (result.success) {
+                              console.log('✅ Bulk cancel result:', result.data);
                               setError('✅ Pending payment resolved! Please try your purchase again.');
                               setPendingPaymentDetected(false);
                               
@@ -429,7 +425,7 @@ const NewPiPaymentModal: React.FC<NewPiPaymentModalProps> = ({
                               return;
                             }
                             
-                            // Fallback to manual list + cancel
+                            // Fallback to manual list + cancel if bulk failed
                             const resp = await getIncompletePayments();
                             if (resp.success && Array.isArray(resp.data) && resp.data.length > 0) {
                               for (const pending of resp.data) {
