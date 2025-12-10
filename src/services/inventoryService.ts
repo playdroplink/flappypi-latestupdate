@@ -2600,18 +2600,28 @@ class InventoryService {
       const unclaimedRewards = this.getUnclaimedSubscriptionRewards();
       const planReward = unclaimedRewards.find(r => r.planId === planId);
       
-      if (!planReward) {
-        // If no unclaimed rewards exist, check if they were already claimed
-        return purchaseHistory.some(transaction => 
-          transaction.metadata?.rewardType === 'subscription_reward' && 
-          transaction.itemName.includes(planId)
-        );
+      // If unclaimed rewards exist for this plan, rewards haven't been claimed yet
+      if (planReward) {
+        console.log(`✅ [hasClaimedPlanRewards] Unclaimed rewards found for ${planId}, can claim`);
+        return false; // NOT claimed - has unclaimed rewards
       }
       
-      return false; // Has unclaimed rewards, so not claimed yet
+      // If no unclaimed rewards exist, check if they were already claimed in history
+      const hasClaimed = purchaseHistory.some(transaction => 
+        transaction.metadata?.rewardType === 'subscription_reward' && 
+        (transaction.itemName.includes(planId) || transaction.itemId === planId)
+      );
+      
+      if (hasClaimed) {
+        console.log(`✅ [hasClaimedPlanRewards] Rewards already claimed for ${planId}`);
+      } else {
+        console.log(`⚠️ [hasClaimedPlanRewards] No claim history found for ${planId}`);
+      }
+      
+      return hasClaimed; // Return true if already claimed
     } catch (error) {
       console.error('Error checking if plan rewards claimed:', error);
-      return false;
+      return false; // Default to allowing claim on error
     }
   }
 
@@ -2623,21 +2633,11 @@ class InventoryService {
       
       if (!planRewards) {
         console.log('❌ No unclaimed rewards found for plan:', planId);
+        console.log('💡 Available unclaimed plans:', unclaimedRewards.map(r => r.planId));
         return null;
       }
 
-      // Check if rewards have already been claimed by looking for transaction history
-      const purchaseHistory = this.getPurchaseHistory();
-      const alreadyClaimed = purchaseHistory.some(transaction => 
-        transaction.metadata?.rewardType === 'subscription_reward' && 
-        transaction.itemName.includes(planRewards.planName)
-      );
-
-      if (alreadyClaimed) {
-        console.log('❌ [DoubleClaim Protection] Rewards already claimed for plan:', planId, planRewards.planName);
-        return null;
-      }
-
+      console.log(`✅ [ClaimSubscriptionRewards] Found unclaimed rewards for plan: ${planId} (${planRewards.planName})`);
       console.log(`✅ [ClaimSubscriptionRewards] Starting claim for plan: ${planId} (${planRewards.planName})`);
 
       // Import wallet utilities
@@ -3226,6 +3226,52 @@ class InventoryService {
     } catch (error) {
       console.error('❌ Failed to get skins with serial codes:', error);
       return [];
+    }
+  }
+
+  /**
+   * Debug: Check reward claiming system status
+   * @returns Status information about unclaimed and claimed rewards
+   */
+  debugRewardClaimingSystem(): {
+    unclaimedRewards: any[];
+    purchaseHistory: any[];
+    allPlans: string[];
+    claimableItems: number;
+  } {
+    try {
+      const unclaimedRewards = this.getUnclaimedSubscriptionRewards();
+      const purchaseHistory = this.getPurchaseHistory();
+      
+      console.log('🔍 === REWARD CLAIMING SYSTEM DEBUG ===');
+      console.log('📦 Unclaimed rewards:', unclaimedRewards);
+      console.log('📝 Purchase history (subscription rewards only):', 
+        purchaseHistory.filter(p => p.metadata?.rewardType === 'subscription_reward')
+      );
+      
+      const allPlans = unclaimedRewards.map(r => r.planId);
+      const claimableItems = unclaimedRewards.reduce((total, r) => total + r.rewards.length, 0);
+      
+      console.log(`📊 Summary:
+        - Total unclaimed plans: ${unclaimedRewards.length}
+        - Plans: ${allPlans.join(', ') || 'NONE'}
+        - Total claimable items: ${claimableItems}
+      `);
+      
+      return {
+        unclaimedRewards,
+        purchaseHistory: purchaseHistory.filter(p => p.metadata?.rewardType === 'subscription_reward'),
+        allPlans,
+        claimableItems
+      };
+    } catch (error) {
+      console.error('❌ Debug error:', error);
+      return {
+        unclaimedRewards: [],
+        purchaseHistory: [],
+        allPlans: [],
+        claimableItems: 0
+      };
     }
   }
 }

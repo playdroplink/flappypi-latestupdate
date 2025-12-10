@@ -103,12 +103,6 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
     }
   }, [dedupedRewards, suppressIfAllOwned]);
 
-  useEffect(() => {
-    if (planId && inventoryService.hasClaimedPlanRewards(planId) && open) {
-      onClose();
-    }
-  }, [planId, open, onClose]);
-
   if (!open) return null;
   if (shouldSuppress) {
     toast({

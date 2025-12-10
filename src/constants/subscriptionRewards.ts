@@ -294,4 +294,10 @@ export const validateRewardImages = (): { valid: boolean; missing: string[] } =>
   // This would typically check against actual file system
   // For now, we'll assume all images are valid
   return { valid: true, missing: [] };
+};
+
+// Helper function to get plan name by ID
+export const getPlanName = (planId: string): string => {
+  const plan = subscriptionPlanRewards.find(p => p.planId === planId);
+  return plan ? plan.planName : planId;
 }; 
