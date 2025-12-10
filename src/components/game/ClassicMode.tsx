@@ -3269,9 +3269,29 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
       // Add coins to user's balance if it's a coin reward
       if (rewardItem.type === 'coins') {
         try {
-        await updateProfile({
-          total_coins: (profile?.total_coins || 0) + rewardItem.amount
-        });
+          // 1. Update localStorage immediately for instant UI feedback
+          const currentCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
+          const newBalance = currentCoins + rewardItem.amount;
+          localStorage.setItem('flappypi-coins', newBalance.toString());
+          console.log(`💰 [Challenge Reward] Added ${rewardItem.amount} coins. New balance: ${newBalance}`);
+          
+          // 2. Update profile in Supabase
+          await updateProfile({
+            total_coins: (profile?.total_coins || 0) + rewardItem.amount
+          });
+          
+          // 3. Dispatch wallet update events for all listeners
+          window.dispatchEvent(new CustomEvent('wallet-updated', { 
+            detail: { coinsAdded: rewardItem.amount, newBalance, source: 'challenge-reward' } 
+          }));
+          
+          window.dispatchEvent(new CustomEvent('coins-claimed', {
+            detail: { amount: rewardItem.amount, newTotal: newBalance, source: 'challenge-reward' }
+          }));
+          
+          window.dispatchEvent(new CustomEvent('force-wallet-refresh', {
+            detail: { newBalance }
+          }));
           
           toast({
             title: 'Coins Added! 🪙',
@@ -3280,6 +3300,12 @@ const ClassicMode: React.FC<ClassicModeProps> = ({ mode = 'classic', challenge, 
           });
         } catch (error) {
           console.error('Error adding coins:', error);
+          toast({
+            title: 'Error',
+            description: 'Failed to add coins. Please try again.',
+            variant: 'destructive',
+            duration: 3000,
+          });
         }
       }
       

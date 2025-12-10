@@ -8,12 +8,21 @@ const WalletBalance = ({ className = "", showBackground = true }) => {
   const { profile } = useUserProfile();
   const formattedBalance = balance.toLocaleString();
   
-  // Sync balance with profile to prevent glitches
+  // Sync balance with localStorage and profile to prevent glitches
   const syncBalance = useCallback(() => {
-    // Only sync if profile has MORE coins (prevents overwriting fresh localStorage updates)
-    if (profile && typeof profile.total_coins === 'number' && profile.total_coins > balance) {
-      console.log(`🪙 Balance sync: wallet=${balance}, profile=${profile.total_coins} (upgrading)`);
+    const currentCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
+    
+    // Always prioritize localStorage as the source of truth
+    if (currentCoins !== balance) {
+      console.log(`🪙 WalletBalance sync: ${balance} → ${currentCoins}`);
+      setBalance(currentCoins);
+    }
+    
+    // Also check profile as fallback
+    if (profile && typeof profile.total_coins === 'number' && profile.total_coins > currentCoins) {
+      console.log(`🪙 Balance sync from profile: ${currentCoins} → ${profile.total_coins}`);
       setBalance(profile.total_coins);
+      localStorage.setItem('flappypi-coins', profile.total_coins.toString());
     }
   }, [profile, balance, setBalance]);
   
@@ -21,8 +30,25 @@ const WalletBalance = ({ className = "", showBackground = true }) => {
     syncBalance();
     // Sync on window focus to catch missed updates
     window.addEventListener('focus', syncBalance);
-    return () => window.removeEventListener('focus', syncBalance);
-  }, [syncBalance]);
+    
+    // Listen for wallet update events for immediate sync
+    const handleWalletEvent = () => {
+      const currentCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
+      console.log(`🪙 WalletBalance: wallet event detected, syncing to ${currentCoins}`);
+      setBalance(currentCoins);
+    };
+    
+    window.addEventListener('wallet-updated', handleWalletEvent);
+    window.addEventListener('coins-claimed', handleWalletEvent);
+    window.addEventListener('force-wallet-refresh', handleWalletEvent);
+    
+    return () => {
+      window.removeEventListener('focus', syncBalance);
+      window.removeEventListener('wallet-updated', handleWalletEvent);
+      window.removeEventListener('coins-claimed', handleWalletEvent);
+      window.removeEventListener('force-wallet-refresh', handleWalletEvent);
+    };
+  }, [syncBalance, setBalance]);
   
   if (!showBackground) {
     // Clean version without background - just logo and amount

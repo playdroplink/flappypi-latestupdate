@@ -148,6 +148,13 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const detail = event?.detail || {};
       console.log(`💰 [WalletContext] wallet-updated event - new balance: ${currentCoins}`, detail);
       setBalance(currentCoins);
+      
+      // Also sync to profile if available
+      if (profile && updateProfile) {
+        updateProfile({ total_coins: currentCoins }).catch(err => 
+          console.warn('⚠️ Failed to sync balance to profile:', err)
+        );
+      }
     };
 
     const handleCoinsClaimed = (event: CustomEvent) => {
@@ -155,13 +162,27 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const currentCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
       console.log(`🪙 [WalletContext] coins-claimed event from '${source}': +${amount}, new balance: ${currentCoins}`);
       setBalance(currentCoins);
+      
+      // Also sync to profile if available
+      if (profile && updateProfile) {
+        updateProfile({ total_coins: currentCoins }).catch(err => 
+          console.warn('⚠️ Failed to sync balance to profile:', err)
+        );
+      }
     };
 
     const handleForceWalletRefresh = (event: CustomEvent) => {
-      const { newBalance } = event.detail;
       const currentCoins = parseInt(localStorage.getItem('flappypi-coins') || '0', 10);
-      console.log(`🔄 [WalletContext] force-wallet-refresh event - current: ${currentCoins}, forcing sync`);
+      console.log(`🔄 [WalletContext] force-wallet-refresh event - syncing to: ${currentCoins}`);
       setBalance(currentCoins);
+      
+      // Force immediate re-render by updating with callback
+      setBalance(prev => {
+        if (prev !== currentCoins) {
+          console.log(`🔄 Balance mismatch fixed: ${prev} → ${currentCoins}`);
+        }
+        return currentCoins;
+      });
     };
 
     // Listen for both event types
@@ -174,7 +195,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       window.removeEventListener('coins-claimed', handleCoinsClaimed as EventListener);
       window.removeEventListener('force-wallet-refresh', handleForceWalletRefresh as EventListener);
     };
-  }, []);
+  }, [profile, updateProfile]);
 
   // Handle user authentication changes
   useEffect(() => {
