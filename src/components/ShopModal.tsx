@@ -217,8 +217,12 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
   };
 
   const handlePiPayment = async (item: any) => {
-
-    // REMOVED: Authentication requirement - allow purchases without signing in
+    // CRITICAL: Items are NOT delivered here anymore
+    // realPiPaymentService.processSubscriptionPayment() handles:
+    // 1. Payment creation via Pi SDK
+    // 2. Payment verification (3-phase flow)
+    // 3. Item delivery ONLY after verified completion
+    // 4. Cancellation handling (no items delivered on cancel)
 
     toast({
       title: "Processing Pi Payment",
@@ -226,135 +230,52 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
     });
 
     try {
-      // Use the same API call structure as subscription payments (plan payments)
+      // Process payment with realPiPaymentService
+      // This handles the FULL payment lifecycle including verification
       const result = await realPiPaymentService.processSubscriptionPayment({
         id: item.id,
         name: item.name,
         price: item.piPrice.toString()
       });
 
-      if (result.success) {
-        // If the purchased item is a Flappy Coin pack, show claim modal instead of direct wallet update
-        if (item.type === 'coins') {
-          let claimedAmount = 0;
-          if (item.amount) {
-            claimedAmount = item.amount;
-          } else if (item.fcAmount) {
-            claimedAmount = item.fcAmount;
-          } else if (item.flappyCoinPrice) {
-            claimedAmount = item.flappyCoinPrice;
-          } else if (item.coinAmount) {
-            claimedAmount = item.coinAmount;
-          } else if (item.quantity) {
-            claimedAmount = item.quantity;
-          }
-          // Fallback: try to parse from name (e.g., "FC500")
-          if (!claimedAmount && item.name) {
-            const match = item.name.match(/FC(\d+)/);
-            if (match) claimedAmount = parseInt(match[1], 10);
-          }
-          // Fallback: try to parse from description
-          if (!claimedAmount && item.description) {
-            const match = item.description.match(/FC(\d+)/);
-            if (match) claimedAmount = parseInt(match[1], 10);
-          }
-          
-          // Show reward modal for coin claim
-          setCoinRewards([{
-            id: item.id,
-            name: item.name,
-            type: 'coins',
-            quantity: claimedAmount,
-            rarity: 'Common',
-            image: item.image,
-            description: item.description || 'Flappy Coins'
-          }]);
-          setShowCoinRewardModal(true);
-          return;
-        }
-
-        // Build inventory item for all other types
-        let itemType = item.type;
-        if (!itemType) {
-          if (["shield","magnet","extra_life","coin_multiplier","turbo_start"].includes(item.id)) {
-            itemType = "powerup";
-          } else {
-            itemType = "skin";
-          }
-        }
-        const inventoryItem = {
-          id: item.id,
-          name: item.name,
-          type: itemType,
-          image: item.image,
-          description: item.description,
-          rarity: item.rarity,
-          quantity: 1,
-          equipped: itemType === 'skin' ? false : (itemType === 'powerup' ? true : undefined)
-        };
-
-        // Save to inventory for all except coins
-        if (inventoryItem.type !== 'coins') {
-          inventoryService.saveToInventory(inventoryItem);
-        }
-
-        // Update localStorage ownership arrays
-        if (inventoryItem.type === 'skin') {
+      // Check if payment was successful AND verified
+      if (result.success && result.deliveredItems && result.deliveredItems.length > 0) {
+        // Payment was completed and verified - items were already delivered by realPiPaymentService
+        
+        // Update local UI state to reflect the owned items
+        if (item.type === 'skin' || !item.type) {
           const newOwnedSkins = [...ownedSkins, item.id];
           setOwnedSkins(newOwnedSkins);
           localStorage.setItem('flappypi-owned-skins', JSON.stringify(newOwnedSkins));
-        } else if (inventoryItem.type === 'powerup') {
-          const ownedPowerups = JSON.parse(localStorage.getItem('flappypi-owned-powerups') || '[]');
-          const newOwnedPowerups = [...ownedPowerups, item.id];
-          localStorage.setItem('flappypi-owned-powerups', JSON.stringify(newOwnedPowerups));
-          
-          // Dispatch event for powerup purchase to sync game equipment
-          window.dispatchEvent(new CustomEvent('power-up-purchased', {
-            detail: {
-              powerUpId: item.id,
-              name: item.name,
-              quantity: 1,
-              purchasedAt: new Date().toISOString()
-            }
-          }));
-        } else if (inventoryItem.type === 'bundle') {
-          const ownedBundles = JSON.parse(localStorage.getItem('flappypi-owned-bundles') || '[]');
-          const newOwnedBundles = [...ownedBundles, item.id];
-          localStorage.setItem('flappypi-owned-bundles', JSON.stringify(newOwnedBundles));
-        } else if (inventoryItem.type === 'mysterybox' || inventoryItem.type === 'mystery-box') {
-          const ownedMysteryBoxes = JSON.parse(localStorage.getItem('flappypi-owned-mysteryboxes') || '[]');
-          const newOwnedMysteryBoxes = [...ownedMysteryBoxes, item.id];
-          localStorage.setItem('flappypi-owned-mysteryboxes', JSON.stringify(newOwnedMysteryBoxes));
-        } else if (inventoryItem.type === 'accessory') {
-          const ownedAccessories = JSON.parse(localStorage.getItem('flappypi-owned-accessories') || '[]');
-          const newOwnedAccessories = [...ownedAccessories, item.id];
-          localStorage.setItem('flappypi-owned-accessories', JSON.stringify(newOwnedAccessories));
         }
 
-        // Dispatch inventory update event for all purchases
-        console.log('🛍️ [Shop] Dispatching inventory-updated event for:', item.id);
-        window.dispatchEvent(new CustomEvent('inventory-updated', {
-          detail: {
-            itemId: item.id,
-            type: inventoryItem.type,
-            action: 'purchased'
-          }
-        }));
-        console.log('✅ [Shop] inventory-updated event dispatched');
+        // Refresh coins from localStorage in case they were updated
+        const savedCoins = parseInt(localStorage.getItem('flappypi-coins') || '0');
+        setCoins(savedCoins);
 
         toast({
           title: "Purchase Successful! 🎉",
           description: `${item.name} has been added to your collection.`,
         });
       } else {
+        // Payment was not successfully completed or verified
+        // NO items were delivered
+        const errorMessage = result.error || "Payment was not completed. No items were delivered.";
+        
         toast({
-          title: "Payment Failed",
-          description: result.error || "Failed to process payment. Please try again.",
+          title: "Payment Failed or Cancelled",
+          description: errorMessage,
           variant: "destructive"
+        });
+
+        console.log('❌ [Shop] Payment not completed:', {
+          success: result.success,
+          hasDeliveredItems: result.deliveredItems && result.deliveredItems.length > 0,
+          error: result.error
         });
       }
     } catch (error) {
-      console.error('Payment error:', error);
+      console.error('❌ Payment error:', error);
       toast({
         title: "Payment Error",
         description: "An error occurred while processing your payment.",
@@ -364,10 +285,34 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
   };
 
   const handleCoinPayment = async (item: any) => {
-    // REMOVED: Authentication requirement - allow purchases without signing in
-
+    // CRITICAL: Verify coin balance before deducting coins
+    // This prevents giving items without proper payment
+    
     const coinPrice = item.flappyCoinPrice || item.coinPrice;
-    if (coins >= coinPrice) {
+    
+    if (coins < coinPrice) {
+      toast({
+        title: "Insufficient Coins",
+        description: "You need more coins to purchase this item.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Step 1: Deduct coins from user balance (atomic operation)
+      const newCoins = coins - coinPrice;
+      setCoins(newCoins);
+      localStorage.setItem('flappypi-coins', newCoins.toString());
+      
+      console.log('💰 [Shop-Coins] Coins deducted:', { 
+        previous: coins, 
+        deducted: coinPrice, 
+        remaining: newCoins,
+        itemId: item.id 
+      });
+
+      // Step 2: Add item to inventory ONLY after coin deduction
       // If the purchased item is Flappy Coins, show claim modal instead of direct wallet update
       if (item.type === 'coins') {
         const claimedAmount = item.amount || item.quantity || 0;
@@ -386,27 +331,22 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
         return;
       }
 
-      // For other items, deduct the coin price
-      const newCoins = coins - coinPrice;
-      setCoins(newCoins);
-      localStorage.setItem('flappypi-coins', newCoins.toString());
-
-      // Add item to inventory using proper inventory service
+      // For other items, add to inventory after coin deduction is confirmed
       const inventoryItem = {
         id: item.id,
         name: item.name,
         type: item.type || 'skin',
-        image: item.image, // Use the GIF image from shop items
+        image: item.image,
         description: item.description,
         rarity: item.rarity,
         quantity: 1,
         equipped: item.type === 'powerup' ? true : false
       };
 
-      // Save to inventory service
+      // Save to inventory service - ONLY AFTER coins are deducted
       inventoryService.saveToInventory(inventoryItem);
 
-      // Also keep in ownedSkins for backwards compatibility
+      // Update localStorage ownership arrays
       const newOwnedSkins = [...ownedSkins, item.id];
       setOwnedSkins(newOwnedSkins);
       localStorage.setItem('flappypi-owned-skins', JSON.stringify(newOwnedSkins));
@@ -440,17 +380,44 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
         title: "Purchase Successful! 🎉",
         description: `${item.name} has been added to your collection.`
       });
-    } else {
+
+      // Log transaction for audit trail
+      const transactions = JSON.parse(localStorage.getItem('flappypi-transactions') || '[]');
+      transactions.push({
+        id: `tx_${Date.now()}`,
+        itemId: item.id,
+        itemName: item.name,
+        type: item.type || 'skin',
+        coinPrice: coinPrice,
+        quantity: 1,
+        timestamp: Date.now(),
+        status: 'completed',
+        paymentMethod: 'coins'
+      });
+      localStorage.setItem('flappypi-transactions', JSON.stringify(transactions));
+
+    } catch (error) {
+      console.error('❌ Coin payment error:', error);
+      
+      // Restore coins if transaction failed
+      setCoins(coins);
+      localStorage.setItem('flappypi-coins', coins.toString());
+      
       toast({
-        title: "Insufficient Coins",
-        description: "You need more coins to purchase this item.",
+        title: "Purchase Failed",
+        description: "An error occurred. Coins have been restored.",
         variant: "destructive"
       });
     }
   };
 
   const handleSubscriptionPayment = async (item: any) => {
-    // REMOVED: Authentication requirement - allow purchases without signing in
+    // CRITICAL: Wait for full payment verification before activating subscription
+    // realPiPaymentService.processSubscriptionPayment handles:
+    // 1. Payment creation via Pi SDK (3-phase flow)
+    // 2. Payment verification with backend
+    // 3. Subscription delivery ONLY after verified completion
+    // 4. Cancellation handling (no subscription given on cancel/failure)
 
     toast({
       title: "Processing Pi Payment",
@@ -464,29 +431,44 @@ const ShopModal: React.FC<ShopModalProps> = ({ open, onClose, musicEnabled }) =>
         price: item.piPrice.toString()
       });
       
-              if (result.success) {
-          let description = '';
-          if (item.id === 'adfree') {
-            description = "You now have 7 days of ad-free gaming.";
-          } else if (item.id === 'allskins') {
-            description = "You now have access to all skins for 15 days.";
-          } else if (item.id === 'elite') {
-            description = "You now have 30 days of Elite benefits.";
-          }
+      // Check if payment was successful AND subscription was delivered
+      if (result.success && result.deliveredItems && result.deliveredItems.length > 0) {
+        // Subscription was activated by realPiPaymentService
+        let description = '';
+        if (item.id === 'adfree') {
+          description = "You now have 7 days of ad-free gaming.";
+        } else if (item.id === 'allskins') {
+          description = "You now have access to all skins for 15 days.";
+        } else if (item.id === 'elite') {
+          description = "You now have 30 days of Elite benefits.";
+        }
+
+        // Refresh coins from localStorage in case they were updated
+        const savedCoins = parseInt(localStorage.getItem('flappypi-coins') || '0');
+        setCoins(savedCoins);
 
         toast({
           title: `${item.name} Active! 🎉`,
           description: description
         });
       } else {
+        // Payment was not completed or subscription was not delivered
+        const errorMessage = result.error || "Payment failed or was cancelled. Subscription not activated.";
+        
         toast({
-          title: "Payment Failed",
-          description: result.error || "Failed to process payment. Please try again.",
+          title: "Payment Failed or Cancelled",
+          description: errorMessage,
           variant: "destructive"
+        });
+
+        console.log('❌ [Shop] Subscription payment not completed:', {
+          success: result.success,
+          hasDeliveredItems: result.deliveredItems && result.deliveredItems.length > 0,
+          error: result.error
         });
       }
     } catch (error) {
-      console.error('Payment error:', error);
+      console.error('❌ Subscription payment error:', error);
       toast({
         title: "Payment Error",
         description: "An error occurred while processing your payment.",

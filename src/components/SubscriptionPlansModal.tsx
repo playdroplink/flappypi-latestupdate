@@ -838,14 +838,15 @@ const SubscriptionPlansModal: React.FC<SubscriptionPlansModalProps> = ({ isOpen,
   };
 
   const handleClaimPlanReward = (planId: string) => {
-    if (inventoryService.hasClaimedPlanRewards(planId)) return;
+    // FIXED: Removed hasClaimedPlanRewards check that was blocking claims
+    // Users should always be able to claim rewards from subscription plans
     const claimed = inventoryService.claimSubscriptionRewards(planId);
-    if (claimed) {
+    if (claimed && claimed.length > 0) {
       toast({ title: 'Reward Claimed!', description: 'You have successfully claimed your subscription plan reward.' });
       setShowRewardModal(true);
       setRewards(claimed);
     } else {
-      toast({ title: 'Already Claimed', description: 'You have already claimed this reward.' });
+      toast({ title: 'No Rewards Available', description: 'This subscription plan has no unclaimed rewards.' });
     }
   };
 

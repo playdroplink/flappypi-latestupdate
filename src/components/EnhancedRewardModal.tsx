@@ -94,13 +94,10 @@ const EnhancedRewardModal: React.FC<EnhancedRewardModalProps> = ({
   }, [rewards]);
 
   const shouldSuppress = React.useMemo(() => {
-    if (!dedupedRewards.length || !suppressIfAllOwned) return false;
-    try {
-      const inv = inventoryService.getInventory ? inventoryService.getInventory() : [];
-      return dedupedRewards.every(r => inv.some(i => i.id === r.id));
-    } catch {
-      return false;
-    }
+    // FIXED: Removed suppressIfAllOwned restriction
+    // Users should ALWAYS be able to claim rewards, even if they already own the items
+    // This allows users to get multiple copies of items if they purchase the same plan
+    return false;
   }, [dedupedRewards, suppressIfAllOwned]);
 
   if (!open) return null;

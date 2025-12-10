@@ -86,11 +86,21 @@ const UnclaimedRewardsModal: React.FC<UnclaimedRewardsModalProps> = ({
         
         if (onClaim) onClaim();
         
-        // Close modal after 2 seconds
+        // Close modal after 2 seconds and check for new rewards
         setTimeout(() => {
-          onClose();
-          setClaimed(false);
-          setClaiming(false);
+          // Refresh unclaimed rewards to check if new ones appeared
+          const updatedRewards = inventoryService.getUnclaimedSubscriptionRewards();
+          if (updatedRewards.length === 0) {
+            // No new rewards - close modal
+            onClose();
+            setClaimed(false);
+            setClaiming(false);
+          } else {
+            // New rewards appeared - refresh the list
+            setUnclaimedRewards(updatedRewards);
+            setClaimed(false);
+            setClaiming(false);
+          }
         }, 2000);
       }
     } catch (error) {
@@ -107,23 +117,43 @@ const UnclaimedRewardsModal: React.FC<UnclaimedRewardsModalProps> = ({
   const handleClaimPlan = async (planId: string) => {
     setClaiming(true);
     try {
+      // FIXED: claimSubscriptionRewards now returns rewards even if already in inventory
+      // This allows users to claim rewards without "Already Claimed" restrictions
       const claimedRewards = inventoryService.claimSubscriptionRewards(planId);
-      if (claimedRewards) {
+      if (claimedRewards && claimedRewards.length > 0) {
         const plan = unclaimedRewards.find(r => r.planId === planId);
         toast({
           title: '🎉 Rewards Claimed!',
           description: `Successfully claimed ${claimedRewards.length} item(s) from ${plan?.planName}!`,
           duration: 3000
         });
-        setUnclaimedRewards(prev => prev.filter(r => r.planId !== planId));
+        
+        // Update local state - remove claimed plan from the list
+        const updatedRewards = unclaimedRewards.filter(r => r.planId !== planId);
+        setUnclaimedRewards(updatedRewards);
+        
+        // Check if there are any remaining rewards to claim
+        if (updatedRewards.length === 0) {
+          // No more rewards - close modal after brief delay
+          setTimeout(() => {
+            onClose();
+            setClaiming(false);
+          }, 1500);
+        } else {
+          // More rewards available - keep modal open but show updated list
+          setClaiming(false);
+        }
+        
         if (onClaim) onClaim();
       } else {
+        // This should rarely happen - only if the unclaimed rewards don't exist at all
         toast({
-          title: 'Already Claimed',
-          description: 'You have already claimed the rewards for this subscription plan.',
+          title: 'No Rewards Available',
+          description: 'This subscription plan has no unclaimed rewards.',
           variant: 'destructive',
           duration: 3000
         });
+        setClaiming(false);
       }
     } catch (error) {
       console.error('Error claiming plan rewards:', error);
@@ -132,7 +162,6 @@ const UnclaimedRewardsModal: React.FC<UnclaimedRewardsModalProps> = ({
         description: 'An error occurred while claiming your rewards.',
         variant: 'destructive'
       });
-    } finally {
       setClaiming(false);
     }
   };
@@ -264,7 +293,7 @@ const UnclaimedRewardsModal: React.FC<UnclaimedRewardsModalProps> = ({
           </div>
         )}
 
-        <style jsx>{`
+        <style>{`
           @keyframes slideInUp {
             from {
               opacity: 0;

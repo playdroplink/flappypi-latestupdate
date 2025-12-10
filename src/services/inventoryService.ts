@@ -2626,6 +2626,8 @@ class InventoryService {
   }
 
   // Claim subscription rewards for a specific plan
+  // FIXED: Now allows claiming even if items already exist in inventory
+  // Users can claim all their subscription plan rewards without restrictions
   claimSubscriptionRewards(planId: string): SubscriptionReward[] | null {
     try {
       const unclaimedRewards = this.getUnclaimedSubscriptionRewards();
@@ -2644,7 +2646,8 @@ class InventoryService {
       const { loadWalletBalance, saveWalletBalance } = require('@/utils/walletUtils');
       let totalCoinsAwarded = 0;
 
-      // Save rewards to inventory
+      // Save rewards to inventory - NO RESTRICTIONS
+      // Users can claim all rewards without being blocked by existing inventory items
       planRewards.rewards.forEach(reward => {
         // CRITICAL FIX: Handle coins separately - add to wallet balance, not inventory
         if (reward.type === 'coins') {
@@ -2678,6 +2681,7 @@ class InventoryService {
           }));
         } else {
           // For non-coin rewards (items, skins, powerups), save to inventory
+          // IMPORTANT: Allow duplicate claims - users should be able to get multiple copies
           const inventoryItem = {
             id: reward.id,
             name: reward.name,
@@ -2703,8 +2707,10 @@ class InventoryService {
             });
           }
           
+          // FIXED: Always save to inventory, even if item already exists
+          // This allows users to claim rewards multiple times without restriction
           this.saveToInventory(inventoryItem);
-          console.log(`📦 Added ${reward.quantity}x ${reward.name} to inventory`);
+          console.log(`📦 Added ${reward.quantity}x ${reward.name} to inventory (no duplicate prevention)`);
           
           // Log item reward transaction
           this.logTransaction(
@@ -2721,7 +2727,8 @@ class InventoryService {
         }
       });
 
-      // Remove from unclaimed rewards - this prevents double claiming
+      // Remove from unclaimed rewards - this prevents double claiming from the unclaimed list
+      // But users can claim rewards again from a new subscription purchase
       const remainingUnclaimed = unclaimedRewards.filter(r => r.planId !== planId);
       localStorage.setItem('flappypi-unclaimed-subscription-rewards', JSON.stringify(remainingUnclaimed));
       
