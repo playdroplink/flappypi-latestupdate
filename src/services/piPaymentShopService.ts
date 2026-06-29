@@ -165,9 +165,10 @@ class PiPaymentShopService {
       if (window.Pi && window.Pi.init) {
         await window.Pi.init({
           version: "2.0",
-          sandbox: piNetworkConfig.pi.sandbox
+          sandbox: false, // Force mainnet mode
+          validationKey: piNetworkConfig.pi.validationKey
         });
-        console.log('✅ Pi Payment Shop Service: SDK initialized');
+        console.log('✅ Pi Payment Shop Service: SDK initialized for mainnet with API key:', piNetworkConfig.pi.apiKey);
       }
       this.isInitialized = true;
     } catch (error) {

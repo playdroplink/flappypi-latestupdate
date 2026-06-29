@@ -45,7 +45,9 @@ serve(async (req: Request) => {
     console.log('🔄 Approving payment:', paymentId, 'for product:', product.name);
 
     // Get Pi Network API key from environment
-    const piApiKey = Deno.env.get('PI_NETWORK_API_KEY');
+    const piApiKey = Deno.env.get('PI_NETWORK_API_KEY') || 'mivc5pngw8l07cbdll8lcxi3dki3yrkrprkfntcqdj5okpstnwbbqtggkrggl0zn';
+    console.log('🔑 Using API key:', piApiKey.substring(0, 10) + '...');
+    
     if (!piApiKey) {
       console.error('❌ PI_NETWORK_API_KEY not configured');
       return new Response(

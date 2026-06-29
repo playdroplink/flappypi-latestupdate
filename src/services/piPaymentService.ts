@@ -46,7 +46,7 @@ class PiPaymentService {
           sandbox: false, // Mainnet mode enabled
           validationKey: piNetworkConfig.pi.validationKey
         });
-        console.log('✅ Pi Payment Service initialized for mainnet mode');
+        console.log('✅ Pi Payment Service initialized for mainnet mode with API key:', piNetworkConfig.pi.apiKey);
       }
 
       this.isInitialized = true;

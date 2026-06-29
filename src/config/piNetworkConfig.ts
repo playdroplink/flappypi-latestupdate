@@ -7,10 +7,10 @@ export const piNetworkConfig = {
     appId: 'flappypi2807',
     apiKey: (typeof import.meta !== 'undefined' && (import.meta as any).env && (import.meta as any).env.VITE_PI_SERVER_API_KEY) 
       || (typeof process !== 'undefined' && (process as any).env && (process as any).env.REACT_APP_PI_API_KEY)
-      || 'zrt9rwcjrdaejytlu72ha0yi2czvljx6geuwphzueaeybqsyboixukixy0cmogmo',
+      || 'mivc5pngw8l07cbdll8lcxi3dki3yrkrprkfntcqdj5okpstnwbbqtggkrggl0zn',
     validationKey: '94e29cc9c70b87c8fc91e496ac630d23664bff7082cca3ad9d6466bba1aa2902caa46a8eb82a64437d272dbcd329c763679c85cfcba91b95e6fb5b4a6f17b2ce',
     // Pi Network API Key for server-to-server payment operations
-    paymentApiKey: 'z6rbduota3alcwlkm39ubi2c3x10can0ckqpsrvbmas8lbaei3mxvmdyx2dbvzzi',
+    paymentApiKey: 'mivc5pngw8l07cbdll8lcxi3dki3yrkrprkfntcqdj5okpstnwbbqtggkrggl0zn',
     environment: 'mainnet',
     sandbox: false,
     mainnet: true,
