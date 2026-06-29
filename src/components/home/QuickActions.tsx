@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Trophy, Package, Users } from 'lucide-react';
+import { ShoppingCart, Trophy, Package, Users, Lock, Video, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface QuickActionsProps {
@@ -8,9 +8,12 @@ interface QuickActionsProps {
   onOpenLeaderboard: () => void;
   onOpenInventory: () => void;
   onInviteFriends: () => void;
+  onOpenReserveConnect?: () => void;
+  onOpenStream?: () => void;
+  onOpenPrivacy?: () => void;
 }
 
-const QuickActions: React.FC<QuickActionsProps> = ({ onOpenShop, onOpenLeaderboard, onOpenInventory, onInviteFriends }) => {
+const QuickActions: React.FC<QuickActionsProps> = ({ onOpenShop, onOpenLeaderboard, onOpenInventory, onInviteFriends, onOpenReserveConnect, onOpenStream, onOpenPrivacy }) => {
   const navigate = useNavigate();
 
   const handleDinoPiClick = () => {
@@ -56,7 +59,38 @@ const QuickActions: React.FC<QuickActionsProps> = ({ onOpenShop, onOpenLeaderboa
         </Button>
       </div>
 
-      {/* Third row - Dino Pi Egg */}
+      {/* Third row - New Features */}
+      <div className="grid grid-cols-3 gap-4">
+        {onOpenReserveConnect && (
+          <Button
+            onClick={onOpenReserveConnect}
+            className="h-14 w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold shadow-xl transform hover:scale-105 transition-all duration-200 border-0 rounded-2xl text-base"
+          >
+            <Lock className="mr-2 h-5 w-5" />
+            Reserve
+          </Button>
+        )}
+        {onOpenStream && (
+          <Button
+            onClick={onOpenStream}
+            className="h-14 w-full bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white font-bold shadow-xl transform hover:scale-105 transition-all duration-200 border-0 rounded-2xl text-base"
+          >
+            <Video className="mr-2 h-5 w-5" />
+            Stream
+          </Button>
+        )}
+        {onOpenPrivacy && (
+          <Button
+            onClick={onOpenPrivacy}
+            className="h-14 w-full bg-gradient-to-r from-gray-500 to-slate-600 hover:from-gray-600 hover:to-slate-700 text-white font-bold shadow-xl transform hover:scale-105 transition-all duration-200 border-0 rounded-2xl text-base"
+          >
+            <EyeOff className="mr-2 h-5 w-5" />
+            Privacy
+          </Button>
+        )}
+      </div>
+
+      {/* Fourth row - Dino Pi Egg */}
       <div className="grid grid-cols-1 gap-4">
         <Button
           onClick={handleDinoPiClick}

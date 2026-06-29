@@ -34,6 +34,9 @@ import PaymentDebugger from '../components/PaymentDebugger';
 import ProfileImageModal from '../components/ProfileImageModal';
 import { inventoryService } from '@/services/inventoryService';
 import PiPaymentShop from '../components/PiPaymentShop';
+import ReserveConnectPanel from '../components/ReserveConnectPanel';
+import StreamPanel from '../components/StreamPanel';
+import PiHidePanel from '../components/PiHidePanel';
 
 import { useUserProfile } from '../hooks/useUserProfile';
 import { useGameEquipment } from '../hooks/useGameEquipment';
@@ -91,6 +94,9 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
   const [showAnnouncement, setShowAnnouncement] = useState(false);
   const [announcementRead, setAnnouncementRead] = useState(() => localStorage.getItem('flappypi-announcement-read') === 'true');
   const [showPaymentShop, setShowPaymentShop] = useState(false);
+  const [showReserveConnect, setShowReserveConnect] = useState(false);
+  const [showStreamPanel, setShowStreamPanel] = useState(false);
+  const [showPiHidePanel, setShowPiHidePanel] = useState(false);
 
   // Example announcement (replace with dynamic fetch if needed)
   const importantAnnouncement = {
@@ -754,6 +760,18 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     navigateToPublic('/shop');
   };
 
+  const handleOpenReserveConnect = () => {
+    setShowReserveConnect(true);
+  };
+
+  const handleOpenStream = () => {
+    setShowStreamPanel(true);
+  };
+
+  const handleOpenPrivacy = () => {
+    setShowPiHidePanel(true);
+  };
+
   const handleOpenLeaderboard = () => {
     navigateToPublic('/leaderboard');
   };
@@ -1192,6 +1210,36 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
                                                   aria-label="Payment Shop"
                                                 >
                                                   🛒 Shop
+                                                </button>
+                                              )}
+                                              {/* Reserve Connect Button */}
+                                              {isPiAuth && (
+                                                <button
+                                                  className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white py-2 px-3 rounded-lg transition-colors font-medium text-sm"
+                                                  onClick={() => setShowReserveConnect(true)}
+                                                  aria-label="Reserve Connect"
+                                                >
+                                                  🔒 Reserve
+                                                </button>
+                                              )}
+                                              {/* Stream Button */}
+                                              {isPiAuth && (
+                                                <button
+                                                  className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white py-2 px-3 rounded-lg transition-colors font-medium text-sm"
+                                                  onClick={() => setShowStreamPanel(true)}
+                                                  aria-label="Stream"
+                                                >
+                                                  📺 Stream
+                                                </button>
+                                              )}
+                                              {/* Pi Hide Button */}
+                                              {isPiAuth && (
+                                                <button
+                                                  className="bg-gradient-to-r from-gray-500 to-slate-500 hover:from-gray-600 hover:to-slate-600 text-white py-2 px-3 rounded-lg transition-colors font-medium text-sm"
+                                                  onClick={() => setShowPiHidePanel(true)}
+                                                  aria-label="Privacy"
+                                                >
+                                                  🙈 Privacy
                                                 </button>
                                               )}
                                               <button
@@ -1740,6 +1788,51 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
           </DialogHeader>
           <div className="p-6">
             <PiPaymentShop />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reserve Connect Modal */}
+      <Dialog open={showReserveConnect} onOpenChange={setShowReserveConnect}>
+        <DialogContent className="max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white p-0">
+          <DialogHeader className="bg-gradient-to-r from-purple-500 to-blue-500 px-8 pt-8 pb-4 flex flex-col items-center">
+            <DialogTitle className="text-white text-2xl font-bold">🎮 Reserve & Connect Flappy</DialogTitle>
+            <DialogDescription className="text-white/80">
+              Reserve your username and connect Flappy for cross-device synchronization
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-6">
+            <ReserveConnectPanel />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Stream Panel Modal */}
+      <Dialog open={showStreamPanel} onOpenChange={setShowStreamPanel}>
+        <DialogContent className="max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white p-0">
+          <DialogHeader className="bg-gradient-to-r from-red-500 to-orange-500 px-8 pt-8 pb-4 flex flex-col items-center">
+            <DialogTitle className="text-white text-2xl font-bold">📺 Stream Your Gameplay</DialogTitle>
+            <DialogDescription className="text-white/80">
+              Live stream your gameplay to the community
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-6">
+            <StreamPanel />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Pi Hide Panel Modal */}
+      <Dialog open={showPiHidePanel} onOpenChange={setShowPiHidePanel}>
+        <DialogContent className="max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white p-0">
+          <DialogHeader className="bg-gradient-to-r from-gray-500 to-slate-500 px-8 pt-8 pb-4 flex flex-col items-center">
+            <DialogTitle className="text-white text-2xl font-bold">🙈 Privacy Settings</DialogTitle>
+            <DialogDescription className="text-white/80">
+              Manage your privacy and leaderboard visibility
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-6">
+            <PiHidePanel />
           </div>
         </DialogContent>
       </Dialog>
