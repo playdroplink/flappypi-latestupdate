@@ -73,7 +73,7 @@ import PiAuthTestPage from './pages/PiAuthTestPage';
 // import SandboxTestPage from './pages/SandboxTestPage'; // Removed - sandbox test page deleted for mainnet-only
 import DemoHeaderPage from './pages/DemoHeaderPage';
 import ClassicGamePage from './pages/ClassicGamePage';
-import ScreamPiPage from './pages/ScreamPiPage';
+// import ScreamPiPage from './pages/ScreamPiPage'; // Removed - Scream Pi feature disabled
 import FlappyStackPage from './pages/FlappyStackPage';
 import DinoPiPage from './pages/DinoPiPage';
 import DinoPiGamePage from './pages/DinoPiGamePage';
@@ -97,7 +97,7 @@ import IceSlideModePage from './pages/challenge/IceSlideModePage';
 import LavaEscapeModePage from './pages/challenge/LavaEscapeModePage';
 import ShieldRunModePage from './pages/challenge/ShieldRunModePage';
 import MysteryModePage from './pages/challenge/MysteryModePage';
-import ScreamPiChallengePage from './pages/challenge/ScreamPiChallengePage';
+// import ScreamPiChallengePage from './pages/challenge/ScreamPiChallengePage'; // Removed - Scream Pi feature disabled
 import ChallengeIndexPage from './pages/challenge/ChallengeIndexPage';
 import UnlockTestPage from './pages/UnlockTestPage';
 
@@ -319,7 +319,7 @@ function AppRouter({ musicEnabled, setMusicEnabled, soundEnabled, setSoundEnable
             <Route path="/dino-pi/endless" element={<DinoPiGamePage />} />
             <Route path="/dino-pi/challenge" element={<DinoPiGamePage />} />
             <Route path="/enhanced-duels" element={<EnhancedDuelsPage />} />
-            <Route path="/scream-pi" element={<ScreamPiPage />} />
+            {/* <Route path="/scream-pi" element={<ScreamPiPage />} /> Removed - Scream Pi feature disabled */}
             <Route path="/mrwain-organization" element={<MrwainOrganizationPage />} />
             <Route path="/account" element={<AccountPage />} />
             <Route path="/game-history" element={<GameHistoryPage />} />
@@ -367,7 +367,7 @@ function AppRouter({ musicEnabled, setMusicEnabled, soundEnabled, setSoundEnable
             <Route path="/challenge/lava-escape" element={<LavaEscapeModePage musicEnabled={musicEnabled} setMusicEnabled={setMusicEnabled} soundEnabled={soundEnabled} setSoundEnabled={setSoundEnabled} />} />
             <Route path="/challenge/shield-run" element={<ShieldRunModePage musicEnabled={musicEnabled} setMusicEnabled={setMusicEnabled} soundEnabled={soundEnabled} setSoundEnabled={setSoundEnabled} />} />
             <Route path="/challenge/mystery" element={<MysteryModePage musicEnabled={musicEnabled} setMusicEnabled={setMusicEnabled} soundEnabled={soundEnabled} setSoundEnabled={setSoundEnabled} />} />
-            <Route path="/challenge/scream-pi" element={<ScreamPiChallengePage musicEnabled={musicEnabled} setMusicEnabled={setMusicEnabled} soundEnabled={soundEnabled} setSoundEnabled={setSoundEnabled} />} />
+            {/* <Route path="/challenge/scream-pi" element={<ScreamPiChallengePage musicEnabled={musicEnabled} setMusicEnabled={setMusicEnabled} soundEnabled={soundEnabled} setSoundEnabled={setSoundEnabled} />} /> Removed - Scream Pi feature disabled */}
             
             {/* Performance Monitor */}
             <Route path="/performance-monitor" element={<PerformanceMonitorPage />} />

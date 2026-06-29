@@ -1,6 +1,9 @@
 -- Supabase schema for Flappy Pi game data storage
 -- Run this in your Supabase SQL editor
 
+-- Enable UUID extension if not already enabled
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- Create the game_data table
 CREATE TABLE IF NOT EXISTS game_data (
   id BIGSERIAL PRIMARY KEY,
@@ -84,7 +87,7 @@ GRANT USAGE ON SEQUENCE public_scores_id_seq TO anon;
 
 -- Create user_reserves table for username reservations
 CREATE TABLE IF NOT EXISTS user_reserves (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   username TEXT NOT NULL UNIQUE,
   pi_uid TEXT NOT NULL,
   reserve_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -102,11 +105,11 @@ ALTER TABLE user_reserves ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for user_reserves
 CREATE POLICY "Allow users to manage their own reserves" ON user_reserves
-  FOR ALL USING (pi_uid = auth.uid());
+  FOR ALL USING (pi_uid = auth.uid()::text::text);
 
 -- Create user_profiles table for Flappy connections
 CREATE TABLE IF NOT EXISTS user_profiles (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   username TEXT NOT NULL,
   pi_uid TEXT NOT NULL UNIQUE,
   is_connected BOOLEAN DEFAULT false,
@@ -129,11 +132,11 @@ ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for user_profiles
 CREATE POLICY "Allow users to manage their own profiles" ON user_profiles
-  FOR ALL USING (pi_uid = auth.uid());
+  FOR ALL USING (pi_uid = auth.uid()::text);
 
 -- Create game_states table for tracking game progress
 CREATE TABLE IF NOT EXISTS game_states (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id TEXT NOT NULL UNIQUE,
   high_score INTEGER DEFAULT 0,
   total_games INTEGER DEFAULT 0,
@@ -154,7 +157,7 @@ ALTER TABLE game_states ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for game_states
 CREATE POLICY "Allow users to manage their own game states" ON game_states
-  FOR ALL USING (user_id = auth.uid());
+  FOR ALL USING (user_id = auth.uid()::text);
 
 -- Create trigger to automatically update updated_at on user_profiles
 CREATE TRIGGER update_user_profiles_updated_at 
@@ -171,24 +174,18 @@ CREATE TRIGGER update_game_states_updated_at
 -- Grant permissions for new tables
 GRANT ALL ON user_reserves TO authenticated;
 GRANT ALL ON user_reserves TO anon;
-GRANT USAGE ON SEQUENCE user_reserves_id_seq TO authenticated;
-GRANT USAGE ON SEQUENCE user_reserves_id_seq TO anon;
 
 GRANT ALL ON user_profiles TO authenticated;
 GRANT ALL ON user_profiles TO anon;
-GRANT USAGE ON SEQUENCE user_profiles_id_seq TO authenticated;
-GRANT USAGE ON SEQUENCE user_profiles_id_seq TO anon;
 
 GRANT ALL ON game_states TO authenticated;
 GRANT ALL ON game_states TO anon;
-GRANT USAGE ON SEQUENCE game_states_id_seq TO authenticated;
-GRANT USAGE ON SEQUENCE game_states_id_seq TO anon;
 
 -- ===== PAYMENT SHOP INVENTORY SCHEMA =====
 
 -- Create user_inventory table for items purchased via payment shop
 CREATE TABLE IF NOT EXISTS user_inventory (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id TEXT NOT NULL,
   item_type TEXT NOT NULL, -- 'game_lives', 'premium_skin', 'subscription', 'coins'
   item_id TEXT,
@@ -210,11 +207,11 @@ ALTER TABLE user_inventory ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for user_inventory
 CREATE POLICY "Allow users to manage their own inventory" ON user_inventory
-  FOR ALL USING (user_id = auth.uid());
+  FOR ALL USING (user_id = auth.uid()::text);
 
 -- Create user_subscriptions table for subscription management
 CREATE TABLE IF NOT EXISTS user_subscriptions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id TEXT NOT NULL UNIQUE,
   plan_type TEXT NOT NULL, -- 'monthly', 'yearly'
   start_date TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -236,11 +233,11 @@ ALTER TABLE user_subscriptions ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for user_subscriptions
 CREATE POLICY "Allow users to manage their own subscriptions" ON user_subscriptions
-  FOR ALL USING (user_id = auth.uid());
+  FOR ALL USING (user_id = auth.uid()::text);
 
 -- Create user_wallets table for coin balance management
 CREATE TABLE IF NOT EXISTS user_wallets (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id TEXT NOT NULL UNIQUE,
   coin_balance INTEGER DEFAULT 0,
   last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -255,11 +252,11 @@ ALTER TABLE user_wallets ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for user_wallets
 CREATE POLICY "Allow users to manage their own wallets" ON user_wallets
-  FOR ALL USING (user_id = auth.uid());
+  FOR ALL USING (user_id = auth.uid()::text);
 
 -- Create coin_transactions table for transaction history
 CREATE TABLE IF NOT EXISTS coin_transactions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id TEXT NOT NULL,
   amount INTEGER NOT NULL,
   transaction_type TEXT NOT NULL, -- 'purchase', 'reward', 'spend'
@@ -278,7 +275,7 @@ ALTER TABLE coin_transactions ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for coin_transactions
 CREATE POLICY "Allow users to view their own transactions" ON coin_transactions
-  FOR SELECT USING (user_id = auth.uid());
+  FOR SELECT USING (user_id = auth.uid()::text);
 
 -- Create trigger to automatically update updated_at on user_subscriptions
 CREATE TRIGGER update_user_subscriptions_updated_at 
@@ -289,29 +286,21 @@ CREATE TRIGGER update_user_subscriptions_updated_at
 -- Grant permissions for payment shop tables
 GRANT ALL ON user_inventory TO authenticated;
 GRANT ALL ON user_inventory TO anon;
-GRANT USAGE ON SEQUENCE user_inventory_id_seq TO authenticated;
-GRANT USAGE ON SEQUENCE user_inventory_id_seq TO anon;
 
 GRANT ALL ON user_subscriptions TO authenticated;
 GRANT ALL ON user_subscriptions TO anon;
-GRANT USAGE ON SEQUENCE user_subscriptions_id_seq TO authenticated;
-GRANT USAGE ON SEQUENCE user_subscriptions_id_seq TO anon;
 
 GRANT ALL ON user_wallets TO authenticated;
 GRANT ALL ON user_wallets TO anon;
-GRANT USAGE ON SEQUENCE user_wallets_id_seq TO authenticated;
-GRANT USAGE ON SEQUENCE user_wallets_id_seq TO anon;
 
 GRANT ALL ON coin_transactions TO authenticated;
-GRANT ALL ON coin_transactions TO anon;
-GRANT USAGE ON SEQUENCE coin_transactions_id_seq TO authenticated;
-GRANT USAGE ON SEQUENCE coin_transactions_id_seq TO anon; 
+GRANT ALL ON coin_transactions TO anon; 
 
 -- ===== PvP DUEL SYSTEM SCHEMA =====
 
 -- Create ghost runs table to store recorded gameplay data
 CREATE TABLE IF NOT EXISTS ghost_runs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id TEXT NOT NULL,
   username TEXT NOT NULL,
   score INTEGER NOT NULL,
@@ -324,7 +313,7 @@ CREATE TABLE IF NOT EXISTS ghost_runs (
 
 -- Create duels table for challenge requests and results
 CREATE TABLE IF NOT EXISTS duels (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   challenger_id TEXT NOT NULL,
   challenger_username TEXT NOT NULL,
   opponent_id TEXT NOT NULL,
@@ -344,7 +333,7 @@ CREATE TABLE IF NOT EXISTS duels (
 
 -- Create duel history table for detailed records
 CREATE TABLE IF NOT EXISTS duel_history (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   duel_id UUID REFERENCES duels(id),
   player_id TEXT NOT NULL,
   player_username TEXT NOT NULL,
@@ -356,7 +345,7 @@ CREATE TABLE IF NOT EXISTS duel_history (
 
 -- Create tournament table for weekly competitions
 CREATE TABLE IF NOT EXISTS tournaments (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
   description TEXT,
   start_date TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -369,7 +358,7 @@ CREATE TABLE IF NOT EXISTS tournaments (
 
 -- Create tournament participants table
 CREATE TABLE IF NOT EXISTS tournament_participants (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   tournament_id UUID REFERENCES tournaments(id),
   user_id TEXT NOT NULL,
   username TEXT NOT NULL,
@@ -412,21 +401,21 @@ CREATE POLICY "Users can view public ghost runs" ON ghost_runs
   FOR SELECT USING (is_public = true);
 
 CREATE POLICY "Users can manage their own ghost runs" ON ghost_runs
-  FOR ALL USING (user_id = auth.uid()::text OR is_anonymous = true);
+  FOR ALL USING (user_id = auth.uid()::text::text OR is_anonymous = true);
 
 -- Create RLS policies for duels
 CREATE POLICY "Users can view duels they're involved in" ON duels
-  FOR SELECT USING (challenger_id = auth.uid()::text OR opponent_id = auth.uid()::text);
+  FOR SELECT USING (challenger_id = auth.uid()::text::text OR opponent_id = auth.uid()::text::text);
 
 CREATE POLICY "Users can create duels" ON duels
-  FOR INSERT WITH CHECK (challenger_id = auth.uid()::text);
+  FOR INSERT WITH CHECK (challenger_id = auth.uid()::text::text);
 
 CREATE POLICY "Users can update duels they're involved in" ON duels
-  FOR UPDATE USING (challenger_id = auth.uid()::text OR opponent_id = auth.uid()::text);
+  FOR UPDATE USING (challenger_id = auth.uid()::text::text OR opponent_id = auth.uid()::text::text);
 
 -- Create RLS policies for duel_history
 CREATE POLICY "Users can view duel history they're involved in" ON duel_history
-  FOR SELECT USING (player_id = auth.uid()::text);
+  FOR SELECT USING (player_id = auth.uid()::text::text);
 
 -- Create RLS policies for tournaments
 CREATE POLICY "Anyone can view tournaments" ON tournaments
@@ -436,7 +425,7 @@ CREATE POLICY "Users can view tournament participants" ON tournament_participant
   FOR SELECT USING (true);
 
 CREATE POLICY "Users can join tournaments" ON tournament_participants
-  FOR INSERT WITH CHECK (user_id = auth.uid()::text);
+  FOR INSERT WITH CHECK (user_id = auth.uid()::text::text);
 
 -- Grant permissions
 GRANT ALL ON ghost_runs TO authenticated;
@@ -509,5 +498,27 @@ BEGIN
   ) RETURNING id INTO new_duel_id;
   
   RETURN new_duel_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function to update duel result
+CREATE OR REPLACE FUNCTION update_duel_result(
+  duel_id_param UUID,
+  winner_id_param TEXT,
+  challenger_score_param INTEGER,
+  opponent_score_param INTEGER
+)
+RETURNS BOOLEAN AS $$
+BEGIN
+  UPDATE duels
+  SET 
+    winner_id = winner_id_param,
+    challenger_score = challenger_score_param,
+    opponent_score = opponent_score_param,
+    status = 'completed',
+    completed_at = NOW()
+  WHERE id = duel_id_param;
+  
+  RETURN TRUE;
 END;
 $$ LANGUAGE plpgsql; 
