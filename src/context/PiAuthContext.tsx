@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import piSDKService from '../services/piSDKService';
+import { initPi, isPiSDKAvailable, isPiBrowser } from '../services/piSdk';
 
 interface PiUser {
   uid: string;
@@ -54,12 +55,13 @@ export const PiAuthProvider: React.FC<PiAuthProviderProps> = ({ children }) => {
   // Check if user is already authenticated on mount
   useEffect(() => {
     const checkAuthStatus = async () => {
+      let timeoutId: NodeJS.Timeout;
       try {
         setIsLoading(true);
         setError(null);
 
         // Set a timeout to prevent infinite loading
-        const timeoutId = setTimeout(() => {
+        timeoutId = setTimeout(() => {
           console.log('⚠️ Authentication timeout - using fallback');
           setIsLoading(false);
         }, 10000); // 10 second timeout
@@ -292,7 +294,7 @@ export const PiAuthProvider: React.FC<PiAuthProviderProps> = ({ children }) => {
       // Attempt silent authentication
       const result = await piService.authenticate(['payments', 'username']);
       
-                   if (result.success && result.user) {
+      if (result.success && result.user) {
         console.log('✅ Automatic authentication successful:', result.user);
         
         // Ensure the user data has the required properties
@@ -351,28 +353,38 @@ export const PiAuthProvider: React.FC<PiAuthProviderProps> = ({ children }) => {
       console.log('🌍 Current environment:', {
         hostname: window.location.hostname,
         userAgent: navigator.userAgent.substring(0, 100),
-        hasPiSDK: typeof window.Pi !== 'undefined',
+        hasPiSDK: isPiSDKAvailable(),
+        isPiBrowser: isPiBrowser(),
         piSDKMethods: window.Pi ? Object.keys(window.Pi) : []
       });
       
       // Check if Pi SDK is available
-      if (typeof window.Pi === 'undefined') {
+      if (!isPiSDKAvailable()) {
         throw new Error('Pi SDK not available. Please ensure you are using Pi Browser or the Pi Network app.');
       }
 
       // Check if we're in a Pi environment
-      const isPiEnvironment = window.location.hostname.includes('pinet.com') || 
-                             window.location.hostname.includes('minepi.com') ||
-                             navigator.userAgent.includes('Pi Browser') ||
-                             navigator.userAgent.includes('PiNetwork');
-      
-      if (!isPiEnvironment) {
-        console.warn('⚠️ Not in Pi environment - authentication may not work properly');
+      if (!isPiBrowser()) {
+        console.warn('⚠️ Not in Pi Browser environment - OAuth login should be used instead');
+        throw new Error('Please open this app in Pi Browser to use Pi Network authentication.');
       }
+
+      // Initialize Pi SDK before authentication
+      console.log('🔄 Initializing Pi SDK...');
+      const initSuccess = initPi({
+        version: "2.0",
+        sandbox: false // Will be determined by environment
+      });
+      
+      if (!initSuccess) {
+        throw new Error('Failed to initialize Pi SDK');
+      }
+      
+      console.log('✅ Pi SDK initialized successfully');
 
       const result = await piService.authenticate(scopes);
       
-      if (result.success && result.user) {
+      if (result && result.user) {
         // Ensure the user data has the required properties
         console.log('🔍 PiAuthContext login - Raw user data:', result.user);
         const username = extractUsername(result.user);
@@ -394,7 +406,7 @@ export const PiAuthProvider: React.FC<PiAuthProviderProps> = ({ children }) => {
         
         console.log('✅ Pi authentication successful - username:', userWithDefaults.username);
       } else {
-        const errorMessage = result.error || 'Authentication failed';
+        const errorMessage = 'Authentication failed';
         console.error('❌ Authentication failed:', errorMessage);
         throw new Error(errorMessage);
       }
@@ -406,6 +418,8 @@ export const PiAuthProvider: React.FC<PiAuthProviderProps> = ({ children }) => {
       // Provide more specific error messages
       if (errorMessage.includes('Pi SDK not available')) {
         setError('Pi SDK not available. Please ensure you are using Pi Browser or the Pi Network app.');
+      } else if (errorMessage.includes('Pi Browser')) {
+        setError('Please open this app in Pi Browser to use Pi Network authentication.');
       } else if (errorMessage.includes('timeout')) {
         setError('Authentication timeout. Please try again.');
       } else if (errorMessage.includes('network')) {

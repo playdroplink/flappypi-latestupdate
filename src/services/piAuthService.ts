@@ -2,6 +2,7 @@
 // Based on official Pi SDK documentation: https://pi-apps.github.io/pi-sdk-docs/quick-start/genai/Authentication
 
 import { piNetworkConfig } from '../config/piNetworkConfig';
+import { initPi, isPiSDKAvailable, isPiBrowser } from './piSdk';
 
 export interface AuthResult {
   accessToken: string;
@@ -106,17 +107,28 @@ class PiAuthService {
       console.log('🔍 Starting Pi authentication...');
       
       // Check if Pi SDK is available
-      if (!window.Pi) {
+      if (!isPiSDKAvailable()) {
         throw new Error('Pi SDK is not available. Please ensure you are using Pi Browser.');
       }
 
-      // Initialize Pi SDK - treat as Promise and await fully
+      // Check if running in Pi Browser
+      if (!isPiBrowser()) {
+        console.warn('⚠️ Not running in Pi Browser. OAuth login should be used instead.');
+        throw new Error('Please open this app in Pi Browser to use Pi Network authentication.');
+      }
+
+      // Initialize Pi SDK using the centralized initPi function
       console.log('🔄 Initializing Pi SDK...');
-      await window.Pi.init({ 
+      const initSuccess = initPi({
         version: "2.0",
         sandbox: piNetworkConfig.pi.sandbox,
         environment: piNetworkConfig.pi.environment
       });
+      
+      if (!initSuccess) {
+        throw new Error('Failed to initialize Pi SDK');
+      }
+      
       console.log('✅ Pi SDK initialized successfully');
 
       // Authenticate with username and payments scopes

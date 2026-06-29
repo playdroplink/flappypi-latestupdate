@@ -4,6 +4,7 @@
 import { piAuthService } from './piAuthService';
 import { piPaymentService } from './piPaymentService';
 import { piAdNetworkService } from './piAdNetworkService';
+import { initPi, isPiSDKAvailable, isPiBrowser } from './piSdk';
 
 export interface PiSDKConfig {
   version: string;
@@ -61,23 +62,25 @@ export class PiSDKService {
       console.log('🚀 Initializing complete Pi SDK integration...');
 
       // Check if running in Pi Browser
-      this.status.isPiBrowser = piAuthService.isPiBrowser();
+      this.status.isPiBrowser = isPiBrowser();
       
       if (!this.status.isPiBrowser) {
         console.warn('⚠️ Not running in Pi Browser. Some features may not work.');
       }
 
-      // Initialize Pi SDK
-      const sdkInitialized = await piAuthService.initialize();
+      // Initialize Pi SDK using the centralized initPi function
+      const sdkInitialized = initPi({
+        version: this.config.version,
+        sandbox: this.config.sandbox
+      });
+      
       if (!sdkInitialized) {
         throw new Error('Failed to initialize Pi SDK');
       }
 
       // Initialize payment service
-      const paymentInitialized = await piPaymentService.initialize();
-      if (!paymentInitialized) {
-        throw new Error('Failed to initialize payment service');
-      }
+      await piPaymentService.initialize();
+      console.log('✅ Payment service initialized');
 
       // Initialize ad network service
       const adNetworkInitialized = await piAdNetworkService.initialize();
@@ -103,7 +106,7 @@ export class PiSDKService {
   /**
    * Authenticate user with Pi Network
    */
-  async authenticate(scopes: string[] = ['payments', 'username']): Promise<boolean> {
+  async authenticate(scopes: string[] = ['payments', 'username']): Promise<{ success: boolean; user?: any; error?: string }> {
     try {
       if (!this.status.initialized) {
         const initialized = await this.initialize();
@@ -114,22 +117,22 @@ export class PiSDKService {
 
       console.log('🔐 Authenticating user with Pi Network...');
 
-      const authResult = await piAuthService.authenticate(scopes);
+      const authResult = await piAuthService.authenticateUser();
       
       this.status.authenticated = true;
       this.status.user = {
-        uid: authResult.user.uid,
-        username: authResult.user.username
+        uid: authResult.uid,
+        username: authResult.username
       };
 
       console.log('✅ User authenticated successfully:', this.status.user);
-      return true;
+      return { success: true, user: this.status.user };
 
     } catch (error) {
       console.error('❌ Authentication failed:', error);
       this.status.authenticated = false;
       this.status.user = undefined;
-      return false;
+      return { success: false, error: error instanceof Error ? error.message : 'Authentication failed' };
     }
   }
 
@@ -152,7 +155,16 @@ export class PiSDKService {
 
       console.log('🛒 Creating shop payment:', { item, quantity });
 
-      const result = await piPaymentService.createShopPayment(item, quantity);
+      const result = await piPaymentService.createPayment({
+        amount: item.price * quantity,
+        memo: `Shop purchase: ${item.name}`,
+        metadata: {
+          type: 'shop_item',
+          itemId: item.id,
+          itemName: item.name,
+          quantity: quantity
+        }
+      });
       
       if (result.success) {
         console.log('✅ Shop payment created successfully');
@@ -189,7 +201,16 @@ export class PiSDKService {
 
       console.log('📅 Creating subscription payment:', subscription);
 
-      const result = await piPaymentService.createSubscriptionPayment(subscription);
+      const result = await piPaymentService.createPayment({
+        amount: subscription.price,
+        memo: `Subscription: ${subscription.name} (${subscription.duration})`,
+        metadata: {
+          type: 'subscription',
+          subscriptionId: subscription.id,
+          subscriptionName: subscription.name,
+          duration: subscription.duration
+        }
+      });
       
       if (result.success) {
         console.log('✅ Subscription payment created successfully');
@@ -334,12 +355,44 @@ export class PiSDKService {
    */
   async logout(): Promise<void> {
     try {
-      await piAuthService.logout();
+      piAuthService.signOut();
       this.status.authenticated = false;
       this.status.user = undefined;
       console.log('✅ User logged out successfully');
     } catch (error) {
       console.error('❌ Logout failed:', error);
+    }
+  }
+
+  /**
+   * Sign out user (alias for logout)
+   */
+  signOut(): void {
+    piAuthService.signOut();
+    this.status.authenticated = false;
+    this.status.user = undefined;
+    console.log('✅ User signed out successfully');
+  }
+
+  /**
+   * Refresh authentication
+   */
+  async refreshAuth(): Promise<boolean> {
+    try {
+      const user = piAuthService.getCurrentUser();
+      if (user && piAuthService.isAuthenticated()) {
+        this.status.authenticated = true;
+        this.status.user = {
+          uid: user.uid,
+          username: user.username
+        };
+        console.log('✅ Authentication refreshed successfully');
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('❌ Failed to refresh authentication:', error);
+      return false;
     }
   }
 

@@ -70,6 +70,7 @@ import PiBrowserLoginPage from './pages/PiBrowserLoginPage';
 import LoginPage from './pages/PiLoginPage';
 import PiTestPage from './pages/PiTestPage';
 import PiAuthTestPage from './pages/PiAuthTestPage';
+import PiCallback from './pages/PiCallback';
 // import SandboxTestPage from './pages/SandboxTestPage'; // Removed - sandbox test page deleted for mainnet-only
 import DemoHeaderPage from './pages/DemoHeaderPage';
 import ClassicGamePage from './pages/ClassicGamePage';
@@ -229,6 +230,7 @@ function AppRouter({ musicEnabled, setMusicEnabled, soundEnabled, setSoundEnable
       <Route path="/pi-auth" element={<PiAuthLogin />} />
       <Route path="/pi-browser-login" element={<PiAuthLogin />} />
       <Route path="/not-in-pi-browser" element={<NotInPiBrowser />} />
+      <Route path="/auth/pi/callback" element={<PiCallback />} />
       <Route path="/signin" element={<SignInPage />} />
       <Route path="/download" element={
         <PiAuthGuard>

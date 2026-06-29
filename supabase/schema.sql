@@ -105,7 +105,7 @@ ALTER TABLE user_reserves ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for user_reserves
 CREATE POLICY "Allow users to manage their own reserves" ON user_reserves
-  FOR ALL USING (pi_uid = auth.uid()::text::text);
+  FOR ALL USING (pi_uid::text = auth.uid()::text);
 
 -- Create user_profiles table for Flappy connections
 CREATE TABLE IF NOT EXISTS user_profiles (

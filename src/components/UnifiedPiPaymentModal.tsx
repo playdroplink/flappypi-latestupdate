@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { walletAddressVerification } from '@/services/walletAddressVerification';
 import { PI_CONFIG } from '@/config/piConfig';
 import PaymentDebugPanel from './PaymentDebugPanel';
+import { initPi, isPiSDKAvailable, isPiBrowser } from '@/services/piSdk';
 
 interface PaymentItem {
   id: string;
@@ -230,10 +231,19 @@ const UnifiedPiPaymentModal: React.FC<UnifiedPiPaymentModalProps> = ({
 
   // Handle Pi authentication sign-in
   const handlePiSignIn = async () => {
-    if (typeof window === 'undefined' || !window.Pi) {
+    if (!isPiSDKAvailable()) {
       toast({
         title: "Pi SDK Not Available",
         description: "Please use Pi Browser to sign in with Pi Network.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!isPiBrowser()) {
+      toast({
+        title: "Pi Browser Required",
+        description: "Please open this app in Pi Browser to use Pi Network authentication.",
         variant: "destructive"
       });
       return;
@@ -243,6 +253,19 @@ const UnifiedPiPaymentModal: React.FC<UnifiedPiPaymentModalProps> = ({
     
     try {
       console.log('🔍 [DEBUG] Attempting Pi authentication...');
+      
+      // Initialize Pi SDK before authentication
+      console.log('🔄 [DEBUG] Initializing Pi SDK...');
+      const initSuccess = initPi({
+        version: "2.0",
+        sandbox: PI_CONFIG.isSandbox()
+      });
+      
+      if (!initSuccess) {
+        throw new Error('Failed to initialize Pi SDK');
+      }
+      
+      console.log('✅ [DEBUG] Pi SDK initialized successfully');
       
       // Try to authenticate with Pi Network
       const authResult = await window.Pi.authenticate(['payments', 'username'], onIncompletePaymentFound);
@@ -378,10 +401,29 @@ const UnifiedPiPaymentModal: React.FC<UnifiedPiPaymentModalProps> = ({
       console.log('🔍 [DEBUG] Starting Pi SDK payment creation...');
       
       // Check if Pi SDK is available
-      if (typeof window === 'undefined' || !window.Pi) {
-        console.error('❌ [DEBUG] Pi SDK not available - window.Pi is undefined');
+      if (!isPiSDKAvailable()) {
+        console.error('❌ [DEBUG] Pi SDK not available');
         throw new Error('Pi SDK not available. Please use Pi Browser to make Pi payments.');
       }
+
+      // Check if running in Pi Browser
+      if (!isPiBrowser()) {
+        console.error('❌ [DEBUG] Not running in Pi Browser');
+        throw new Error('Please open this app in Pi Browser to make Pi payments.');
+      }
+
+      // Initialize Pi SDK before creating payment
+      console.log('🔄 [DEBUG] Initializing Pi SDK before payment...');
+      const initSuccess = initPi({
+        version: "2.0",
+        sandbox: PI_CONFIG.isSandbox()
+      });
+      
+      if (!initSuccess) {
+        throw new Error('Failed to initialize Pi SDK');
+      }
+      
+      console.log('✅ [DEBUG] Pi SDK initialized successfully');
 
       console.log('✅ [DEBUG] Pi SDK available:', {
         hasPi: !!window.Pi,

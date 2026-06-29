@@ -3,6 +3,7 @@
 
 import { piNetworkConfig } from '../config/piNetworkConfig';
 import { piAuthService } from './piAuthService';
+import { initPi, isPiSDKAvailable } from './piSdk';
 
 export interface PaymentRequest {
   amount: number;
@@ -35,19 +36,21 @@ class PiPaymentService {
     if (this.isInitialized) return;
 
     try {
-      if (!window.Pi) {
+      if (!isPiSDKAvailable()) {
         throw new Error('Pi SDK not loaded');
       }
 
-      // Initialize Pi SDK with mainnet mode
-      if (window.Pi.init) {
-        await window.Pi.init({
-          version: "2.0",
-          sandbox: false, // Mainnet mode enabled
-          validationKey: piNetworkConfig.pi.validationKey
-        });
-        console.log('✅ Pi Payment Service initialized for mainnet mode with API key:', piNetworkConfig.pi.apiKey);
+      // Initialize Pi SDK using the centralized initPi function
+      const initSuccess = initPi({
+        version: "2.0",
+        sandbox: false, // Mainnet mode enabled
+      });
+      
+      if (!initSuccess) {
+        throw new Error('Failed to initialize Pi SDK');
       }
+      
+      console.log('✅ Pi Payment Service initialized for mainnet mode with API key:', piNetworkConfig.pi.apiKey);
 
       this.isInitialized = true;
     } catch (error) {
