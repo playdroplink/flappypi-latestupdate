@@ -33,7 +33,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import PaymentDebugger from '../components/PaymentDebugger';
 import ProfileImageModal from '../components/ProfileImageModal';
 import { inventoryService } from '@/services/inventoryService';
-import PiSignInButton from '../components/PiSignInButton';
 import PiPaymentShop from '../components/PiPaymentShop';
 
 import { useUserProfile } from '../hooks/useUserProfile';
@@ -1302,21 +1301,6 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
             <div className="text-center mb-4 welcome-message">
               <p className={theme === 'night' ? 'text-white/90 text-sm' : 'text-blue-800 text-sm'}>Welcome back, {userDisplay.username}! 🎉</p>
               <p className={theme === 'night' ? 'text-white/70 text-xs' : 'text-gray-700 text-xs'}>Pi Network authenticated</p>
-            </div>
-          )}
-
-          {/* Pi Sign In Button for non-authenticated users */}
-          {!userDisplay.isPiAuth && (
-            <div className="mb-4">
-              <PiSignInButton 
-                onAuthSuccess={(user) => {
-                  console.log('✅ User signed in:', user);
-                  setAuthUpdateTrigger(prev => prev + 1);
-                }}
-                onAuthError={(error) => {
-                  console.error('❌ Sign in error:', error);
-                }}
-              />
             </div>
           )}
           
