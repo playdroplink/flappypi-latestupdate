@@ -401,7 +401,7 @@ CREATE POLICY "Users can view public ghost runs" ON ghost_runs
   FOR SELECT USING (is_public = true);
 
 CREATE POLICY "Users can manage their own ghost runs" ON ghost_runs
-  FOR ALL USING (user_id = auth.uid()::text::text OR is_anonymous = true);
+  FOR ALL USING (user_id = auth.uid()::text::text);
 
 -- Create RLS policies for duels
 CREATE POLICY "Users can view duels they're involved in" ON duels
