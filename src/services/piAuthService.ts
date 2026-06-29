@@ -1,5 +1,5 @@
 // Pi Network Authentication Service
-// Based on the comprehensive Pi Network Payment Integration Guide
+// Based on official Pi SDK documentation: https://pi-apps.github.io/pi-sdk-docs/quick-start/genai/Authentication
 
 import { piNetworkConfig } from '../config/piNetworkConfig';
 
@@ -16,11 +16,18 @@ export interface User {
   username: string;
 }
 
+export interface BackendAuthResponse {
+  success: boolean;
+  user?: User;
+  error?: string;
+}
+
 class PiAuthService {
   private static instance: PiAuthService;
   private currentUser: User | null = null;
   private authToken: string | null = null;
   private isInitialized = false;
+  private autoAuthAttempted = false;
 
   static getInstance(): PiAuthService {
     if (!PiAuthService.instance) {
@@ -59,7 +66,39 @@ class PiAuthService {
     }
   }
 
-  // Main authentication method
+  // Validate access token with backend using Pi Network API
+  private async validateTokenWithBackend(accessToken: string): Promise<BackendAuthResponse> {
+    try {
+      console.log('🔐 Validating access token with backend...');
+      
+      // Call backend to validate token via Pi Network API
+      const response = await fetch('/api/auth/validate-pi-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ accessToken })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Backend validation failed: ${response.statusText}`);
+      }
+
+      const result: BackendAuthResponse = await response.json();
+      
+      if (result.success && result.user) {
+        console.log('✅ Token validated successfully:', result.user);
+        return result;
+      } else {
+        throw new Error(result.error || 'Token validation failed');
+      }
+    } catch (error) {
+      console.error('❌ Backend token validation error:', error);
+      throw error;
+    }
+  }
+
+  // Main authentication method following official Pi SDK flow
   async authenticateUser(): Promise<User> {
     await this.initializeAuth();
 
@@ -71,33 +110,33 @@ class PiAuthService {
         throw new Error('Pi SDK is not available. Please ensure you are using Pi Browser.');
       }
 
-      // Initialize Pi SDK for mainnet
-      if (window.Pi.init) {
-        window.Pi.init({ 
-          version: "2.0",
-          sandbox: false, // Mainnet mode
-          environment: 'mainnet'
-        });
-      }
+      // Initialize Pi SDK - treat as Promise and await fully
+      console.log('🔄 Initializing Pi SDK...');
+      await window.Pi.init({ 
+        version: "2.0",
+        sandbox: piNetworkConfig.pi.sandbox,
+        environment: piNetworkConfig.pi.environment
+      });
+      console.log('✅ Pi SDK initialized successfully');
 
-      // Authenticate user with payments and username scopes
-      const scopes = ['payments', 'username'];
+      // Authenticate with username scope only (per official spec)
+      const scopes = ['username'];
       console.log('🚀 Calling Pi.authenticate with scopes:', scopes);
       
-      // Store scopes for later validation
-      localStorage.setItem('pi_requested_scopes', JSON.stringify(scopes));
+      const authResult: AuthResult = await window.Pi.authenticate(scopes);
       
-      const authResult: AuthResult = await window.Pi.authenticate(scopes, this.onIncompletePaymentFound);
+      console.log('✅ Pi authentication successful, received access token');
       
-      console.log('✅ Pi authentication successful:', authResult);
+      // Validate access token with backend before establishing session
+      const backendValidation = await this.validateTokenWithBackend(authResult.accessToken);
       
-      // Store user data
-      this.currentUser = authResult.user;
+      // Store validated user data
+      this.currentUser = backendValidation.user!;
       this.authToken = authResult.accessToken;
       
       // Save to localStorage with timestamp
       const userData = {
-        user: authResult.user,
+        user: backendValidation.user,
         token: authResult.accessToken,
         scopes: scopes,
         timestamp: Date.now()
@@ -107,13 +146,44 @@ class PiAuthService {
       
       // Dispatch custom event for UI updates
       window.dispatchEvent(new CustomEvent('piUserAuthenticated', {
-        detail: { user: authResult.user }
+        detail: { user: backendValidation.user }
       }));
       
-      return authResult.user;
+      return backendValidation.user;
     } catch (error: any) {
       console.error('❌ Pi authentication failed:', error);
+      
+      // Clear potentially corrupted data
+      this.currentUser = null;
+      this.authToken = null;
+      localStorage.removeItem('pi_user_data');
+      localStorage.removeItem('pi_requested_scopes');
+      
       throw error;
+    }
+  }
+
+  // Auto-trigger authentication on app load
+  async autoAuthenticate(): Promise<User | null> {
+    if (this.autoAuthAttempted) {
+      return this.currentUser;
+    }
+    
+    this.autoAuthAttempted = true;
+    
+    try {
+      // Check if already authenticated from cache
+      if (this.isAuthenticated()) {
+        console.log('✅ User already authenticated from cache');
+        return this.currentUser;
+      }
+      
+      // Attempt automatic authentication
+      console.log('🔄 Attempting automatic authentication...');
+      return await this.authenticateUser();
+    } catch (error) {
+      console.warn('⚠️ Automatic authentication failed, user needs to sign in manually:', error);
+      return null;
     }
   }
 
@@ -155,6 +225,21 @@ class PiAuthService {
       }
     } catch (error) {
       console.error('❌ Error checking requested scopes:', error);
+      // Don't return false here - let the fallback logic handle it
+    }
+
+    // Additional fallback: check current user data for scope information
+    try {
+      const userData = localStorage.getItem('pi_user_data');
+      if (userData) {
+        const parsed = JSON.parse(userData);
+        if (parsed.scopes && parsed.scopes.includes('payments')) {
+          console.log('✅ PiAuthService - Payments scope found in user data');
+          return true;
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error checking user data scopes:', error);
     }
 
     return false;
@@ -162,7 +247,7 @@ class PiAuthService {
 
   // Force re-authentication to get new scopes
   async forceReAuthentication(): Promise<any> {
-    console.log('🔄 Forcing re-authentication to get payments scope...');
+    console.log('🔄 Forcing re-authentication...');
     
     // Clear current authentication
     this.signOut();
@@ -171,28 +256,20 @@ class PiAuthService {
     localStorage.removeItem('pi_user_data');
     sessionStorage.removeItem('pi_user_data');
     
+    // Reset auto-auth flag
+    this.autoAuthAttempted = false;
+    
     // Wait for cleanup
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     // Re-authenticate
     try {
       const result = await this.authenticateUser();
-      
-      if (!this.hasPaymentsScope()) {
-        console.warn('⚠️ Re-authentication completed but payments scope still not available');
-        if (piNetworkConfig.pi.sandbox) {
-          console.log('🔧 Sandbox mode: Continuing without strict scope validation');
-          return result;
-        } else {
-          throw new Error('Payments scope not obtained after re-authentication.');
-        }
-      }
-      
-      console.log('✅ Re-authentication successful with payments scope');
+      console.log('✅ Re-authentication successful');
       return result;
     } catch (error) {
       console.error('❌ Re-authentication failed:', error);
-      throw new Error('Failed to re-authenticate with payments scope.');
+      throw new Error('Failed to re-authenticate.');
     }
   }
 
@@ -204,20 +281,23 @@ class PiAuthService {
     return null;
   }
 
+  // Get access token
+  getAccessToken(): string | null {
+    return this.authToken;
+  }
+
   // Sign out
   signOut(): void {
     this.currentUser = null;
     this.authToken = null;
+    this.autoAuthAttempted = false;
     localStorage.removeItem('pi_user_data');
     sessionStorage.removeItem('pi_user_data');
     localStorage.removeItem('pi_requested_scopes');
+    
+    // Dispatch sign out event
+    window.dispatchEvent(new CustomEvent('piUserSignedOut'));
   }
-
-  // Handle incomplete payments
-  private onIncompletePaymentFound = (payment: any) => {
-    console.log('Incomplete payment found:', payment);
-    return Promise.resolve();
-  };
 }
 
 export const piAuthService = new PiAuthService();

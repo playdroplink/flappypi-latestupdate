@@ -173,6 +173,7 @@ import { autoSyncPiData } from './utils/piNetworkUtils';
 import PiSDKTest from './components/PiSDKTest';
 import PiConsentInfo from './components/PiConsentInfo';
 import PiSDKInitializer from './components/PiSDKInitializer';
+import PiSignInButton from './components/PiSignInButton';
 // import PiAutoSignIn from './components/PiAutoSignIn'; // Removed - manual sign-in only
 
 

@@ -1,0 +1,7 @@
+{
+  "name": "validate-pi-token",
+  "version": "1.0.0",
+  "description": "Validates Pi Network access tokens and establishes user sessions",
+  "main": "index.ts",
+  "type": "module"
+}

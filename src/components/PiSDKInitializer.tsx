@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { piAuthService } from '../services/piAuthService';
 
 interface PiSDKInitializerProps {
   children: React.ReactNode;
@@ -7,6 +8,7 @@ interface PiSDKInitializerProps {
 const PiSDKInitializer: React.FC<PiSDKInitializerProps> = ({ children }) => {
   const [sdkReady, setSdkReady] = useState(false);
   const [initAttempted, setInitAttempted] = useState(false);
+  const [autoAuthAttempted, setAutoAuthAttempted] = useState(false);
 
   useEffect(() => {
     const initializePiSDK = async () => {
@@ -49,6 +51,24 @@ const PiSDKInitializer: React.FC<PiSDKInitializerProps> = ({ children }) => {
       }
     };
 
+    // Auto-trigger authentication after SDK is ready
+    const autoAuthenticate = async () => {
+      if (autoAuthAttempted || !sdkReady) return;
+      setAutoAuthAttempted(true);
+
+      try {
+        console.log('🔄 Attempting automatic Pi authentication...');
+        const user = await piAuthService.autoAuthenticate();
+        if (user) {
+          console.log('✅ Automatic authentication successful:', user.username);
+        } else {
+          console.log('ℹ️ Automatic authentication failed or skipped, user can sign in manually');
+        }
+      } catch (error) {
+        console.warn('⚠️ Automatic authentication error:', error);
+      }
+    };
+
     // Initialize immediately
     initializePiSDK();
 
@@ -60,10 +80,15 @@ const PiSDKInitializer: React.FC<PiSDKInitializerProps> = ({ children }) => {
 
     window.addEventListener('pi-sdk-ready', handleSDKReady);
 
+    // Attempt auto-authentication when SDK is ready
+    if (sdkReady) {
+      autoAuthenticate();
+    }
+
     return () => {
       window.removeEventListener('pi-sdk-ready', handleSDKReady);
     };
-  }, [initAttempted]);
+  }, [initAttempted, sdkReady, autoAuthAttempted]);
 
   // Always render children - don't block the app
   return <>{children}</>;

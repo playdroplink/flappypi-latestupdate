@@ -57,8 +57,13 @@ export class PiAdsService {
       }
 
       // Check if ad network is supported
-      const nativeFeatures = await window.Pi.nativeFeaturesList();
-      this.adNetworkSupported = nativeFeatures.includes('ad_network');
+      try {
+        const nativeFeatures = await window.Pi.nativeFeaturesList();
+        this.adNetworkSupported = nativeFeatures.includes('ad_network');
+      } catch (featureError) {
+        console.warn('⚠️ Could not check native features, assuming ad network support:', featureError);
+        this.adNetworkSupported = true;
+      }
       
       if (!this.adNetworkSupported) {
         console.warn('⚠️ Ad network not supported on this Pi Browser version');
@@ -79,6 +84,23 @@ export class PiAdsService {
    */
   setAuthenticationStatus(isAuthenticated: boolean) {
     this.isAuthenticated = isAuthenticated;
+    console.log(`🔐 Pi Ads service authentication status updated: ${isAuthenticated}`);
+  }
+
+  /**
+   * Check authentication status from Pi SDK
+   */
+  private checkAuthenticationStatus(): boolean {
+    try {
+      if (typeof window !== 'undefined' && window.Pi && window.Pi.currentUser) {
+        const user = window.Pi.currentUser();
+        return user !== null && user !== undefined;
+      }
+      return false;
+    } catch (error) {
+      console.warn('⚠️ Could not check authentication status:', error);
+      return false;
+    }
   }
 
   /**
@@ -114,6 +136,11 @@ export class PiAdsService {
     try {
       if (!this.isInitialized) {
         await this.initialize();
+      }
+
+      // Auto-check authentication status
+      if (!this.isAuthenticated) {
+        this.isAuthenticated = this.checkAuthenticationStatus();
       }
 
       if (!this.isAuthenticated) {
@@ -219,6 +246,11 @@ export class PiAdsService {
         await this.initialize();
       }
 
+      // Auto-check authentication status
+      if (!this.isAuthenticated) {
+        this.isAuthenticated = this.checkAuthenticationStatus();
+      }
+
       if (!this.isAuthenticated) {
         console.warn('⚠️ User must be authenticated for rewarded ads');
         return {
@@ -317,7 +349,22 @@ export class PiAdsService {
       return status;
     } catch (error) {
       console.error('❌ Failed to verify rewarded ad status:', error);
-      throw error;
+      // Return a default status indicating verification failure
+      return {
+        identifier: adId,
+        mediator_ack_status: 'failed',
+        mediator_granted_at: null,
+        mediator_revoked_at: null,
+        transaction: null,
+        status: {
+          created_at: null,
+          updated_at: null,
+          blocked: false,
+          cancelled: false,
+          user_cancelled: false,
+          completed: false
+        }
+      };
     }
   }
 

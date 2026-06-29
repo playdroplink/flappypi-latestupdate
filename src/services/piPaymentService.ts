@@ -68,7 +68,11 @@ class PiPaymentService {
       }
 
       // Auto-clear any incomplete/pending payments to unblock new payments
-      await this.clearIncompletePayments();
+      try {
+        await this.clearIncompletePayments();
+      } catch (clearError) {
+        console.warn('⚠️ Failed to clear incomplete payments, continuing anyway:', clearError);
+      }
 
       // For production mode, skip scope validation
       if (piNetworkConfig.pi.productionMode && !piNetworkConfig.pi.sandbox) {
@@ -284,7 +288,10 @@ class PiPaymentService {
           // Cancel all payments with individual error handling
           const cancelPromises = payments.map(async (p) => {
             const paymentId = p?.identifier || p?.payment_id || p?.paymentId || p?.id;
-            if (!paymentId) return null;
+            if (!paymentId) {
+              console.warn('⚠️ Payment missing ID field:', p);
+              return null;
+            }
             
             try {
               const cancelRes = await fetch('/api/payments/cancel', {
@@ -326,6 +333,7 @@ class PiPaymentService {
       console.warn('⚠️ All retry attempts exhausted for clearing incomplete payments');
     } catch (err) {
       console.error('❌ Critical error in clearIncompletePayments:', err);
+      // Don't throw - allow payment to proceed even if clearing fails
     }
   }
 
