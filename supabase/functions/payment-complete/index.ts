@@ -159,7 +159,7 @@ async function deliverGameLives(supabaseAdmin: any, userId: string, product: any
   const lives = product.metadata?.lives || 1;
   console.log('💖 Delivering', lives, 'game lives to user:', userId);
 
-  // Update user's game lives in database
+  // Add game lives to user's inventory
   const { error } = await supabaseAdmin
     .from('user_inventory')
     .upsert({

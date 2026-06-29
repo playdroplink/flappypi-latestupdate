@@ -80,6 +80,233 @@ GRANT ALL ON public_scores TO anon;
 GRANT USAGE ON SEQUENCE public_scores_id_seq TO authenticated;
 GRANT USAGE ON SEQUENCE public_scores_id_seq TO anon; 
 
+-- ===== RESERVE AND CONNECT FLAPPY SCHEMA =====
+
+-- Create user_reserves table for username reservations
+CREATE TABLE IF NOT EXISTS user_reserves (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  username TEXT NOT NULL UNIQUE,
+  pi_uid TEXT NOT NULL,
+  reserve_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for user_reserves
+CREATE INDEX IF NOT EXISTS idx_user_reserves_username ON user_reserves(username);
+CREATE INDEX IF NOT EXISTS idx_user_reserves_pi_uid ON user_reserves(pi_uid);
+CREATE INDEX IF NOT EXISTS idx_user_reserves_active ON user_reserves(is_active);
+
+-- Enable RLS on user_reserves
+ALTER TABLE user_reserves ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for user_reserves
+CREATE POLICY "Allow users to manage their own reserves" ON user_reserves
+  FOR ALL USING (pi_uid = auth.uid());
+
+-- Create user_profiles table for Flappy connections
+CREATE TABLE IF NOT EXISTS user_profiles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  username TEXT NOT NULL,
+  pi_uid TEXT NOT NULL UNIQUE,
+  is_connected BOOLEAN DEFAULT false,
+  is_reserved BOOLEAN DEFAULT false,
+  reserve_date TIMESTAMP WITH TIME ZONE,
+  connect_date TIMESTAMP WITH TIME ZONE,
+  connection_status TEXT DEFAULT 'pending',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for user_profiles
+CREATE INDEX IF NOT EXISTS idx_user_profiles_username ON user_profiles(username);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_pi_uid ON user_profiles(pi_uid);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_connected ON user_profiles(is_connected);
+CREATE INDEX IF NOT EXISTS idx_user_profiles_status ON user_profiles(connection_status);
+
+-- Enable RLS on user_profiles
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for user_profiles
+CREATE POLICY "Allow users to manage their own profiles" ON user_profiles
+  FOR ALL USING (pi_uid = auth.uid());
+
+-- Create game_states table for tracking game progress
+CREATE TABLE IF NOT EXISTS game_states (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id TEXT NOT NULL UNIQUE,
+  high_score INTEGER DEFAULT 0,
+  total_games INTEGER DEFAULT 0,
+  total_coins INTEGER DEFAULT 0,
+  current_streak INTEGER DEFAULT 0,
+  last_played TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for game_states
+CREATE INDEX IF NOT EXISTS idx_game_states_user_id ON game_states(user_id);
+CREATE INDEX IF NOT EXISTS idx_game_states_high_score ON game_states(high_score DESC);
+CREATE INDEX IF NOT EXISTS idx_game_states_last_played ON game_states(last_played DESC);
+
+-- Enable RLS on game_states
+ALTER TABLE game_states ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for game_states
+CREATE POLICY "Allow users to manage their own game states" ON game_states
+  FOR ALL USING (user_id = auth.uid());
+
+-- Create trigger to automatically update updated_at on user_profiles
+CREATE TRIGGER update_user_profiles_updated_at 
+  BEFORE UPDATE ON user_profiles 
+  FOR EACH ROW 
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- Create trigger to automatically update updated_at on game_states
+CREATE TRIGGER update_game_states_updated_at 
+  BEFORE UPDATE ON game_states 
+  FOR EACH ROW 
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- Grant permissions for new tables
+GRANT ALL ON user_reserves TO authenticated;
+GRANT ALL ON user_reserves TO anon;
+GRANT USAGE ON SEQUENCE user_reserves_id_seq TO authenticated;
+GRANT USAGE ON SEQUENCE user_reserves_id_seq TO anon;
+
+GRANT ALL ON user_profiles TO authenticated;
+GRANT ALL ON user_profiles TO anon;
+GRANT USAGE ON SEQUENCE user_profiles_id_seq TO authenticated;
+GRANT USAGE ON SEQUENCE user_profiles_id_seq TO anon;
+
+GRANT ALL ON game_states TO authenticated;
+GRANT ALL ON game_states TO anon;
+GRANT USAGE ON SEQUENCE game_states_id_seq TO authenticated;
+GRANT USAGE ON SEQUENCE game_states_id_seq TO anon;
+
+-- ===== PAYMENT SHOP INVENTORY SCHEMA =====
+
+-- Create user_inventory table for items purchased via payment shop
+CREATE TABLE IF NOT EXISTS user_inventory (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id TEXT NOT NULL,
+  item_type TEXT NOT NULL, -- 'game_lives', 'premium_skin', 'subscription', 'coins'
+  item_id TEXT,
+  quantity INTEGER DEFAULT 1,
+  rarity TEXT DEFAULT 'common',
+  payment_id TEXT,
+  txid TEXT,
+  acquired_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for user_inventory
+CREATE INDEX IF NOT EXISTS idx_user_inventory_user_id ON user_inventory(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_inventory_item_type ON user_inventory(item_type);
+CREATE INDEX IF NOT EXISTS idx_user_inventory_item_id ON user_inventory(item_id);
+
+-- Enable RLS on user_inventory
+ALTER TABLE user_inventory ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for user_inventory
+CREATE POLICY "Allow users to manage their own inventory" ON user_inventory
+  FOR ALL USING (user_id = auth.uid());
+
+-- Create user_subscriptions table for subscription management
+CREATE TABLE IF NOT EXISTS user_subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id TEXT NOT NULL UNIQUE,
+  plan_type TEXT NOT NULL, -- 'monthly', 'yearly'
+  start_date TIMESTAMP WITH TIME ZONE NOT NULL,
+  end_date TIMESTAMP WITH TIME ZONE NOT NULL,
+  payment_id TEXT,
+  txid TEXT,
+  status TEXT DEFAULT 'active', -- 'active', 'expired', 'cancelled'
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for user_subscriptions
+CREATE INDEX IF NOT EXISTS idx_user_subscriptions_user_id ON user_subscriptions(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_subscriptions_status ON user_subscriptions(status);
+CREATE INDEX IF NOT EXISTS idx_user_subscriptions_end_date ON user_subscriptions(end_date);
+
+-- Enable RLS on user_subscriptions
+ALTER TABLE user_subscriptions ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for user_subscriptions
+CREATE POLICY "Allow users to manage their own subscriptions" ON user_subscriptions
+  FOR ALL USING (user_id = auth.uid());
+
+-- Create user_wallets table for coin balance management
+CREATE TABLE IF NOT EXISTS user_wallets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id TEXT NOT NULL UNIQUE,
+  coin_balance INTEGER DEFAULT 0,
+  last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for user_wallets
+CREATE INDEX IF NOT EXISTS idx_user_wallets_user_id ON user_wallets(user_id);
+
+-- Enable RLS on user_wallets
+ALTER TABLE user_wallets ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for user_wallets
+CREATE POLICY "Allow users to manage their own wallets" ON user_wallets
+  FOR ALL USING (user_id = auth.uid());
+
+-- Create coin_transactions table for transaction history
+CREATE TABLE IF NOT EXISTS coin_transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id TEXT NOT NULL,
+  amount INTEGER NOT NULL,
+  transaction_type TEXT NOT NULL, -- 'purchase', 'reward', 'spend'
+  payment_id TEXT,
+  txid TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for coin_transactions
+CREATE INDEX IF NOT EXISTS idx_coin_transactions_user_id ON coin_transactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_coin_transactions_type ON coin_transactions(transaction_type);
+CREATE INDEX IF NOT EXISTS idx_coin_transactions_created_at ON coin_transactions(created_at DESC);
+
+-- Enable RLS on coin_transactions
+ALTER TABLE coin_transactions ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for coin_transactions
+CREATE POLICY "Allow users to view their own transactions" ON coin_transactions
+  FOR SELECT USING (user_id = auth.uid());
+
+-- Create trigger to automatically update updated_at on user_subscriptions
+CREATE TRIGGER update_user_subscriptions_updated_at 
+  BEFORE UPDATE ON user_subscriptions 
+  FOR EACH ROW 
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- Grant permissions for payment shop tables
+GRANT ALL ON user_inventory TO authenticated;
+GRANT ALL ON user_inventory TO anon;
+GRANT USAGE ON SEQUENCE user_inventory_id_seq TO authenticated;
+GRANT USAGE ON SEQUENCE user_inventory_id_seq TO anon;
+
+GRANT ALL ON user_subscriptions TO authenticated;
+GRANT ALL ON user_subscriptions TO anon;
+GRANT USAGE ON SEQUENCE user_subscriptions_id_seq TO authenticated;
+GRANT USAGE ON SEQUENCE user_subscriptions_id_seq TO anon;
+
+GRANT ALL ON user_wallets TO authenticated;
+GRANT ALL ON user_wallets TO anon;
+GRANT USAGE ON SEQUENCE user_wallets_id_seq TO authenticated;
+GRANT USAGE ON SEQUENCE user_wallets_id_seq TO anon;
+
+GRANT ALL ON coin_transactions TO authenticated;
+GRANT ALL ON coin_transactions TO anon;
+GRANT USAGE ON SEQUENCE coin_transactions_id_seq TO authenticated;
+GRANT USAGE ON SEQUENCE coin_transactions_id_seq TO anon; 
+
 -- ===== PvP DUEL SYSTEM SCHEMA =====
 
 -- Create ghost runs table to store recorded gameplay data

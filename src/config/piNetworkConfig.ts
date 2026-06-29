@@ -24,6 +24,19 @@ export const piNetworkConfig = {
     productionMode: true
   },
   
+  // Supabase Configuration
+  supabase: {
+    url: (typeof import.meta !== 'undefined' && (import.meta as any).env && (import.meta as any).env.VITE_SUPABASE_URL) 
+      || (typeof process !== 'undefined' && (process as any).env && (process as any).env.REACT_APP_SUPABASE_URL)
+      || 'https://xsjdvetxendwkgyftgqm.supabase.co',
+    anonKey: (typeof import.meta !== 'undefined' && (import.meta as any).env && (import.meta as any).env.VITE_SUPABASE_ANON_KEY) 
+      || (typeof process !== 'undefined' && (process as any).env && (process as any).env.REACT_APP_SUPABASE_ANON_KEY)
+      || 'sb_publishable__tplW4KcOpKUCL8BLBAyyQ_W6gdRT-q',
+    serviceRoleKey: (typeof import.meta !== 'undefined' && (import.meta as any).env && (import.meta as any).env.VITE_SUPABASE_SERVICE_ROLE_KEY) 
+      || (typeof process !== 'undefined' && (process as any).env && (process as any).env.REACT_APP_SUPABASE_SERVICE_ROLE_KEY)
+      || 'sb_publishable__tplW4KcOpKUCL8BLBAyyQ_W6gdRT-q'
+  },
+  
   // Application Configuration
   app: {
     name: 'Flappy Pi',
