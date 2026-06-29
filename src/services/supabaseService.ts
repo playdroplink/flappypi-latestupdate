@@ -279,6 +279,358 @@ class SupabaseService {
       return []
     }
   }
+
+  // ===== REWARDS AND TRANSACTIONS =====
+
+  // Record user reward
+  async recordReward(
+    userId: string,
+    rewardType: string,
+    rewardAmount: number,
+    rewardItem: string,
+    adType?: string
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      console.log('🔄 Recording reward:', rewardType, 'for user:', userId)
+
+      const { error } = await supabase
+        .from('user_rewards')
+        .insert({
+          user_id: userId,
+          reward_type: rewardType,
+          reward_amount: rewardAmount,
+          reward_item: rewardItem,
+          ad_type: adType,
+          timestamp: new Date().toISOString()
+        })
+
+      if (error) {
+        console.error('❌ Error recording reward:', error)
+        return { success: false, error: error.message }
+      }
+
+      console.log('✅ Reward recorded successfully')
+      return { success: true }
+    } catch (error) {
+      console.error('❌ Record reward error:', error)
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    }
+  }
+
+  // Record transaction
+  async recordTransaction(
+    userId: string,
+    transactionType: string,
+    amount: number,
+    rewardType: string
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      console.log('🔄 Recording transaction:', transactionType, 'for user:', userId)
+
+      const { error } = await supabase
+        .from('reward_transactions')
+        .insert({
+          user_id: userId,
+          transaction_type: transactionType,
+          amount: amount,
+          reward_type: rewardType,
+          timestamp: new Date().toISOString()
+        })
+
+      if (error) {
+        console.error('❌ Error recording transaction:', error)
+        return { success: false, error: error.message }
+      }
+
+      console.log('✅ Transaction recorded successfully')
+      return { success: true }
+    } catch (error) {
+      console.error('❌ Record transaction error:', error)
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    }
+  }
+
+  // Get user rewards
+  async getUserRewards(userId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('user_rewards')
+        .select('*')
+        .eq('user_id', userId)
+        .order('timestamp', { ascending: false })
+
+      if (error) {
+        console.error('❌ Error fetching user rewards:', error)
+        return []
+      }
+
+      return data || []
+    } catch (error) {
+      console.error('❌ Get user rewards error:', error)
+      return []
+    }
+  }
+
+  // Get user transactions
+  async getUserTransactions(userId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('reward_transactions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('timestamp', { ascending: false })
+
+      if (error) {
+        console.error('❌ Error fetching user transactions:', error)
+        return []
+      }
+
+      return data || []
+    } catch (error) {
+      console.error('❌ Get user transactions error:', error)
+      return []
+    }
+  }
+
+  // ===== SCORES AND LEADERBOARD =====
+
+  // Submit game score
+  async submitScore(
+    userId: string,
+    username: string,
+    score: number,
+    gameMode: string,
+    gameData?: any
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      console.log('🔄 Submitting score:', score, 'for user:', userId, 'mode:', gameMode)
+
+      const { error } = await supabase
+        .from('game_scores')
+        .insert({
+          user_id: userId,
+          username: username,
+          score: score,
+          game_mode: gameMode,
+          game_data: gameData,
+          timestamp: new Date().toISOString()
+        })
+
+      if (error) {
+        console.error('❌ Error submitting score:', error)
+        return { success: false, error: error.message }
+      }
+
+      console.log('✅ Score submitted successfully')
+      return { success: true }
+    } catch (error) {
+      console.error('❌ Submit score error:', error)
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    }
+  }
+
+  // Get leaderboard scores
+  async getLeaderboardScores(
+    gameMode?: string,
+    limit: number = 10
+  ): Promise<any[]> {
+    try {
+      let query = supabase
+        .from('game_scores')
+        .select('*')
+        .order('score', { ascending: false })
+        .limit(limit)
+
+      if (gameMode) {
+        query = query.eq('game_mode', gameMode)
+      }
+
+      const { data, error } = await query
+
+      if (error) {
+        console.error('❌ Error fetching leaderboard scores:', error)
+        return []
+      }
+
+      return data || []
+    } catch (error) {
+      console.error('❌ Get leaderboard scores error:', error)
+      return []
+    }
+  }
+
+  // Get user scores
+  async getUserScores(userId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('game_scores')
+        .select('*')
+        .eq('user_id', userId)
+        .order('score', { ascending: false })
+
+      if (error) {
+        console.error('❌ Error fetching user scores:', error)
+        return []
+      }
+
+      return data || []
+    } catch (error) {
+      console.error('❌ Get user scores error:', error)
+      return []
+    }
+  }
+
+  // ===== SECURITY AND SESSIONS =====
+
+  // Record security violation
+  async recordSecurityViolation(
+    userId: string | null,
+    violationType: string,
+    details: any
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      console.log('🔄 Recording security violation:', violationType, 'for user:', userId)
+
+      const { error } = await supabase
+        .from('security_violations')
+        .insert({
+          user_id: userId,
+          violation_type: violationType,
+          details: details,
+          timestamp: new Date().toISOString()
+        })
+
+      if (error) {
+        console.error('❌ Error recording security violation:', error)
+        return { success: false, error: error.message }
+      }
+
+      console.log('✅ Security violation recorded successfully')
+      return { success: true }
+    } catch (error) {
+      console.error('❌ Record security violation error:', error)
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    }
+  }
+
+  // Get security violations
+  async getSecurityViolations(userId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('security_violations')
+        .select('*')
+        .eq('user_id', userId)
+        .order('timestamp', { ascending: false })
+
+      if (error) {
+        console.error('❌ Error fetching security violations:', error)
+        return []
+      }
+
+      return data || []
+    } catch (error) {
+      console.error('❌ Get security violations error:', error)
+      return []
+    }
+  }
+
+  // Create game session
+  async createGameSession(
+    userId: string,
+    sessionId: string,
+    gameMode: string,
+    sessionData: any
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      console.log('🔄 Creating game session:', sessionId, 'for user:', userId)
+
+      const { error } = await supabase
+        .from('game_sessions')
+        .insert({
+          user_id: userId,
+          session_id: sessionId,
+          game_mode: gameMode,
+          session_data: sessionData,
+          started_at: new Date().toISOString(),
+          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+        })
+
+      if (error) {
+        console.error('❌ Error creating game session:', error)
+        return { success: false, error: error.message }
+      }
+
+      console.log('✅ Game session created successfully')
+      return { success: true }
+    } catch (error) {
+      console.error('❌ Create game session error:', error)
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    }
+  }
+
+  // Get game session
+  async getGameSession(sessionId: string): Promise<any | null> {
+    try {
+      const { data, error } = await supabase
+        .from('game_sessions')
+        .select('*')
+        .eq('session_id', sessionId)
+        .single()
+
+      if (error || !data) {
+        console.error('❌ Error fetching game session:', error)
+        return null
+      }
+
+      return data
+    } catch (error) {
+      console.error('❌ Get game session error:', error)
+      return null
+    }
+  }
+
+  // Delete game session
+  async deleteGameSession(sessionId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('game_sessions')
+        .delete()
+        .eq('session_id', sessionId)
+
+      if (error) {
+        console.error('❌ Error deleting game session:', error)
+        return false
+      }
+
+      console.log('✅ Game session deleted successfully')
+      return true
+    } catch (error) {
+      console.error('❌ Delete game session error:', error)
+      return false
+    }
+  }
+
+  // Cleanup expired sessions
+  async cleanupExpiredSessions(): Promise<number> {
+    try {
+      const { data, error } = await supabase
+        .from('game_sessions')
+        .delete()
+        .lt('expires_at', new Date().toISOString())
+        .select()
+
+      if (error) {
+        console.error('❌ Error cleaning up expired sessions:', error)
+        return 0
+      }
+
+      console.log(`✅ Cleaned up ${data?.length || 0} expired sessions`)
+      return data?.length || 0
+    } catch (error) {
+      console.error('❌ Cleanup expired sessions error:', error)
+      return 0
+    }
+  }
 }
 
 export const supabaseService = SupabaseService.getInstance()

@@ -12,6 +12,7 @@ import {
   addExtraLife,
   addRouletteSpin
 } from '@/utils/rewardUtils';
+import { supabaseService } from './supabaseService';
 
 class RewardsService {
   // Removed DailyRewardStatus and related functions
@@ -57,22 +58,22 @@ class RewardsService {
       // Handle different reward types
       switch (adType) {
         case 'coins':
-          return this.grantCoinReward(username, rewardAmount);
+          return await this.grantCoinReward(username, rewardAmount);
           
         case 'continue':
         case 'revive':
-          return this.grantReviveReward(username);
+          return await this.grantReviveReward(username);
           
         case 'life':
         case 'extra_life':
-          return this.grantExtraLifeReward(username);
+          return await this.grantExtraLifeReward(username);
           
         case 'roulette_spin':
-          return this.grantRouletteSpinReward(username);
+          return await this.grantRouletteSpinReward(username);
           
         default:
           console.warn(`⚠️ Unknown ad type: ${adType}, defaulting to coins`);
-          return this.grantCoinReward(username, rewardAmount);
+          return await this.grantCoinReward(username, rewardAmount);
       }
       
     } catch (error) {
@@ -82,7 +83,7 @@ class RewardsService {
   }
 
   // Grant coin reward
-  private grantCoinReward(username: string, amount: number): AdRewardResult {
+  private async grantCoinReward(username: string, amount: number): Promise<AdRewardResult> {
     try {
       const currentBalance = loadWalletBalance(username);
       const newBalance = currentBalance + amount;
@@ -91,7 +92,10 @@ class RewardsService {
       saveWalletBalance(newBalance, username);
       
       // Record transaction
-      this.recordTransaction(username, 'ad_reward', amount, 'coins');
+      await this.recordTransaction(username, 'ad_reward', amount, 'coins');
+      
+      // Record reward in Supabase
+      await supabaseService.recordReward(username, 'ad_reward', amount, 'coins', 'coins');
       
       console.log(`✅ Coin reward granted: ${amount} coins, new balance: ${newBalance}`);
       
@@ -107,13 +111,16 @@ class RewardsService {
   }
 
   // Grant revive reward
-  private grantReviveReward(username: string): AdRewardResult {
+  private async grantReviveReward(username: string): Promise<AdRewardResult> {
     try {
       // Use the utility function to add revive
       addRevive(username, 1);
       
       // Record transaction
-      this.recordTransaction(username, 'ad_reward', 1, 'revive');
+      await this.recordTransaction(username, 'ad_reward', 1, 'revive');
+      
+      // Record reward in Supabase
+      await supabaseService.recordReward(username, 'ad_reward', 1, 'revive', 'revive');
       
       console.log(`✅ Revive reward granted for user: ${username}`);
       
@@ -129,13 +136,16 @@ class RewardsService {
   }
 
   // Grant extra life reward
-  private grantExtraLifeReward(username: string): AdRewardResult {
+  private async grantExtraLifeReward(username: string): Promise<AdRewardResult> {
     try {
       // Use the utility function to add extra life
       addExtraLife(username, 1);
       
       // Record transaction
-      this.recordTransaction(username, 'ad_reward', 1, 'extra_life');
+      await this.recordTransaction(username, 'ad_reward', 1, 'extra_life');
+      
+      // Record reward in Supabase
+      await supabaseService.recordReward(username, 'ad_reward', 1, 'extra_life', 'extra_life');
       
       console.log(`✅ Extra life reward granted for user: ${username}`);
       
@@ -151,13 +161,16 @@ class RewardsService {
   }
 
   // Grant roulette spin reward
-  private grantRouletteSpinReward(username: string): AdRewardResult {
+  private async grantRouletteSpinReward(username: string): Promise<AdRewardResult> {
     try {
       // Use the utility function to add roulette spin
       addRouletteSpin(username, 1);
       
       // Record transaction
-      this.recordTransaction(username, 'ad_reward', 1, 'roulette_spin');
+      await this.recordTransaction(username, 'ad_reward', 1, 'roulette_spin');
+      
+      // Record reward in Supabase
+      await supabaseService.recordReward(username, 'ad_reward', 1, 'roulette_spin', 'roulette_spin');
       
       console.log(`✅ Roulette spin reward granted for user: ${username}`);
       
@@ -173,8 +186,18 @@ class RewardsService {
   }
 
   // Record transaction for tracking
-  private recordTransaction(username: string, type: string, amount: number, rewardType: string) {
+  private async recordTransaction(username: string, type: string, amount: number, rewardType: string) {
     try {
+      // Try to record in Supabase first
+      const supabaseResult = await supabaseService.recordTransaction(username, type, amount, rewardType);
+      
+      if (supabaseResult.success) {
+        console.log(`📝 Transaction recorded in Supabase: ${type} - ${amount} ${rewardType}`);
+        return;
+      }
+      
+      // Fallback to localStorage if Supabase fails
+      console.warn('⚠️ Supabase transaction failed, using localStorage fallback');
       const transactions = this.loadTransactions(username);
       const transaction = {
         id: Date.now().toString(),
@@ -188,7 +211,7 @@ class RewardsService {
       transactions.push(transaction);
       this.saveTransactions(username, transactions);
       
-      console.log(`📝 Transaction recorded: ${type} - ${amount} ${rewardType}`);
+      console.log(`📝 Transaction recorded in localStorage: ${type} - ${amount} ${rewardType}`);
     } catch (error) {
       console.warn('⚠️ Failed to record transaction:', error);
     }

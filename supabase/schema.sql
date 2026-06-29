@@ -521,4 +521,156 @@ BEGIN
   
   RETURN TRUE;
 END;
-$$ LANGUAGE plpgsql; 
+$$ LANGUAGE plpgsql;
+
+-- ===== REWARDS AND TRANSACTIONS SCHEMA =====
+
+-- Create user_rewards table for tracking ad rewards and daily rewards
+CREATE TABLE IF NOT EXISTS user_rewards (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id TEXT NOT NULL,
+  reward_type TEXT NOT NULL, -- 'ad_reward', 'daily_reward', 'bonus'
+  reward_amount INTEGER NOT NULL,
+  reward_item TEXT, -- 'coins', 'revive', 'extra_life', 'roulette_spin'
+  ad_type TEXT, -- Type of ad watched
+  timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for user_rewards
+CREATE INDEX IF NOT EXISTS idx_user_rewards_user_id ON user_rewards(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_rewards_type ON user_rewards(reward_type);
+CREATE INDEX IF NOT EXISTS idx_user_rewards_timestamp ON user_rewards(timestamp DESC);
+
+-- Enable RLS on user_rewards
+ALTER TABLE user_rewards ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for user_rewards
+CREATE POLICY "Allow users to view their own rewards" ON user_rewards
+  FOR SELECT USING (user_id = auth.uid()::text);
+
+CREATE POLICY "Allow users to insert their own rewards" ON user_rewards
+  FOR INSERT WITH CHECK (user_id = auth.uid()::text);
+
+-- Create reward_transactions table for transaction history
+CREATE TABLE IF NOT EXISTS reward_transactions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id TEXT NOT NULL,
+  transaction_type TEXT NOT NULL, -- 'ad_reward', 'purchase', 'spend'
+  amount INTEGER NOT NULL,
+  reward_type TEXT, -- 'coins', 'revive', 'extra_life', 'roulette_spin'
+  timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for reward_transactions
+CREATE INDEX IF NOT EXISTS idx_reward_transactions_user_id ON reward_transactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_reward_transactions_type ON reward_transactions(transaction_type);
+CREATE INDEX IF NOT EXISTS idx_reward_transactions_timestamp ON reward_transactions(timestamp DESC);
+
+-- Enable RLS on reward_transactions
+ALTER TABLE reward_transactions ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for reward_transactions
+CREATE POLICY "Allow users to view their own transactions" ON reward_transactions
+  FOR SELECT USING (user_id = auth.uid()::text);
+
+CREATE POLICY "Allow users to insert their own transactions" ON reward_transactions
+  FOR INSERT WITH CHECK (user_id = auth.uid()::text);
+
+-- ===== SCORES AND LEADERBOARD SCHEMA =====
+
+-- Create game_scores table for leaderboard
+CREATE TABLE IF NOT EXISTS game_scores (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id TEXT NOT NULL,
+  username TEXT NOT NULL,
+  score INTEGER NOT NULL,
+  game_mode TEXT NOT NULL, -- 'classic', 'endless', 'screampi', 'dinopi', 'challenge', 'flappy-stack', 'night-mode'
+  game_data JSONB, -- Additional game-specific data
+  timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for game_scores
+CREATE INDEX IF NOT EXISTS idx_game_scores_user_id ON game_scores(user_id);
+CREATE INDEX IF NOT EXISTS idx_game_scores_score ON game_scores(score DESC);
+CREATE INDEX IF NOT EXISTS idx_game_scores_game_mode ON game_scores(game_mode);
+CREATE INDEX IF NOT EXISTS idx_game_scores_timestamp ON game_scores(timestamp DESC);
+
+-- Enable RLS on game_scores
+ALTER TABLE game_scores ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for game_scores
+CREATE POLICY "Allow users to view all scores" ON game_scores
+  FOR SELECT USING (true);
+
+CREATE POLICY "Allow users to insert their own scores" ON game_scores
+  FOR INSERT WITH CHECK (user_id = auth.uid()::text);
+
+-- ===== SECURITY AND SESSIONS SCHEMA =====
+
+-- Create security_violations table for tracking security events
+CREATE TABLE IF NOT EXISTS security_violations (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id TEXT,
+  violation_type TEXT NOT NULL,
+  details JSONB,
+  timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for security_violations
+CREATE INDEX IF NOT EXISTS idx_security_violations_user_id ON security_violations(user_id);
+CREATE INDEX IF NOT EXISTS idx_security_violations_type ON security_violations(violation_type);
+CREATE INDEX IF NOT EXISTS idx_security_violations_timestamp ON security_violations(timestamp DESC);
+
+-- Enable RLS on security_violations
+ALTER TABLE security_violations ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for security_violations
+CREATE POLICY "Allow users to view their own violations" ON security_violations
+  FOR SELECT USING (user_id = auth.uid()::text);
+
+CREATE POLICY "Allow users to insert their own violations" ON security_violations
+  FOR INSERT WITH CHECK (user_id = auth.uid()::text);
+
+-- Create game_sessions table for tracking active game sessions
+CREATE TABLE IF NOT EXISTS game_sessions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id TEXT NOT NULL,
+  session_id TEXT NOT NULL UNIQUE,
+  game_mode TEXT NOT NULL,
+  session_data JSONB,
+  started_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  expires_at TIMESTAMP WITH TIME ZONE DEFAULT (NOW() + INTERVAL '24 hours'),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for game_sessions
+CREATE INDEX IF NOT EXISTS idx_game_sessions_user_id ON game_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_game_sessions_session_id ON game_sessions(session_id);
+CREATE INDEX IF NOT EXISTS idx_game_sessions_expires_at ON game_sessions(expires_at);
+
+-- Enable RLS on game_sessions
+ALTER TABLE game_sessions ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for game_sessions
+CREATE POLICY "Allow users to manage their own sessions" ON game_sessions
+  FOR ALL USING (user_id = auth.uid()::text);
+
+-- Grant permissions for new tables
+GRANT ALL ON user_rewards TO authenticated;
+GRANT ALL ON user_rewards TO anon;
+
+GRANT ALL ON reward_transactions TO authenticated;
+GRANT ALL ON reward_transactions TO anon;
+
+GRANT ALL ON game_scores TO authenticated;
+GRANT ALL ON game_scores TO anon;
+
+GRANT ALL ON security_violations TO authenticated;
+GRANT ALL ON security_violations TO anon;
+
+GRANT ALL ON game_sessions TO authenticated;
+GRANT ALL ON game_sessions TO anon; 
