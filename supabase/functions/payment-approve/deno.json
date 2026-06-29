@@ -1,0 +1,7 @@
+{
+  "name": "payment-approve",
+  "version": "1.0.0",
+  "description": "Approves Pi Network payments by calling Pi Network API",
+  "main": "index.ts",
+  "type": "module"
+}

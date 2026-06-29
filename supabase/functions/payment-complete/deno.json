@@ -1,0 +1,7 @@
+{
+  "name": "payment-complete",
+  "version": "1.0.0",
+  "description": "Completes Pi Network payments and delivers products to users",
+  "main": "index.ts",
+  "type": "module"
+}

@@ -34,6 +34,7 @@ import PaymentDebugger from '../components/PaymentDebugger';
 import ProfileImageModal from '../components/ProfileImageModal';
 import { inventoryService } from '@/services/inventoryService';
 import PiSignInButton from '../components/PiSignInButton';
+import PiPaymentShop from '../components/PiPaymentShop';
 
 import { useUserProfile } from '../hooks/useUserProfile';
 import { useGameEquipment } from '../hooks/useGameEquipment';
@@ -90,6 +91,7 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
   // Notification state (moved from top-level)
   const [showAnnouncement, setShowAnnouncement] = useState(false);
   const [announcementRead, setAnnouncementRead] = useState(() => localStorage.getItem('flappypi-announcement-read') === 'true');
+  const [showPaymentShop, setShowPaymentShop] = useState(false);
 
   // Example announcement (replace with dynamic fetch if needed)
   const importantAnnouncement = {
@@ -1183,6 +1185,16 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
                                                   <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse" />
                                                 )}
                                               </button>
+                                              {/* Payment Shop Button */}
+                                              {isPiAuth && (
+                                                <button
+                                                  className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white py-2 px-3 rounded-lg transition-colors font-medium text-sm"
+                                                  onClick={() => setShowPaymentShop(true)}
+                                                  aria-label="Payment Shop"
+                                                >
+                                                  🛒 Shop
+                                                </button>
+                                              )}
                                               <button
                                                 className={`${theme === 'night' ? 'bg-gray-800 hover:bg-gray-700 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'} rounded-full p-3 transition-all duration-200 hover:scale-105 shadow-md`}
                                                 onClick={() => navigateToPublic('/profile')}
@@ -1732,6 +1744,21 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Payment Shop Modal */}
+      <Dialog open={showPaymentShop} onOpenChange={setShowPaymentShop}>
+        <DialogContent className="max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white p-0">
+          <DialogHeader className="bg-gradient-to-r from-purple-500 to-blue-500 px-8 pt-8 pb-4 flex flex-col items-center">
+            <DialogTitle className="text-white text-2xl font-bold">🛒 Pi Payment Shop</DialogTitle>
+            <DialogDescription className="text-white/80">
+              Purchase game lives, premium skins, subscriptions, and coins with Pi
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-6">
+            <PiPaymentShop />
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Dev Redeem Modal */}
       <Dialog open={showDevRedeem} onOpenChange={setShowDevRedeem}>

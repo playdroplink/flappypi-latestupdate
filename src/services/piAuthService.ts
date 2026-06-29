@@ -119,11 +119,12 @@ class PiAuthService {
       });
       console.log('✅ Pi SDK initialized successfully');
 
-      // Authenticate with username scope only (per official spec)
-      const scopes = ['username'];
+      // Authenticate with username and payments scopes
+      const scopes = ['username', 'payments'];
       console.log('🚀 Calling Pi.authenticate with scopes:', scopes);
       
-      const authResult: AuthResult = await window.Pi.authenticate(scopes);
+      // Provide incomplete payment callback
+      const authResult: AuthResult = await window.Pi.authenticate(scopes, this.onIncompletePaymentFound);
       
       console.log('✅ Pi authentication successful, received access token');
       
@@ -298,6 +299,33 @@ class PiAuthService {
     // Dispatch sign out event
     window.dispatchEvent(new CustomEvent('piUserSignedOut'));
   }
+
+  // Handle incomplete payments
+  private onIncompletePaymentFound = async (payment: any) => {
+    console.log('🔄 Incomplete payment found during authentication:', payment);
+    
+    try {
+      // Complete the in-flight payment via backend
+      const paymentId = payment.identifier || payment.payment_id || payment.id;
+      if (paymentId) {
+        const response = await fetch('/api/payments/complete-incomplete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ paymentId })
+        });
+
+        if (response.ok) {
+          console.log('✅ Incomplete payment completed:', paymentId);
+        } else {
+          console.warn('⚠️ Failed to complete incomplete payment:', paymentId);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error handling incomplete payment:', error);
+    }
+  };
 }
 
 export const piAuthService = new PiAuthService();
