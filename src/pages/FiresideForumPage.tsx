@@ -74,7 +74,7 @@ const FiresideForumPage: React.FC = () => {
 🏆 Share your scores, discuss strategies, and connect with other Pi Network gamers.
 
 📍 fireside.pinet.com/channels/FlappyPiChallenge
-🌐 Play Flappy Pi: https://flappypi.fun/flappypiofficial
+🌐 Play Flappy Pi: https://www.flappypi.xyz/flappypiofficial
 
 #FlappyPi #PiNetwork #FlappyPiChallenge #PiGaming`;
 

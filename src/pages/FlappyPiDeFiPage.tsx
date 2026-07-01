@@ -403,7 +403,7 @@ const FlappyPiDeFiPage: React.FC<FlappyPiDeFiPageProps> = ({ musicEnabled, setMu
                     Read Whitepaper
                   </Button>
                   <Button
-                    onClick={() => window.open('mailto:support@flappypi.fun', '_blank')}
+                    onClick={() => window.open('mailto:support@www.flappypi.xyz', '_blank')}
                     variant="outline"
                     size="lg"
                     className="bg-white/20 border-2 border-white/30 text-white hover:bg-white/30 hover:border-white/50 font-bold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-200"

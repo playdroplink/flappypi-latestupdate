@@ -28,8 +28,8 @@ export class SecurityService {
   // Check if the current origin is allowed
   checkOrigin(): boolean {
     const allowedOrigins = [
-      'https://www.flappypi.fun',
-      'https://flappypi.fun',
+      'https://www.flappypi.xyz',
+      'https://flappypi.xyz',
       '/',
       'https://localhost:5173'
     ];

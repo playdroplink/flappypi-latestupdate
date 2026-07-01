@@ -29,7 +29,7 @@ const PrivacyPolicyPage: React.FC = () => {
           <p><b>5. Security:</b> We use industry-standard security measures to protect your data. However, no system is 100% secure.</p>
           <p><b>6. Children's Privacy:</b> Flappy Pi is not intended for children under 13. We do not knowingly collect data from children under 13.</p>
           <p><b>7. Changes to Policy:</b> We may update this policy. Continued use of the app means you accept the new policy.</p>
-          <p><b>8. Contact:</b> For privacy questions, contact <a href="mailto:support@flappypi.fun" className="text-blue-600 underline">support@flappypi.fun</a>.</p>
+          <p><b>8. Contact:</b> For privacy questions, contact <a href="mailto:support@www.flappypi.xyz" className="text-blue-600 underline">support@www.flappypi.xyz</a>.</p>
         </div>
         <div className="px-8 pb-4 flex gap-2">
           <Button onClick={() => navigate(ROUTES.HOME)} variant="outline" className="flex-1">

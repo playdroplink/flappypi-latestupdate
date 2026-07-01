@@ -95,8 +95,8 @@ const ContactPage: React.FC = () => {
                 <Mail className="h-6 w-6" />
                 <div>
                   <h3 className="font-semibold">Email Support</h3>
-                  <p className="text-sm">support@flappypi.fun</p>
-                  <p className="text-sm">flappypi.fun@gmail.com</p>
+                  <p className="text-sm">support@www.flappypi.xyz</p>
+                  <p className="text-sm">www.flappypi.xyz@gmail.com</p>
                 </div>
               </div>
             </Card>

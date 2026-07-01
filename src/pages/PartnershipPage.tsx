@@ -33,8 +33,8 @@ const PartnershipPage: React.FC = () => {
 
         <div className="bg-white/60 shadow-lg p-8 w-full text-blue-900">
           <h2 className="text-2xl font-bold mb-4">Become a Partner</h2>
-          <p className="text-lg mb-2">Email: <a href="mailto:support@flappypi.fun" className="underline text-blue-700">support@flappypi.fun</a></p>
-          <p className="text-lg mb-4">Website: <a href="https://flappypi.fun" className="underline text-blue-700">flappypi.fun</a></p>
+          <p className="text-lg mb-2">Email: <a href="mailto:support@www.flappypi.xyz" className="underline text-blue-700">support@www.flappypi.xyz</a></p>
+          <p className="text-lg mb-4">Website: <a href="https://www.flappypi.xyz" className="underline text-blue-700">www.flappypi.xyz</a></p>
           <p className="text-sm mt-4 text-blue-800">Coming soon: <span className="font-semibold">flappy.pi</span> domain</p>
         </div>
       </div>

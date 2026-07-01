@@ -77,7 +77,7 @@ export class PiBrowserDebugger {
       return 'pinet-subdomain';
     } else if (window.location.hostname.includes('.minepi.com')) {
       return 'minepi-subdomain';
-    } else if (window.location.hostname.includes('flappypi.fun')) {
+    } else if (window.location.hostname.includes('www.flappypi.xyz')) {
       return 'custom-domain';
     } else {
       return 'unknown';
@@ -180,7 +180,7 @@ export class PiBrowserDebugger {
     }
 
     if (this.isSubdomain()) {
-      recommendations.push('Test on custom domain (flappypi.fun) for comparison');
+      recommendations.push('Test on custom domain (www.flappypi.xyz) for comparison');
       recommendations.push('Contact Pi Core Team for subdomain verification');
     }
 

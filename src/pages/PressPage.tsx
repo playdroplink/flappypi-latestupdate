@@ -55,7 +55,7 @@ const PressPage: React.FC = () => {
           <CardContent className="p-0">
             <h3 className="text-xl font-semibold mb-2">Flappy Pi Launches on the Pi Network</h3>
             <p className="mb-4">Flappy Pi, the most addictive tap-to-fly arcade game, is now available on the Pi Network. Players can compete, earn Pi cryptocurrency, and join a growing community of Pi gamers. Download the press kit for more information and assets.</p>
-            <p className="text-sm text-blue-700">Contact: press@flappypi.fun</p>
+            <p className="text-sm text-blue-700">Contact: press@www.flappypi.xyz</p>
           </CardContent>
         </Card>
       </div>

@@ -259,7 +259,7 @@ export async function nativeShare(data: ShareScoreData, options: ShareOptions = 
     let shareData: any = {
       title: 'My Flappy Pi Score!',
       text: shareText,
-      url: 'https://flappypi.fun'
+      url: 'https://www.flappypi.xyz'
     };
 
     // Add image if requested and supported

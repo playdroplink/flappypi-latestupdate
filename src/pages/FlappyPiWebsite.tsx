@@ -160,7 +160,7 @@ const FlappyPiWebsite: React.FC = () => {
           <span className="text-2xl font-bold text-white tracking-tight">Flappy Pi</span>
         </div>
         <Button size="lg" className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold px-6 py-2 rounded-xl shadow-md" asChild>
-          <a href="https://flappypi.fun/" target="_blank" rel="noopener noreferrer">
+          <a href="https://www.flappypi.xyz/" target="_blank" rel="noopener noreferrer">
             <Play className="w-5 h-5 mr-2" /> Play Now
           </a>
         </Button>
@@ -195,7 +195,7 @@ const FlappyPiWebsite: React.FC = () => {
                   className="bg-yellow-400 hover:bg-yellow-500 text-white font-bold px-10 py-5 text-lg rounded-xl shadow-lg border-2 border-yellow-600 transition-all duration-200"
                   style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.15)' }}
                 >
-                  <a href="https://flappypi.fun" target="_blank" rel="noopener noreferrer">
+                  <a href="https://www.flappypi.xyz" target="_blank" rel="noopener noreferrer">
                     <Play className="w-5 h-5 mr-2" />
                     Play Now
                   </a>
@@ -870,7 +870,7 @@ const FlappyPiWebsite: React.FC = () => {
               <h3 className="text-lg font-semibold mb-4">Game</h3>
               <ul className="space-y-2">
                 <li>
-                  <a href="https://flappypi.fun" target="_blank" rel="noopener noreferrer" className="underline font-bold hover:text-yellow-300" style={{ color: '#fff' }}>
+                  <a href="https://www.flappypi.xyz" target="_blank" rel="noopener noreferrer" className="underline font-bold hover:text-yellow-300" style={{ color: '#fff' }}>
                     Play Now
                   </a>
                 </li>

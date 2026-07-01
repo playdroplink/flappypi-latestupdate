@@ -397,8 +397,8 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
       return 'Pi User';
     };
 
-    // Treat Pi auth as valid on any mainnet host (pinet, minepi, flappypi.fun)
-    const isPiMainnetHost = ['pinet.com', 'minepi.com', 'flappypi.fun'].some(domain => window.location.hostname.includes(domain));
+    // Treat Pi auth as valid on any mainnet host (pinet, minepi, www.flappypi.xyz)
+    const isPiMainnetHost = ['pinet.com', 'minepi.com', 'www.flappypi.xyz'].some(domain => window.location.hostname.includes(domain));
 
     // 1) AuthContext (mainnet only)
     if (authPiUser && isPiAuth && isPiMainnetHost) {
@@ -1608,10 +1608,10 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
             {homeNpcDialogs[homeNpcDialogIndex] || 'Hello there! 👋'}
           </div>
           
-          {/* User Character Sprite below dialog */}
+          {/* NPC Sprite below dialog */}
           <img
-            src={equippedSkinImg || "/flappy-logo.png"}
-            alt="Your Character"
+            src={homeNpcGif || "/npc/character.png"}
+            alt="Home NPC"
             className="animate-bounce-slow"
             style={{ 
               width: 88, 
@@ -1624,7 +1624,7 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
               zIndex: 100,
             }}
             onError={(e) => {
-              console.warn('⚠️ User character sprite failed to load, using fallback');
+              console.warn('⚠️ Home NPC sprite failed to load, using fallback');
               e.currentTarget.src = '/flappy-logo.png';
             }}
           />

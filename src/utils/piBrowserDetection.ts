@@ -101,7 +101,7 @@ export class PiBrowserDetector {
                            hostname.includes('.minepi.com') ||
                            hostname.includes('.pi.network') ||
                            hostname.includes('ecosystem.pinet.com') ||
-                           hostname.includes('flappypi.fun'); // Add support for flappypi.fun
+                           hostname.includes('www.flappypi.xyz'); // Add support for www.flappypi.xyz
 
     // Enhanced detection logic - more permissive for PiNet and mobile Pi Browser
     const isPiBrowser = hasPiUserAgent || hasPiSDK || hasPiWindowProps || hasPiStorage || isOnPiSubdomain;

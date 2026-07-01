@@ -90,7 +90,7 @@ const NFTMarketplacePage: React.FC = () => {
       <div className="w-full max-w-xl text-center mt-4 mb-10">
         <p className="text-lg text-purple-700 font-semibold mb-2">Want to be the first to know when NFT trading launches?</p>
         <Button asChild className="bg-yellow-400 hover:bg-yellow-500 text-purple-900 font-bold px-8 py-3 rounded-xl shadow-lg text-lg">
-          <a href="mailto:support@flappypi.fun?subject=NFT%20Marketplace%20Waitlist">Join the Waitlist</a>
+          <a href="mailto:support@www.flappypi.xyz?subject=NFT%20Marketplace%20Waitlist">Join the Waitlist</a>
         </Button>
       </div>
     </div>

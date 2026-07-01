@@ -30,12 +30,12 @@ class BaseUrlManager {
       appUrl = `http://${hostname}:8080`;
     } else if (isSandbox) {
       // Pi Browser sandbox environment
-      apiUrl = 'https://flappypi.fun/flappypiofficial';
-      appUrl = 'https://flappypi.fun/flappypiofficial';
+      apiUrl = 'https://www.flappypi.xyz/flappypiofficial';
+      appUrl = 'https://www.flappypi.xyz/flappypiofficial';
     } else {
       // Production environment
-      apiUrl = 'https://flappypi.fun/flappypiofficial';
-      appUrl = 'https://flappypi.fun/flappypiofficial';
+      apiUrl = 'https://www.flappypi.xyz/flappypiofficial';
+      appUrl = 'https://www.flappypi.xyz/flappypiofficial';
     }
 
     this.config = { apiUrl, appUrl, isDevelopment, isPiBrowser, isSandbox };

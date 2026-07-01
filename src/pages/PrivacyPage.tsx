@@ -213,10 +213,10 @@ const PrivacyPage: React.FC = () => {
             </p>
             <div className="mt-4 space-y-2">
               <p className="text-gray-700">
-                <strong>Email:</strong> privacy@flappypi.fun
+                <strong>Email:</strong> privacy@www.flappypi.xyz
               </p>
               <p className="text-gray-700">
-                <strong>Website:</strong> https://flappypi.fun
+                <strong>Website:</strong> https://www.flappypi.xyz
               </p>
             </div>
           </CardContent>

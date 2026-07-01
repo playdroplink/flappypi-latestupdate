@@ -26,7 +26,7 @@ export class UnifiedLeaderboardService {
 
   private constructor() {
     this.config = {
-      apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://flappypi.fun',
+      apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://www.flappypi.xyz',
       enableCache: true,
       cacheTimeout: 30000, // 30 seconds
       enableLocalFallback: true,

@@ -445,7 +445,7 @@ class PiNetworkService {
       }
 
       const title = "Check out my Flappy Pi score!";
-      const message = `I just scored ${score} points and reached level ${level} in Flappy Pi! 🐦 Can you beat my score? Play now at https://flappypi.fun/flappypiofficial`;
+      const message = `I just scored ${score} points and reached level ${level} in Flappy Pi! 🐦 Can you beat my score? Play now at https://www.flappypi.xyz/flappypiofficial`;
       
       if (window.Pi?.openShareDialog) {
         window.Pi.openShareDialog(title, message);
