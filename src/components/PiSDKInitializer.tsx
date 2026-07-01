@@ -24,8 +24,16 @@ const PiSDKInitializer: React.FC<PiSDKInitializerProps> = ({ children }) => {
 
       // Check if Pi SDK is available
       if (!window.Pi) {
-        console.log('⚠️ Pi SDK not found in window object');
+        console.log('⚠️ Pi SDK not found in window object - not in Pi Browser');
         setSdkReady(true); // Continue without Pi SDK for regular browsers
+        return;
+      }
+
+      // Check if already initialized
+      if (window.Pi._initialized) {
+        console.log('✅ Pi SDK already initialized');
+        setSdkReady(true);
+        window.dispatchEvent(new CustomEvent('pi-sdk-ready'));
         return;
       }
 
@@ -36,6 +44,9 @@ const PiSDKInitializer: React.FC<PiSDKInitializerProps> = ({ children }) => {
         await window.Pi.init({
           version: '2.0'
         });
+
+        // Mark as initialized
+        window.Pi._initialized = true;
 
         console.log('✅ Pi SDK initialized successfully');
         
@@ -70,20 +81,22 @@ const PiSDKInitializer: React.FC<PiSDKInitializerProps> = ({ children }) => {
     };
 
     // Initialize immediately
-    initializePiSDK();
+    initializePiSDK().then(() => {
+      // Only attempt auto-auth after SDK is ready
+      if (sdkReady) {
+        autoAuthenticate();
+      }
+    });
 
     // Also listen for the SDK ready event in case it's initialized elsewhere
     const handleSDKReady = () => {
       console.log('🎉 Pi SDK ready event received');
       setSdkReady(true);
+      // Attempt auto-auth when SDK is ready
+      autoAuthenticate();
     };
 
     window.addEventListener('pi-sdk-ready', handleSDKReady);
-
-    // Attempt auto-authentication when SDK is ready
-    if (sdkReady) {
-      autoAuthenticate();
-    }
 
     return () => {
       window.removeEventListener('pi-sdk-ready', handleSDKReady);

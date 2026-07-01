@@ -68,8 +68,8 @@ export class PiSDKService {
         console.warn('⚠️ Not running in Pi Browser. Some features may not work.');
       }
 
-      // Initialize Pi SDK using the centralized initPi function
-      const sdkInitialized = initPi({
+      // Initialize Pi SDK using the centralized initPi function (now async)
+      const sdkInitialized = await initPi({
         version: this.config.version,
         sandbox: this.config.sandbox
       });

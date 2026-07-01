@@ -2,6 +2,7 @@
 // Ensures Pi.init() is called once before any other Pi SDK methods
 
 let initialized = false;
+let initializationPromise: Promise<boolean> | null = null;
 
 export interface PiSDKInitOptions {
   version: string;
@@ -12,11 +13,17 @@ export interface PiSDKInitOptions {
 /**
  * Initialize Pi Network SDK
  * This function ensures Pi.init() is called only once before any other Pi SDK methods
+ * Now async to properly await the Pi SDK initialization
  */
-export const initPi = (options?: Partial<PiSDKInitOptions>): boolean => {
+export const initPi = async (options?: Partial<PiSDKInitOptions>): Promise<boolean> => {
   if (initialized) {
     console.log('✅ Pi SDK already initialized');
     return true;
+  }
+
+  if (initializationPromise) {
+    console.log('⏳ Pi SDK initialization in progress, waiting...');
+    return initializationPromise;
   }
 
   if (typeof window === 'undefined') {
@@ -29,25 +36,44 @@ export const initPi = (options?: Partial<PiSDKInitOptions>): boolean => {
     return false;
   }
 
-  try {
-    const initOptions: PiSDKInitOptions = {
-      version: "2.0",
-      sandbox: false,
-      environment: "mainnet",
-      ...options
-    };
-
-    console.log('🔄 Initializing Pi SDK with options:', initOptions);
-    
-    window.Pi.init(initOptions);
-    
+  // Check if already initialized by another component
+  if (window.Pi._initialized) {
+    console.log('✅ Pi SDK already initialized by another component');
     initialized = true;
-    console.log('✅ Pi SDK initialized successfully');
     return true;
-  } catch (error) {
-    console.error('❌ Failed to initialize Pi SDK:', error);
-    return false;
   }
+
+  initializationPromise = (async () => {
+    try {
+      const initOptions: PiSDKInitOptions = {
+        version: "2.0",
+        sandbox: false,
+        environment: "mainnet",
+        ...options
+      };
+
+      console.log('🔄 Initializing Pi SDK with options:', initOptions);
+      
+      await window.Pi.init(initOptions);
+      
+      // Mark as initialized on window object
+      window.Pi._initialized = true;
+      initialized = true;
+      
+      console.log('✅ Pi SDK initialized successfully');
+      
+      // Dispatch event for other components
+      window.dispatchEvent(new CustomEvent('pi-sdk-ready'));
+      
+      return true;
+    } catch (error) {
+      console.error('❌ Failed to initialize Pi SDK:', error);
+      initializationPromise = null;
+      return false;
+    }
+  })();
+
+  return initializationPromise;
 };
 
 /**
