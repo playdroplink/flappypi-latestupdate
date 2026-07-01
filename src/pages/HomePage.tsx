@@ -1608,10 +1608,10 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
             {homeNpcDialogs[homeNpcDialogIndex] || 'Hello there! 👋'}
           </div>
           
-          {/* NPC Sprite below dialog */}
+          {/* User Character Sprite below dialog */}
           <img
-            src={homeNpcGif || "/npc/character.png"}
-            alt="Home NPC"
+            src={equippedSkinImg || "/flappy-logo.png"}
+            alt="Your Character"
             className="animate-bounce-slow"
             style={{ 
               width: 88, 
@@ -1624,7 +1624,7 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
               zIndex: 100,
             }}
             onError={(e) => {
-              console.warn('⚠️ Home NPC sprite failed to load, using fallback');
+              console.warn('⚠️ User character sprite failed to load, using fallback');
               e.currentTarget.src = '/flappy-logo.png';
             }}
           />
