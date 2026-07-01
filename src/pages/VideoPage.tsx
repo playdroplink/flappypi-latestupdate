@@ -13,7 +13,7 @@ import { useGlobalMusic } from '../hooks/useGlobalMusic';
 const video = {
   name: 'Flappy Pi Gameplay Trailer',
   description: 'Watch the official Flappy Pi gameplay trailer and see how you can earn Pi while playing!',
-  thumbnailUrl: 'https://flappypi.fun/assets/social-preview.jpg',
+  thumbnailUrl: 'https://www.flappypi.xyz/assets/social-preview.jpg',
   uploadDate: '2025-06-15',
   contentUrl: 'https://www.youtube.com/watch?v=',
   embedUrl: 'https://www.youtube.com/embed/',

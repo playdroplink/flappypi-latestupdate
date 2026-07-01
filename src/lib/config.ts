@@ -30,7 +30,7 @@ export const config = {
     name: 'Flappy Pi',
     version: '3.0',
     environment: 'production',
-    baseUrl: 'https://flappypi.fun'
+    baseUrl: 'https://www.flappypi.xyz'
   },
 
   // Payment Configuration

@@ -357,7 +357,7 @@ const SubscriptionPlansPage: React.FC = () => {
     "Each plan comes with unique bonuses and coins.",
     "Upgrade anytime for more perks!",
     "Your support helps us build Flappy Pi for everyone!",
-    "Questions? Contact support@flappypi.fun."
+    "Questions? Contact support@www.flappypi.xyz."
   ];
   const [dialogIndex, setDialogIndex] = useState(0);
 
@@ -777,7 +777,7 @@ const SubscriptionPlansPage: React.FC = () => {
           "Ad-free gameplay means uninterrupted gaming sessions.",
           "Pi Network integration ensures secure and instant payments.",
           "Your support helps us build Flappy Pi for everyone!",
-          "Questions about plans? Contact support@flappypi.fun",
+          "Questions about plans? Contact support@www.flappypi.xyz",
           "Upgrade anytime - your progress and rewards are always saved.",
           "Exclusive skins and bundles only available in subscription plans.",
           "Join thousands of players enjoying ad-free Flappy Pi!",

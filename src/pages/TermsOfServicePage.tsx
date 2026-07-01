@@ -36,7 +36,7 @@ const TermsOfServicePage: React.FC = () => {
           <p><b>4. Game Content:</b> All game assets, graphics, and content are the property of Flappy Pi and may not be used without permission.</p>
           <p><b>5. Limitation of Liability:</b> Flappy Pi is provided "as is" without warranties of any kind. We are not liable for any damages or losses resulting from your use of the app or Pi Network payments.</p>
           <p><b>6. Changes to Terms:</b> We may update these terms at any time. Continued use of the app means you accept the new terms.</p>
-          <p><b>7. Contact:</b> For questions, contact <a href="mailto:support@flappypi.fun" className="text-blue-600 underline">support@flappypi.fun</a>.</p>
+          <p><b>7. Contact:</b> For questions, contact <a href="mailto:support@www.flappypi.xyz" className="text-blue-600 underline">support@www.flappypi.xyz</a>.</p>
         </div>
         <div className="px-8 pb-4 flex gap-2">
           <Button onClick={() => navigate(ROUTES.HOME)} variant="outline" className="flex-1">

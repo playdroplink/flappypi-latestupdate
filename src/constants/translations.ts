@@ -523,7 +523,7 @@ export const translations = {
     privacySection7Text: "We may update this policy. Continued use of the app means you accept the new policy.",
     privacySection8: "8. Contact:",
     privacySection8Text: "For privacy questions, contact",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "Terms of Service",
     termsDescription: "Read our terms and conditions",
@@ -541,7 +541,7 @@ export const translations = {
     termsSection6Text: "We may update these terms at any time. Continued use of the app means you accept the new terms.",
     termsSection7: "7. Contact:",
     termsSection7Text: "For questions, contact",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi Whitepaper",
     whitepaperDescription: "Technical documentation and roadmap",
@@ -557,7 +557,7 @@ export const translations = {
     whitepaperSection5Text: "Planned features include NFT collectibles, advanced tournaments, and cross-platform compatibility.",
     whitepaperSection6: "6. Contact & Community",
     whitepaperSection6Text: "For questions, feedback, or partnership inquiries, contact",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "Join our community to help shape the future of Flappy Pi!",
     
     helpTitle: "Help & Guide",
@@ -590,7 +590,7 @@ export const translations = {
     helpThirdPlace: "🥉 3rd Place: 1,000 Flappy Coins + Common Skin",
     helpSpecialRewards: "Special Rewards: Score 1,000+ points for bonus prizes",
     helpMonthlyPiRewards: "Monthly Pi Rewards: Stay tuned for Pi cryptocurrency prizes",
-    helpClaimRewards: "Claim Rewards: Email us at support@flappypi.fun",
+    helpClaimRewards: "Claim Rewards: Email us at support@www.flappypi.xyz",
     helpProTips: "🎯 Pro Tips for Success",
     helpFindRhythm: "Find your rhythm: Develop a steady tapping pattern",
     helpLookAhead: "Look ahead: Focus on upcoming pipes, not just your bird",
@@ -667,7 +667,7 @@ export const translations = {
     // Splash Screen Translations
     splashMusicPrompt: "Tap to enable music",
     splashHelpText: "Need help?",
-    splashContactEmail: "contact support@flappypi.fun",
+    splashContactEmail: "contact support@www.flappypi.xyz",
     splashByText: "by Mrwain Organization",
     
     // Home Screen Translations
@@ -1193,7 +1193,7 @@ export const translations = {
     privacySection7Text: "Podemos actualizar esta política. El uso continuado de la aplicación significa que aceptas la nueva política.",
     privacySection8: "8. Contacto:",
     privacySection8Text: "Para preguntas sobre privacidad, contacta a",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "Términos de Servicio",
     termsDescription: "Lee nuestros términos y condiciones",
@@ -1211,7 +1211,7 @@ export const translations = {
     termsSection6Text: "Podemos actualizar estos términos en cualquier momento. El uso continuado de la aplicación significa que aceptas los nuevos términos.",
     termsSection7: "7. Contacto:",
     termsSection7Text: "Para preguntas, contacta a",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Whitepaper de Flappy Pi",
     whitepaperDescription: "Documentación técnica y hoja de ruta",
@@ -1227,7 +1227,7 @@ export const translations = {
     whitepaperSection5Text: "Las características planificadas incluyen coleccionables NFT, torneos avanzados y compatibilidad multiplataforma.",
     whitepaperSection6: "6. Contacto y Comunidad",
     whitepaperSection6Text: "Para preguntas, comentarios o consultas de asociación, contacta a",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "¡Únete a nuestra comunidad para ayudar a dar forma al futuro de Flappy Pi!",
     
     helpTitle: "Ayuda y Guía",
@@ -1260,7 +1260,7 @@ export const translations = {
     helpThirdPlace: "🥉 3er Lugar: 1,000 Monedas Flappy + Piel Común",
     helpSpecialRewards: "Recompensas Especiales: Puntúa 1,000+ puntos para premios de bonificación",
     helpMonthlyPiRewards: "Recompensas Mensuales de Pi: Mantente atento a premios de criptomoneda Pi",
-    helpClaimRewards: "Reclamar Recompensas: Envíanos un correo a support@flappypi.fun",
+    helpClaimRewards: "Reclamar Recompensas: Envíanos un correo a support@www.flappypi.xyz",
     helpProTips: "🎯 Consejos Pro para el Éxito",
     helpFindRhythm: "Encuentra tu ritmo: Desarrolla un patrón de toques constante",
     helpLookAhead: "Mira hacia adelante: Enfócate en las tuberías próximas, no solo en tu pájaro",
@@ -1617,7 +1617,7 @@ export const translations = {
     privacySection7Text: "Maaari naming i-update ang patakarang ito. Ang patuloy na paggamit ng app ay nangangahulugan na tinatanggap mo ang bagong patakaran.",
     privacySection8: "8. Kontak:",
     privacySection8Text: "Para sa mga tanong tungkol sa privacy, makipag-ugnayan sa",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "Mga Tuntunin ng Serbisyo",
     termsDescription: "Basahin ang aming mga tuntunin at kondisyon",
@@ -1635,7 +1635,7 @@ export const translations = {
     termsSection6Text: "Maaari naming i-update ang mga tuntuning ito anumang oras. Ang patuloy na paggamit ng app ay nangangahulugan na tinatanggap mo ang mga bagong tuntunin.",
     termsSection7: "7. Kontak:",
     termsSection7Text: "Para sa mga tanong, makipag-ugnayan sa",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi Whitepaper",
     whitepaperDescription: "Teknikal na dokumentasyon at roadmap",
@@ -1651,7 +1651,7 @@ export const translations = {
     whitepaperSection5Text: "Ang mga planned features ay may kasamang NFT collectibles, advanced tournaments, at cross-platform compatibility.",
     whitepaperSection6: "6. Kontak & Komunidad",
     whitepaperSection6Text: "Para sa mga tanong, feedback, o partnership inquiries, makipag-ugnayan sa",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "Sumali sa aming komunidad para makatulong sa paghubog ng future ng Flappy Pi!",
     
     helpTitle: "Tulong & Gabay",
@@ -1684,7 +1684,7 @@ export const translations = {
     helpThirdPlace: "🥉 3rd Place: 1,000 Flappy Coins + Common Skin",
     helpSpecialRewards: "Mga Special Reward: Mag-score ng 1,000+ points para sa bonus prizes",
     helpMonthlyPiRewards: "Mga Monthly Pi Reward: Manatiling updated para sa Pi cryptocurrency prizes",
-    helpClaimRewards: "Kunin ang mga Reward: I-email kami sa support@flappypi.fun",
+    helpClaimRewards: "Kunin ang mga Reward: I-email kami sa support@www.flappypi.xyz",
     helpProTips: "🎯 Mga Pro Tip para sa Tagumpay",
     helpFindRhythm: "Hanapin ang iyong rhythm: Bumuo ng steady tapping pattern",
     helpLookAhead: "Tumingin sa unahan: Mag-focus sa mga upcoming pipes, hindi lang sa iyong ibon",
@@ -1754,7 +1754,7 @@ export const translations = {
     
     // Splash Screen Translations
     splashMusicPrompt: "I-tap para i-enable ang musika",
-    splashContactEmail: "kontak support@flappypi.fun",
+    splashContactEmail: "kontak support@www.flappypi.xyz",
     splashByText: "ni Mrwain Organization",
     
     // Home Screen Translations
@@ -2131,7 +2131,7 @@ export const translations = {
     privacySection7Text: "हम इस नीति को अपडेट कर सकते हैं। ऐप का निरंतर उपयोग का मतलब है कि आप नई नीति को स्वीकार करते हैं।",
     privacySection8: "8. संपर्क:",
     privacySection8Text: "गोपनीयता प्रश्नों के लिए, संपर्क करें",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "सेवा की शर्तें",
     termsDescription: "हमारी शर्तें और शर्तें पढ़ें",
@@ -2149,7 +2149,7 @@ export const translations = {
     termsSection6Text: "हम किसी भी समय इन शर्तों को अपडेट कर सकते हैं। ऐप का निरंतर उपयोग का मतलब है कि आप नई शर्तों को स्वीकार करते हैं।",
     termsSection7: "7. संपर्क:",
     termsSection7Text: "प्रश्नों के लिए, संपर्क करें",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi व्हाइटपेपर",
     whitepaperDescription: "तकनीकी दस्तावेज और रोडमैप",
@@ -2165,7 +2165,7 @@ export const translations = {
     whitepaperSection5Text: "नियोजित सुविधाओं में NFT कलेक्टिबल्स, उन्नत टूर्नामेंट और क्रॉस-प्लेटफॉर्म संगतता शामिल हैं।",
     whitepaperSection6: "6. संपर्क और समुदाय",
     whitepaperSection6Text: "प्रश्नों, प्रतिक्रिया या साझेदारी पूछताछ के लिए, संपर्क करें",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "Flappy Pi के भविष्य को आकार देने में मदद करने के लिए हमारे समुदाय में शामिल हों!",
     
     helpTitle: "सहायता और गाइड",
@@ -2198,7 +2198,7 @@ export const translations = {
     helpThirdPlace: "🥉 तीसरा स्थान: 1,000 Flappy Coins + कॉमन स्किन",
     helpSpecialRewards: "विशेष पुरस्कार: बोनस पुरस्कारों के लिए 1,000+ अंक स्कोर करें",
     helpMonthlyPiRewards: "मासिक Pi पुरस्कार: Pi क्रिप्टोकरेंसी पुरस्कारों के लिए बने रहें",
-    helpClaimRewards: "पुरस्कार दावा करें: हमें support@flappypi.fun पर ईमेल करें",
+    helpClaimRewards: "पुरस्कार दावा करें: हमें support@www.flappypi.xyz पर ईमेल करें",
     helpProTips: "🎯 सफलता के लिए प्रो टिप्स",
     helpFindRhythm: "अपनी लय खोजें: एक स्थिर टैपिंग पैटर्न विकसित करें",
     helpLookAhead: "आगे देखें: आगामी पाइप पर ध्यान केंद्रित करें, केवल अपने पक्षी पर नहीं",
@@ -2659,7 +2659,7 @@ export const translations = {
     privacySection7Text: "我们可能会更新此政策。继续使用应用程序意味着您接受新政策。",
     privacySection8: "8. 联系：",
     privacySection8Text: "对于隐私问题，请联系",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "服务条款",
     termsDescription: "阅读我们的条款和条件",
@@ -2677,7 +2677,7 @@ export const translations = {
     termsSection6Text: "我们可能随时更新这些条款。继续使用应用程序意味着您接受新条款。",
     termsSection7: "7. 联系：",
     termsSection7Text: "如有问题，请联系",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi 白皮书",
     whitepaperDescription: "技术文档和路线图",
@@ -2693,7 +2693,7 @@ export const translations = {
     whitepaperSection5Text: "计划功能包括 NFT 收藏品、高级锦标赛和跨平台兼容性。",
     whitepaperSection6: "6. 联系和社区",
     whitepaperSection6Text: "对于问题、反馈或合作咨询，请联系",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "加入我们的社区，帮助塑造 Flappy Pi 的未来！",
     
     helpTitle: "帮助和指南",
@@ -2726,7 +2726,7 @@ export const translations = {
     helpThirdPlace: "🥉 第三名：1,000 Flappy Coins + 普通皮肤",
     helpSpecialRewards: "特殊奖励：获得 1,000+ 积分获得奖励奖品",
     helpMonthlyPiRewards: "每月 Pi 奖励：关注 Pi 加密货币奖品",
-    helpClaimRewards: "领取奖励：发送邮件至 support@flappypi.fun",
+    helpClaimRewards: "领取奖励：发送邮件至 support@www.flappypi.xyz",
     helpProTips: "🎯 成功专业提示",
     helpFindRhythm: "找到您的节奏：发展稳定的点击模式",
     helpLookAhead: "向前看：专注于即将到来的管道，而不仅仅是您的鸟",
@@ -3160,7 +3160,7 @@ export const translations = {
     privacySection7Text: "Kami dapat memperbarui kebijakan ini. Penggunaan aplikasi yang berkelanjutan berarti Anda menerima kebijakan baru.",
     privacySection8: "8. Kontak:",
     privacySection8Text: "Untuk pertanyaan privasi, hubungi",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "Ketentuan Layanan",
     termsDescription: "Baca ketentuan dan kondisi kami",
@@ -3178,7 +3178,7 @@ export const translations = {
     termsSection6Text: "Kami dapat memperbarui ketentuan ini kapan saja. Penggunaan aplikasi yang berkelanjutan berarti Anda menerima ketentuan baru.",
     termsSection7: "7. Kontak:",
     termsSection7Text: "Untuk pertanyaan, hubungi",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi Whitepaper",
     whitepaperDescription: "Dokumentasi teknis dan roadmap",
@@ -3194,7 +3194,7 @@ export const translations = {
     whitepaperSection5Text: "Fitur yang direncanakan termasuk NFT collectibles, turnamen lanjutan, dan kompatibilitas cross-platform.",
     whitepaperSection6: "6. Kontak & Komunitas",
     whitepaperSection6Text: "Untuk pertanyaan, umpan balik, atau pertanyaan kemitraan, hubungi",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "Bergabunglah dengan komunitas kami untuk membantu membentuk masa depan Flappy Pi!",
     
     helpTitle: "Bantuan & Panduan",
@@ -3227,7 +3227,7 @@ export const translations = {
     helpThirdPlace: "🥉 Tempat 3: 1,000 Flappy Coins + Skin Umum",
     helpSpecialRewards: "Hadiah Khusus: Skor 1,000+ poin untuk hadiah bonus",
     helpMonthlyPiRewards: "Hadiah Pi Bulanan: Tetap disini untuk hadiah kriptocurrency Pi",
-    helpClaimRewards: "Klaim Hadiah: Email kami di support@flappypi.fun",
+    helpClaimRewards: "Klaim Hadiah: Email kami di support@www.flappypi.xyz",
     helpProTips: "🎯 Tips Pro untuk Sukses",
     helpFindRhythm: "Temukan ritme Anda: Kembangkan pola tap yang stabil",
     helpLookAhead: "Lihat ke depan: Fokus pada pipa yang akan datang, bukan hanya burung Anda",
@@ -3682,7 +3682,7 @@ export const translations = {
     privacySection7Text: "Podemos atualizar esta política. O uso contínuo do aplicativo significa que você aceita a nova política.",
     privacySection8: "8. Contato:",
     privacySection8Text: "Para questões de privacidade, entre em contato com",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "Termos de Serviço",
     termsDescription: "Leia nossos termos e condições",
@@ -3700,7 +3700,7 @@ export const translations = {
     termsSection6Text: "Podemos atualizar estes termos a qualquer momento. O uso contínuo do aplicativo significa que você aceita os novos termos.",
     termsSection7: "7. Contato:",
     termsSection7Text: "Para perguntas, entre em contato com",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi Whitepaper",
     whitepaperDescription: "Documentação técnica e roadmap",
@@ -3716,7 +3716,7 @@ export const translations = {
     whitepaperSection5Text: "Recursos planejados incluem NFT collectibles, torneios avançados e compatibilidade cross-platform.",
     whitepaperSection6: "6. Contato e Comunidade",
     whitepaperSection6Text: "Para perguntas, feedback ou consultas de parceria, entre em contato com",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "Junte-se à nossa comunidade para ajudar a moldar o futuro do Flappy Pi!",
     
     helpTitle: "Ajuda e Guia",
@@ -3749,7 +3749,7 @@ export const translations = {
     helpThirdPlace: "🥉 3º Lugar: 1,000 Flappy Coins + Skin Comum",
     helpSpecialRewards: "Recompensas Especiais: Faça 1,000+ pontos para prêmios bônus",
     helpMonthlyPiRewards: "Recompensas Pi Mensais: Fique atento aos prêmios de criptomoeda Pi",
-    helpClaimRewards: "Reivindique Recompensas: Envie-nos um email em support@flappypi.fun",
+    helpClaimRewards: "Reivindique Recompensas: Envie-nos um email em support@www.flappypi.xyz",
     helpProTips: "🎯 Dicas Pro para Sucesso",
     helpFindRhythm: "Encontre seu ritmo: Desenvolva um padrão de toque estável",
     helpLookAhead: "Olhe para frente: Foque nos tubos próximos, não apenas no seu pássaro",
@@ -4212,7 +4212,7 @@ export const translations = {
     privacySection7Text: "Nous pouvons mettre à jour cette politique. L'utilisation continue de l'application signifie que vous acceptez la nouvelle politique.",
     privacySection8: "8. Contact :",
     privacySection8Text: "Pour les questions de confidentialité, contactez",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "Conditions de Service",
     termsDescription: "Lisez nos termes et conditions",
@@ -4230,7 +4230,7 @@ export const translations = {
     termsSection6Text: "Nous pouvons mettre à jour ces conditions à tout moment. L'utilisation continue de l'application signifie que vous acceptez les nouvelles conditions.",
     termsSection7: "7. Contact :",
     termsSection7Text: "Pour les questions, contactez",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi Whitepaper",
     whitepaperDescription: "Documentation technique et feuille de route",
@@ -4246,7 +4246,7 @@ export const translations = {
     whitepaperSection5Text: "Les fonctionnalités prévues incluent des NFT collectibles, des tournois avancés et la compatibilité cross-platform.",
     whitepaperSection6: "6. Contact et Communauté",
     whitepaperSection6Text: "Pour les questions, commentaires ou demandes de partenariat, contactez",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "Rejoignez notre communauté pour aider à façonner l'avenir de Flappy Pi !",
     
     helpTitle: "Aide et Guide",
@@ -4279,7 +4279,7 @@ export const translations = {
     helpThirdPlace: "🥉 3ème Place : 1,000 Flappy Coins + Skin Commune",
     helpSpecialRewards: "Récompenses Spéciales : Marquez 1,000+ points pour des prix bonus",
     helpMonthlyPiRewards: "Récompenses Pi Mensuelles : Restez à l'écoute pour les prix en cryptomonnaie Pi",
-    helpClaimRewards: "Réclamez les Récompenses : Envoyez-nous un email à support@flappypi.fun",
+    helpClaimRewards: "Réclamez les Récompenses : Envoyez-nous un email à support@www.flappypi.xyz",
     helpProTips: "🎯 Conseils Pro pour Réussir",
     helpFindRhythm: "Trouvez votre rythme : Développez un modèle de tap stable",
     helpLookAhead: "Regardez devant : Concentrez-vous sur les tuyaux à venir, pas seulement sur votre oiseau",
@@ -4350,7 +4350,7 @@ export const translations = {
     // Splash Screen Translations
     splashMusicPrompt: "Appuyez pour activer la musique",
     splashHelpText: "Besoin d'aide?",
-    splashContactEmail: "contactez support@flappypi.fun",
+    splashContactEmail: "contactez support@www.flappypi.xyz",
     splashByText: "par Mrwain Organization",
     
     // Home Screen Translations
@@ -4740,7 +4740,7 @@ export const translations = {
     privacySection7Text: "Мы можем обновить эту политику. Продолжение использования приложения означает, что вы принимаете новую политику.",
     privacySection8: "8. Контакт:",
     privacySection8Text: "По вопросам конфиденциальности обращайтесь к",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "Условия обслуживания",
     termsDescription: "Прочитайте наши условия и положения",
@@ -4758,7 +4758,7 @@ export const translations = {
     termsSection6Text: "Мы можем обновить эти условия в любое время. Продолжение использования приложения означает, что вы принимаете новые условия.",
     termsSection7: "7. Контакт:",
     termsSection7Text: "По вопросам обращайтесь к",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi Белая книга",
     whitepaperDescription: "Техническая документация и дорожная карта",
@@ -4774,7 +4774,7 @@ export const translations = {
     whitepaperSection5Text: "Планируемые функции включают NFT коллекции, продвинутые турниры и кроссплатформенную совместимость.",
     whitepaperSection6: "6. Контакт и сообщество",
     whitepaperSection6Text: "По вопросам, отзывам или запросам о партнерстве обращайтесь к",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "Присоединяйтесь к нашему сообществу, чтобы помочь формировать будущее Flappy Pi!",
     
     helpTitle: "Помощь и руководство",
@@ -4807,7 +4807,7 @@ export const translations = {
     helpThirdPlace: "🥉 3-е место: 1,000 Flappy Coins + Обычный скин",
     helpSpecialRewards: "Специальные награды: Наберите 1,000+ очков для бонусных призов",
     helpMonthlyPiRewards: "Ежемесячные награды Pi: Следите за призами в криптовалюте Pi",
-    helpClaimRewards: "Получите награды: Напишите нам на support@flappypi.fun",
+    helpClaimRewards: "Получите награды: Напишите нам на support@www.flappypi.xyz",
     helpProTips: "🎯 Про советы для успеха",
     helpFindRhythm: "Найдите свой ритм: Развивайте стабильный паттерн нажатий",
     helpLookAhead: "Смотрите вперед: Фокусируйтесь на предстоящих трубах, а не только на вашей птице",
@@ -4878,7 +4878,7 @@ export const translations = {
     // Splash Screen Translations
     splashMusicPrompt: "Нажмите для включения музыки",
     splashHelpText: "Нужна помощь?",
-    splashContactEmail: "свяжитесь support@flappypi.fun",
+    splashContactEmail: "свяжитесь support@www.flappypi.xyz",
     splashByText: "от Mrwain Organization",
     
     // Home Screen Translations
@@ -5258,7 +5258,7 @@ export const translations = {
     privacySection7Text: "Bu politikayı güncelleyebiliriz. Uygulamayı kullanmaya devam etmek, yeni politikayı kabul ettiğiniz anlamına gelir.",
     privacySection8: "8. İletişim:",
     privacySection8Text: "Gizlilik soruları için iletişime geçin",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "Hizmet Şartları",
     termsDescription: "Şartlarımızı ve koşullarımızı okuyun",
@@ -5276,7 +5276,7 @@ export const translations = {
     termsSection6Text: "Bu şartları herhangi bir zamanda güncelleyebiliriz. Uygulamayı kullanmaya devam etmek, yeni şartları kabul ettiğiniz anlamına gelir.",
     termsSection7: "7. İletişim:",
     termsSection7Text: "Sorular için iletişime geçin",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi Whitepaper",
     whitepaperDescription: "Teknik dokümantasyon ve yol haritası",
@@ -5292,7 +5292,7 @@ export const translations = {
     whitepaperSection5Text: "Planlanan özellikler NFT koleksiyonları, gelişmiş turnuvalar ve çapraz platform uyumluluğunu içerir.",
     whitepaperSection6: "6. İletişim ve Topluluk",
     whitepaperSection6Text: "Sorular, geri bildirimler veya ortaklık sorguları için iletişime geçin",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "Flappy Pi'nin geleceğini şekillendirmeye yardım etmek için topluluğumuza katılın!",
     
     helpTitle: "Yardım ve Rehber",
@@ -5325,7 +5325,7 @@ export const translations = {
     helpThirdPlace: "🥉 3. Sıra: 1,000 Flappy Coins + Ortak Cilt",
     helpSpecialRewards: "Özel Ödüller: Bonus ödüller için 1,000+ puan alın",
     helpMonthlyPiRewards: "Aylık Pi Ödülleri: Pi kripto para birimi ödülleri için takipte kalın",
-    helpClaimRewards: "Ödülleri Talep Edin: Bize support@flappypi.fun adresinden e-posta gönderin",
+    helpClaimRewards: "Ödülleri Talep Edin: Bize support@www.flappypi.xyz adresinden e-posta gönderin",
     helpProTips: "🎯 Başarı için Pro İpuçları",
     helpFindRhythm: "Ritminizi bulun: Kararlı bir dokunma modeli geliştirin",
     helpLookAhead: "İleriye bakın: Sadece kuşunuza değil, gelecek borulara odaklanın",
@@ -5396,7 +5396,7 @@ export const translations = {
     // Splash Screen Translations
     splashMusicPrompt: "Müziği etkinleştirmek için dokunun",
     splashHelpText: "Yardıma ihtiyacınız var mı?",
-    splashContactEmail: "iletişim support@flappypi.fun",
+    splashContactEmail: "iletişim support@www.flappypi.xyz",
     splashByText: "Mrwain Organization tarafından",
     
     // Home Screen Translations
@@ -5711,7 +5711,7 @@ export const translations = {
     privacySection7Text: "Chúng tôi có thể cập nhật chính sách này. Việc tiếp tục sử dụng ứng dụng có nghĩa là bạn chấp nhận chính sách mới.",
     privacySection8: "8. Liên hệ:",
     privacySection8Text: "Đối với câu hỏi về quyền riêng tư, liên hệ",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "Điều khoản Dịch vụ",
     termsDescription: "Đọc điều khoản và điều kiện của chúng tôi",
@@ -5729,7 +5729,7 @@ export const translations = {
     termsSection6Text: "Chúng tôi có thể cập nhật các điều khoản này bất cứ lúc nào. Việc tiếp tục sử dụng ứng dụng có nghĩa là bạn chấp nhận các điều khoản mới.",
     termsSection7: "7. Liên hệ:",
     termsSection7Text: "Đối với câu hỏi, liên hệ",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi Whitepaper",
     whitepaperDescription: "Tài liệu kỹ thuật và lộ trình",
@@ -5745,7 +5745,7 @@ export const translations = {
     whitepaperSection5Text: "Các tính năng dự kiến bao gồm NFT collectibles, giải đấu nâng cao và khả năng tương thích đa nền tảng.",
     whitepaperSection6: "6. Liên hệ và Cộng đồng",
     whitepaperSection6Text: "Đối với câu hỏi, phản hồi hoặc yêu cầu hợp tác, liên hệ",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "Tham gia cộng đồng của chúng tôi để giúp định hình tương lai của Flappy Pi!",
     
     helpTitle: "Trợ giúp và Hướng dẫn",
@@ -5778,7 +5778,7 @@ export const translations = {
     helpThirdPlace: "🥉 Vị trí 3: 1,000 Flappy Coins + Skin Thường",
     helpSpecialRewards: "Phần thưởng Đặc biệt: Đạt 1,000+ điểm để có giải thưởng thưởng",
     helpMonthlyPiRewards: "Phần thưởng Pi Hàng tháng: Theo dõi giải thưởng tiền điện tử Pi",
-    helpClaimRewards: "Yêu cầu Phần thưởng: Gửi email cho chúng tôi tại support@flappypi.fun",
+    helpClaimRewards: "Yêu cầu Phần thưởng: Gửi email cho chúng tôi tại support@www.flappypi.xyz",
     helpProTips: "🎯 Mẹo Pro để Thành công",
     helpFindRhythm: "Tìm nhịp điệu của bạn: Phát triển mô hình nhấn ổn định",
     helpLookAhead: "Nhìn phía trước: Tập trung vào các ống sắp tới, không chỉ chim của bạn",
@@ -5849,7 +5849,7 @@ export const translations = {
     // Splash Screen Translations
     splashMusicPrompt: "Nhấn để bật nhạc",
     splashHelpText: "Cần giúp đỡ?",
-    splashContactEmail: "liên hệ support@flappypi.fun",
+    splashContactEmail: "liên hệ support@www.flappypi.xyz",
     splashByText: "bởi Mrwain Organization",
     
     // Home Screen Translations
@@ -6161,7 +6161,7 @@ export const translations = {
     privacySection7Text: "เราอาจอัปเดตนโยบายนี้ การใช้แอปอย่างต่อเนื่องหมายความว่าคุณยอมรับนโยบายใหม่",
     privacySection8: "8. ติดต่อ:",
     privacySection8Text: "สำหรับคำถามเกี่ยวกับความเป็นส่วนตัว ติดต่อ",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "ข้อกำหนดการให้บริการ",
     termsDescription: "อ่านข้อกำหนดและเงื่อนไขของเรา",
@@ -6179,7 +6179,7 @@ export const translations = {
     termsSection6Text: "เราอาจอัปเดตข้อกำหนดเหล่านี้ได้ทุกเมื่อ การใช้แอปอย่างต่อเนื่องหมายความว่าคุณยอมรับข้อกำหนดใหม่",
     termsSection7: "7. ติดต่อ:",
     termsSection7Text: "สำหรับคำถาม ติดต่อ",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi Whitepaper",
     whitepaperDescription: "เอกสารทางเทคนิคและแผนงาน",
@@ -6195,7 +6195,7 @@ export const translations = {
     whitepaperSection5Text: "คุณสมบัติที่วางแผนไว้รวมถึง NFT collectibles การแข่งขันขั้นสูงและความเข้ากันได้ข้ามแพลตฟอร์ม",
     whitepaperSection6: "6. ติดต่อและชุมชน",
     whitepaperSection6Text: "สำหรับคำถาม ข้อเสนอแนะหรือคำขอความร่วมมือ ติดต่อ",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "เข้าร่วมชุมชนของเราเพื่อช่วยกำหนดอนาคตของ Flappy Pi!",
     
     helpTitle: "ความช่วยเหลือและคู่มือ",
@@ -6228,7 +6228,7 @@ export const translations = {
     helpThirdPlace: "🥉 อันดับ 3: 1,000 Flappy Coins + สกินทั่วไป",
     helpSpecialRewards: "รางวัลพิเศษ: ทำคะแนน 1,000+ คะแนนสำหรับรางวัลโบนัส",
     helpMonthlyPiRewards: "รางวัล Pi รายเดือน: ติดตามรางวัลคริปโตเคอร์เรนซี Pi",
-    helpClaimRewards: "รับรางวัล: ส่งอีเมลถึงเราที่ support@flappypi.fun",
+    helpClaimRewards: "รับรางวัล: ส่งอีเมลถึงเราที่ support@www.flappypi.xyz",
     helpProTips: "🎯 เคล็ดลับ Pro สำหรับความสำเร็จ",
     helpFindRhythm: "หาจังหวะของคุณ: พัฒนารูปแบบการกดที่เสถียร",
     helpLookAhead: "มองไปข้างหน้า: เน้นที่ท่อที่กำลังจะมา ไม่ใช่แค่นกของคุณ",
@@ -6311,7 +6311,7 @@ export const translations = {
     // Splash Screen Translations
     splashMusicPrompt: "แตะเพื่อเปิดเพลง",
     splashHelpText: "ต้องการความช่วยเหลือ?",
-    splashContactEmail: "ติดต่อ support@flappypi.fun",
+    splashContactEmail: "ติดต่อ support@www.flappypi.xyz",
     splashByText: "โดย Mrwain Organization",
     
     // Home Screen Translations
@@ -6703,7 +6703,7 @@ export const translations = {
     privacySection7Text: "Wir können diese Richtlinie aktualisieren. Die fortgesetzte Nutzung der App bedeutet, dass Sie die neue Richtlinie akzeptieren.",
     privacySection8: "8. Kontakt:",
     privacySection8Text: "Für Datenschutzfragen kontaktieren Sie",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "Nutzungsbedingungen",
     termsDescription: "Lesen Sie unsere Bedingungen und Bestimmungen",
@@ -6721,7 +6721,7 @@ export const translations = {
     termsSection6Text: "Wir können diese Bedingungen jederzeit aktualisieren. Die fortgesetzte Nutzung der App bedeutet, dass Sie die neuen Bedingungen akzeptieren.",
     termsSection7: "7. Kontakt:",
     termsSection7Text: "Für Fragen kontaktieren Sie",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi Whitepaper",
     whitepaperDescription: "Technische Dokumentation und Roadmap",
@@ -6737,7 +6737,7 @@ export const translations = {
     whitepaperSection5Text: "Geplante Features umfassen NFT-Sammlerstücke, erweiterte Turniere und plattformübergreifende Kompatibilität.",
     whitepaperSection6: "6. Kontakt und Community",
     whitepaperSection6Text: "Für Fragen, Feedback oder Partnerschaftsanfragen kontaktieren Sie",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "Treten Sie unserer Community bei, um die Zukunft von Flappy Pi mitzugestalten!",
     
     helpTitle: "Hilfe und Anleitung",
@@ -6770,7 +6770,7 @@ export const translations = {
     helpThirdPlace: "🥉 3. Platz: 1,000 Flappy Coins + Gewöhnlicher Skin",
     helpSpecialRewards: "Spezielle Belohnungen: Erreichen Sie 1,000+ Punkte für Bonus-Preise",
     helpMonthlyPiRewards: "Monatliche Pi-Belohnungen: Bleiben Sie dran für Pi-Kryptowährungs-Preise",
-    helpClaimRewards: "Belohnungen einfordern: Senden Sie uns eine E-Mail an support@flappypi.fun",
+    helpClaimRewards: "Belohnungen einfordern: Senden Sie uns eine E-Mail an support@www.flappypi.xyz",
     helpProTips: "🎯 Pro-Tipps für Erfolg",
     helpFindRhythm: "Finden Sie Ihren Rhythmus: Entwickeln Sie ein stabiles Tipp-Muster",
     helpLookAhead: "Schauen Sie voraus: Konzentrieren Sie sich auf kommende Röhren, nicht nur auf Ihren Vogel",
@@ -6854,7 +6854,7 @@ export const translations = {
     // Splash Screen Translations
     splashMusicPrompt: "Tippe um Musik zu aktivieren",
     splashHelpText: "Brauchst du Hilfe?",
-    splashContactEmail: "kontaktiere support@flappypi.fun",
+    splashContactEmail: "kontaktiere support@www.flappypi.xyz",
     splashByText: "von Mrwain Organization",
     
     // Home Screen Translations
@@ -7037,7 +7037,7 @@ export const translations = {
     privacySection7Text: "ما ممکن است این سیاست را به‌روزرسانی کنیم. استفاده مداوم از برنامه به معنای پذیرش سیاست جدید است.",
     privacySection8: "8. تماس:",
     privacySection8Text: "برای سؤالات مربوط به حریم خصوصی، با ما تماس بگیرید",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "شرایط خدمات",
     termsDescription: "شرایط و ضوابط ما را بخوانید",
@@ -7055,7 +7055,7 @@ export const translations = {
     termsSection6Text: "ما ممکن است این شرایط را در هر زمان به‌روزرسانی کنیم. استفاده مداوم از برنامه به معنای پذیرش شرایط جدید است.",
     termsSection7: "7. تماس:",
     termsSection7Text: "برای سؤالات، با ما تماس بگیرید",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi Whitepaper",
     whitepaperDescription: "مستندات فنی و نقشه راه",
@@ -7071,7 +7071,7 @@ export const translations = {
     whitepaperSection5Text: "ویژگی‌های برنامه‌ریزی شده شامل NFT collectibles، مسابقات پیشرفته و سازگاری cross-platform است.",
     whitepaperSection6: "6. تماس و جامعه",
     whitepaperSection6Text: "برای سؤالات، بازخورد یا درخواست‌های مشارکت، با ما تماس بگیرید",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "به جامعه ما بپیوندید تا به شکل‌دهی آینده Flappy Pi کمک کنید!",
     
     helpTitle: "راهنما و راهنمایی",
@@ -7104,7 +7104,7 @@ export const translations = {
     helpThirdPlace: "🥉 رتبه 3: 1,000 Flappy Coins + پوست معمولی",
     helpSpecialRewards: "جوایز ویژه: 1,000+ امتیاز برای جوایز پاداش کسب کنید",
     helpMonthlyPiRewards: "جوایز ماهانه Pi: برای جوایز ارز دیجیتال Pi در انتظار باشید",
-    helpClaimRewards: "جوایز را دریافت کنید: به ما در support@flappypi.fun ایمیل بزنید",
+    helpClaimRewards: "جوایز را دریافت کنید: به ما در support@www.flappypi.xyz ایمیل بزنید",
     helpProTips: "🎯 نکات حرفه‌ای برای موفقیت",
     helpFindRhythm: "ریتم خود را پیدا کنید: یک الگوی ضربه پایدار توسعه دهید",
     helpLookAhead: "به جلو نگاه کنید: روی لوله‌های آینده تمرکز کنید، نه فقط روی پرنده خود",
@@ -7181,7 +7181,7 @@ export const translations = {
     almostThere: "تقریباً آماده...",
     splashMusicPrompt: "برای فعال‌سازی موسیقی ضربه بزنید",
     splashHelpText: "نیاز به کمک دارید؟",
-    splashContactEmail: "تماس support@flappypi.fun",
+    splashContactEmail: "تماس support@www.flappypi.xyz",
     splashByText: "توسط Mrwain Organization",
     
     // Home Screen Translations
@@ -7376,7 +7376,7 @@ export const translations = {
     privacySection7Text: "이 정책을 업데이트할 수 있습니다. 앱을 계속 사용하는 것은 새로운 정책을 수락한다는 의미입니다.",
     privacySection8: "8. 연락처:",
     privacySection8Text: "개인정보 관련 문의사항은 다음으로 연락하세요",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "서비스 약관",
     termsDescription: "약관 및 조건을 읽어보세요",
@@ -7394,7 +7394,7 @@ export const translations = {
     termsSection6Text: "언제든지 이 약관을 업데이트할 수 있습니다. 앱을 계속 사용하는 것은 새로운 약관을 수락한다는 의미입니다.",
     termsSection7: "7. 연락처:",
     termsSection7Text: "문의사항은 다음으로 연락하세요",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi 백서",
     whitepaperDescription: "기술 문서 및 로드맵",
@@ -7410,7 +7410,7 @@ export const translations = {
     whitepaperSection5Text: "계획된 기능에는 NFT 수집품, 고급 토너먼트 및 크로스 플랫폼 호환성이 포함됩니다.",
     whitepaperSection6: "6. 연락처 및 커뮤니티",
     whitepaperSection6Text: "질문, 피드백 또는 파트너십 문의는 다음으로 연락하세요",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "Flappy Pi의 미래를 형성하는 데 도움을 주기 위해 커뮤니티에 참여하세요!",
     
     helpTitle: "도움말 및 가이드",
@@ -7443,7 +7443,7 @@ export const translations = {
     helpThirdPlace: "🥉 3위: 1,000 Flappy 코인 + 일반 스킨",
     helpSpecialRewards: "특별 보상: 보너스 상품을 위해 1,000+ 점수를 달성하세요",
     helpMonthlyPiRewards: "월간 Pi 보상: Pi 암호화폐 상품을 위해 계속 지켜보세요",
-    helpClaimRewards: "보상 청구: support@flappypi.fun으로 이메일을 보내주세요",
+    helpClaimRewards: "보상 청구: support@www.flappypi.xyz으로 이메일을 보내주세요",
     helpProTips: "🎯 성공을 위한 프로 팁",
     helpFindRhythm: "리듬을 찾으세요: 안정적인 탭 패턴을 개발하세요",
     helpLookAhead: "앞을 보세요: 새에만 집중하지 말고 다가오는 파이프에 집중하세요",
@@ -7520,7 +7520,7 @@ export const translations = {
     almostThere: "거의 다 왔습니다...",
     splashMusicPrompt: "음악을 활성화하려면 탭하세요",
     splashHelpText: "도움이 필요하신가요?",
-    splashContactEmail: "연락 support@flappypi.fun",
+    splashContactEmail: "연락 support@www.flappypi.xyz",
     splashByText: "Mrwain Organization 제공",
     
     // Home Screen Translations
@@ -7857,7 +7857,7 @@ export const translations = {
     privacySection7Text: "このポリシーを更新する場合があります。アプリの継続使用は新しいポリシーの受諾を意味します。",
     privacySection8: "8. お問い合わせ:",
     privacySection8Text: "プライバシーに関するご質問は以下までお問い合わせください",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "利用規約",
     termsDescription: "利用規約と条件をお読みください",
@@ -7875,7 +7875,7 @@ export const translations = {
     termsSection6Text: "いつでもこの規約を更新する場合があります。アプリの継続使用は新しい規約の受諾を意味します。",
     termsSection7: "7. お問い合わせ:",
     termsSection7Text: "ご質問は以下までお問い合わせください",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi ホワイトペーパー",
     whitepaperDescription: "技術文書とロードマップ",
@@ -7891,7 +7891,7 @@ export const translations = {
     whitepaperSection5Text: "計画された機能には、NFTコレクション、高度なトーナメント、クロスプラットフォーム互換性が含まれます。",
     whitepaperSection6: "6. お問い合わせとコミュニティ",
     whitepaperSection6Text: "ご質問、フィードバック、パートナーシップのご相談は以下までお問い合わせください",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "Flappy Piの未来を形作るお手伝いをしていただくため、コミュニティに参加してください！",
     
     helpTitle: "ヘルプとガイド",
@@ -7924,7 +7924,7 @@ export const translations = {
     helpThirdPlace: "🥉 3位: 1,000 Flappyコイン + コモンスキン",
     helpSpecialRewards: "特別報酬: ボーナス報酬のために1,000+ポイントを達成してください",
     helpMonthlyPiRewards: "月間Pi報酬: Pi暗号通貨報酬をお楽しみに",
-    helpClaimRewards: "報酬請求: support@flappypi.funにメールしてください",
+    helpClaimRewards: "報酬請求: support@www.flappypi.xyzにメールしてください",
     helpProTips: "🎯 成功のためのプロのヒント",
     helpFindRhythm: "リズムを見つけましょう: 安定したタップパターンを開発してください",
     helpLookAhead: "先を見て: 鳥だけに集中せず、来るパイプに集中してください",
@@ -8033,7 +8033,7 @@ export const translations = {
     // Splash Screen Translations
     splashMusicPrompt: "音楽を有効にするにはタップ",
     splashHelpText: "ヘルプが必要ですか？",
-    splashContactEmail: "連絡 support@flappypi.fun",
+    splashContactEmail: "連絡 support@www.flappypi.xyz",
     splashByText: "Mrwain Organization 提供",
     
     // Home Screen Translations
@@ -8307,7 +8307,7 @@ export const translations = {
     privacySection7Text: "قد نحدث هذه السياسة. الاستخدام المستمر للتطبيق يعني قبول السياسة الجديدة.",
     privacySection8: "8. الاتصال:",
     privacySection8Text: "للأسئلة المتعلقة بالخصوصية، اتصل بنا على",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "شروط الخدمة",
     termsDescription: "اقرأ شروطنا وأحكامنا",
@@ -8325,7 +8325,7 @@ export const translations = {
     termsSection6Text: "قد نحدث هذه الشروط في أي وقت. الاستخدام المستمر للتطبيق يعني قبول الشروط الجديدة.",
     termsSection7: "7. الاتصال:",
     termsSection7Text: "للأسئلة، اتصل بنا على",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi الورقة البيضاء",
     whitepaperDescription: "الوثائق التقنية والخريطة الطريقية",
@@ -8341,7 +8341,7 @@ export const translations = {
     whitepaperSection5Text: "تشمل الميزات المخططة NFT collectibles والمسابقات المتقدمة والتوافق عبر المنصات.",
     whitepaperSection6: "6. الاتصال والمجتمع",
     whitepaperSection6Text: "للأسئلة والتعليقات أو طلبات الشراكة، اتصل بنا على",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "انضم إلى مجتمعنا للمساعدة في تشكيل مستقبل Flappy Pi!",
     
     helpTitle: "المساعدة والدليل",
@@ -8374,7 +8374,7 @@ export const translations = {
     helpThirdPlace: "🥉 المركز الثالث: 1,000 Flappy Coins + جلد عادي",
     helpSpecialRewards: "مكافآت خاصة: احصل على 1,000+ نقطة لمكافآت إضافية",
     helpMonthlyPiRewards: "مكافآت Pi الشهرية: ترقب مكافآت عملة Pi المشفرة",
-    helpClaimRewards: "احصل على المكافآت: أرسل لنا بريدًا إلكترونيًا على support@flappypi.fun",
+    helpClaimRewards: "احصل على المكافآت: أرسل لنا بريدًا إلكترونيًا على support@www.flappypi.xyz",
     helpProTips: "🎯 نصائح احترافية للنجاح",
     helpFindRhythm: "اعثر على إيقاعك: طور نمط ضغط مستقر",
     helpLookAhead: "انظر للأمام: ركز على الأنابيب القادمة، وليس فقط على طائرك",
@@ -8451,7 +8451,7 @@ export const translations = {
     almostThere: "تقريباً جاهز...",
     splashMusicPrompt: "انقر لتفعيل الموسيقى",
     splashHelpText: "تحتاج مساعدة؟",
-    splashContactEmail: "تواصل support@flappypi.fun",
+    splashContactEmail: "تواصل support@www.flappypi.xyz",
     splashByText: "بواسطة Mrwain Organization",
     
     // Home Screen Translations
@@ -8635,7 +8635,7 @@ export const translations = {
     privacySection7Text: "Ми можемо оновлювати цю політику. Продовження використання додатку означає прийняття нової політики.",
     privacySection8: "8. Контакти:",
     privacySection8Text: "Для питань щодо конфіденційності зв'яжіться з нами за адресою",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "Умови надання послуг",
     termsDescription: "Прочитайте наші умови та положення",
@@ -8653,7 +8653,7 @@ export const translations = {
     termsSection6Text: "Ми можемо оновлювати ці умови в будь-який час. Продовження використання додатку означає прийняття нових умов.",
     termsSection7: "7. Контакти:",
     termsSection7Text: "Для питань зв'яжіться з нами за адресою",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi Біла книга",
     whitepaperDescription: "Технічна документація та дорожня карта",
@@ -8669,7 +8669,7 @@ export const translations = {
     whitepaperSection5Text: "Заплановані функції включають NFT колекції, розширені турніри та крос-платформну сумісність.",
     whitepaperSection6: "6. Контакти та спільнота",
     whitepaperSection6Text: "Для питань, відгуків або запитів на партнерство зв'яжіться з нами за адресою",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "Приєднуйтесь до нашої спільноти, щоб допомогти сформувати майбутнє Flappy Pi!",
     
     helpTitle: "Допомога та посібник",
@@ -8702,7 +8702,7 @@ export const translations = {
     helpThirdPlace: "🥉 3 місце: 1,000 Flappy Coins + звичайна шкіра",
     helpSpecialRewards: "Спеціальні нагороди: отримайте 1,000+ очок для бонусних нагород",
     helpMonthlyPiRewards: "Щомісячні нагороди Pi: очікуйте нагороди криптовалюти Pi",
-    helpClaimRewards: "Отримайте нагороди: напишіть нам на support@flappypi.fun",
+    helpClaimRewards: "Отримайте нагороди: напишіть нам на support@www.flappypi.xyz",
     helpProTips: "🎯 Професійні поради для успіху",
     helpFindRhythm: "Знайдіть свій ритм: розвивайте стабільну модель натискань",
     helpLookAhead: "Дивіться вперед: фокусуйтесь на майбутніх трубах, а не тільки на вашому птахові",
@@ -8779,7 +8779,7 @@ export const translations = {
     almostThere: "Майже готово...",
     splashMusicPrompt: "Натисніть для увімкнення музики",
     splashHelpText: "Потрібна допомога?",
-    splashContactEmail: "зв'яжіться support@flappypi.fun",
+    splashContactEmail: "зв'яжіться support@www.flappypi.xyz",
     splashByText: "від Mrwain Organization",
     
     // Home Screen Translations
@@ -9015,7 +9015,7 @@ export const translations = {
     privacySection7Text: "Potremmo aggiornare questa policy. L'uso continuato dell'app significa accettare la nuova policy.",
     privacySection8: "8. Contatti:",
     privacySection8Text: "Per domande sulla privacy, contattaci a",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "Termini di Servizio",
     termsDescription: "Leggi i nostri termini e condizioni",
@@ -9033,7 +9033,7 @@ export const translations = {
     termsSection6Text: "Potremmo aggiornare questi termini in qualsiasi momento. L'uso continuato dell'app significa accettare i nuovi termini.",
     termsSection7: "7. Contatti:",
     termsSection7Text: "Per domande, contattaci a",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi Whitepaper",
     whitepaperDescription: "Documentazione tecnica e roadmap",
@@ -9049,7 +9049,7 @@ export const translations = {
     whitepaperSection5Text: "Le funzionalità pianificate includono NFT collectibles, tornei avanzati e compatibilità cross-platform.",
     whitepaperSection6: "6. Contatti e comunità",
     whitepaperSection6Text: "Per domande, feedback o richieste di partnership, contattaci a",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "Unisciti alla nostra comunità per aiutare a plasmare il futuro di Flappy Pi!",
     
     helpTitle: "Aiuto e Guida",
@@ -9082,7 +9082,7 @@ export const translations = {
     helpThirdPlace: "🥉 3° posto: 1,000 Flappy Coins + skin comune",
     helpSpecialRewards: "Ricompense speciali: ottieni 1,000+ punti per ricompense bonus",
     helpMonthlyPiRewards: "Ricompense mensili Pi: resta sintonizzato per ricompense in criptovaluta Pi",
-    helpClaimRewards: "Riscatta ricompense: inviaci un'email a support@flappypi.fun",
+    helpClaimRewards: "Riscatta ricompense: inviaci un'email a support@www.flappypi.xyz",
     helpProTips: "🎯 Suggerimenti pro per il successo",
     helpFindRhythm: "Trova il tuo ritmo: sviluppa un modello di tocco stabile",
     helpLookAhead: "Guarda avanti: concentrati sui tubi futuri, non solo sul tuo uccello",
@@ -9159,7 +9159,7 @@ export const translations = {
     almostThere: "Quasi pronto...",
     splashMusicPrompt: "Tocca per attivare la musica",
     splashHelpText: "Hai bisogno di aiuto?",
-    splashContactEmail: "contatta support@flappypi.fun",
+    splashContactEmail: "contatta support@www.flappypi.xyz",
     splashByText: "di Mrwain Organization",
     classicMode: "Modalità Classica",
     endlessMode: "Modalità Infinita",
@@ -9334,7 +9334,7 @@ export const translations = {
     privacySection7Text: "Możemy aktualizować tę politykę. Kontynuowanie korzystania z aplikacji oznacza akceptację nowej polityki.",
     privacySection8: "8. Kontakt:",
     privacySection8Text: "W przypadku pytań dotyczących prywatności skontaktuj się z nami pod adresem",
-    privacyContactEmail: "support@flappypi.fun",
+    privacyContactEmail: "support@www.flappypi.xyz",
     
     termsTitle: "Warunki Usługi",
     termsDescription: "Przeczytaj nasze warunki i postanowienia",
@@ -9352,7 +9352,7 @@ export const translations = {
     termsSection6Text: "Możemy aktualizować te warunki w dowolnym momencie. Kontynuowanie korzystania z aplikacji oznacza akceptację nowych warunków.",
     termsSection7: "7. Kontakt:",
     termsSection7Text: "W przypadku pytań skontaktuj się z nami pod adresem",
-    termsContactEmail: "support@flappypi.fun",
+    termsContactEmail: "support@www.flappypi.xyz",
     
     whitepaperTitle: "Flappy Pi Whitepaper",
     whitepaperDescription: "Dokumentacja techniczna i mapa drogowa",
@@ -9368,7 +9368,7 @@ export const translations = {
     whitepaperSection5Text: "Planowane funkcje obejmują NFT collectibles, zaawansowane turnieje i kompatybilność cross-platform.",
     whitepaperSection6: "6. Kontakt i społeczność",
     whitepaperSection6Text: "W przypadku pytań, opinii lub wniosków o partnerstwo skontaktuj się z nami pod adresem",
-    whitepaperContactEmail: "support@flappypi.fun",
+    whitepaperContactEmail: "support@www.flappypi.xyz",
     whitepaperContactText: "Dołącz do naszej społeczności, aby pomóc w kształtowaniu przyszłości Flappy Pi!",
     
     helpTitle: "Pomoc i Przewodnik",
@@ -9401,7 +9401,7 @@ export const translations = {
     helpThirdPlace: "🥉 3 miejsce: 1,000 Flappy Coins + zwykła skóra",
     helpSpecialRewards: "Specjalne nagrody: zdobądź 1,000+ punktów za bonusowe nagrody",
     helpMonthlyPiRewards: "Miesięczne nagrody Pi: czekaj na nagrody w kryptowalucie Pi",
-    helpClaimRewards: "Odbierz nagrody: wyślij nam email na support@flappypi.fun",
+    helpClaimRewards: "Odbierz nagrody: wyślij nam email na support@www.flappypi.xyz",
     helpProTips: "🎯 Pro wskazówki do sukcesu",
     helpFindRhythm: "Znajdź swój rytm: rozwijaj stabilny wzór dotykania",
     helpLookAhead: "Patrz do przodu: skup się na nadchodzących rurach, nie tylko na swoim ptaku",
@@ -9478,7 +9478,7 @@ export const translations = {
     almostThere: "Prawie gotowe...",
     splashMusicPrompt: "Dotknij, aby włączyć muzykę",
     splashHelpText: "Potrzebujesz pomocy?",
-    splashContactEmail: "skontaktuj się support@flappypi.fun",
+    splashContactEmail: "skontaktuj się support@www.flappypi.xyz",
     splashByText: "przez Mrwain Organization",
     
     // Welcome Page Translations
@@ -10671,7 +10671,7 @@ export const translations = {
     gettingReady: "Ana shirya don tashi...",
     almostThere: "Kusan isa...",
     splashMusicPrompt: "Danna don kunna kiɗa",
-    splashContactEmail: "tuntuɓar support@flappypi.fun",
+    splashContactEmail: "tuntuɓar support@www.flappypi.xyz",
     splashByText: "ta Mrwain Organization",
     
     // Home Screen Translations

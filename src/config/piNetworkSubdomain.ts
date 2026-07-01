@@ -25,7 +25,7 @@ export const PI_NETWORK_SUBDOMAIN_CONFIG = {
     'https://flappypi2807.pinet.com',
     'https://*.pinet.com',
     'https://*.minepi.com',
-    'https://flappypi.fun'
+    'https://www.flappypi.xyz'
   ],
   
   // Pi SDK configuration

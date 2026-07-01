@@ -540,11 +540,11 @@ export default function Whitepaper({ musicEnabled, setMusicEnabled, soundEnabled
                   <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
                     <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
                       <h3 className="font-semibold mb-2">📧 Official Email</h3>
-                      <a href="mailto:support@flappypi.fun" className="text-green-200 hover:text-white underline">support@flappypi.fun</a>
+                      <a href="mailto:support@www.flappypi.xyz" className="text-green-200 hover:text-white underline">support@www.flappypi.xyz</a>
                     </div>
                     <div className="bg-white/10 backdrop-blur-sm p-4 rounded-lg">
                       <h3 className="font-semibold mb-2">🌐 Website</h3>
-                      <a href="https://flappypi.fun" className="text-green-200 hover:text-white underline">flappypi.fun</a>
+                      <a href="https://www.flappypi.xyz" className="text-green-200 hover:text-white underline">www.flappypi.xyz</a>
                     </div>
                   </div>
                 </div>
