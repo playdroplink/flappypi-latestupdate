@@ -233,6 +233,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ profile, onLogout }) => {
   // Refresh username when authentication state changes
   useEffect(() => {
     refreshUsername();
+    console.log('🔄 Username refreshed:', username);
   }, [isAuthenticated, piUser, isPiAuth]);
   const [tab, setTab] = useState('avatar');
   const [avatar, setAvatar] = useState(() => {

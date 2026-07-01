@@ -549,6 +549,14 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
     const streakCount = Number(localStorage.getItem('flappy-streak')) || 1;
     const now = Date.now();
     const hoursSince = (now - lastClaimTime) / (1000 * 60 * 60);
+    
+    console.log('🎁 Daily Reward Check:', {
+      lastClaimTime,
+      hoursSince,
+      streakCount,
+      isEligible: hoursSince >= 24 || lastClaimTime === 0
+    });
+    
     if (hoursSince >= 24 || lastClaimTime === 0) {
       // Queue the modal instead of showing immediately
       queueModal(() => {
@@ -1721,8 +1729,8 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
             <DialogDescription id="daily-reward-desc">{t('dailyRewardDescription')}</DialogDescription>
                           <img src="/flappycoins.png" alt="Flappy Coins" className="w-24 h-24 mb-4 animate-bounce" />
             <div className="text-xl font-bold text-yellow-600 mb-2">Daily Login Reward</div>
-                          <div className="text-gray-700 mb-2">{t('dailyRewardReceived').replace('{amount}', dailyRewardAmount.toString())}</div>
-            <div className="text-sm text-gray-500 mb-4">Come back every 24 hours to increase your reward! (+100 FC per day streak)</div>
+            <div className="text-gray-700 mb-2">Hi, {username || piUser?.username || 'Player'}! You received {dailyRewardAmount} Flappy Coins today!</div>
+            <div className="text-sm text-gray-500 mb-4">Come back every 24 hours to increase your reward! (+10 FC per day streak)</div>
             <Button className="mt-4 bg-yellow-400 text-white px-6 py-3 text-lg rounded-xl hover:bg-yellow-500 transition-transform duration-200 hover:scale-105 font-bold" onClick={handleClaimDailyReward}>
               {t('claimNow')}
             </Button>
