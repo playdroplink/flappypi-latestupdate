@@ -41,7 +41,7 @@ const Bird: React.FC<BirdProps> = ({ y, velocity, onFlap, isDead, skin, classNam
   }, [isDead, countdownFlap]);
 
   // Smooth rotation based on velocity - more like original Flappy Bird
-  const rotation = Math.max(Math.min(velocity * 2.5, 30), -25); // Reduced rotation range for smoother flight
+  const rotation = Math.max(Math.min(velocity * 3, 45), -30); // Increased rotation range for more responsive feel
 
   // Use the provided skin or animated frames
   const birdImg = skin || FLAP_FRAMES[frame];
@@ -73,7 +73,7 @@ const Bird: React.FC<BirdProps> = ({ y, velocity, onFlap, isDead, skin, classNam
         top: y, 
         left: left !== undefined ? left : (isMobile ? '25vw' : '15vw'), // Use left prop if provided
         transform: `rotate(${rotation}deg)`, 
-        transition: 'transform 0.1s linear', 
+        transition: 'transform 0.08s cubic-bezier(0.25, 0.46, 0.45, 0.94)', 
         ...style 
       }}
     >

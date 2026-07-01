@@ -1532,18 +1532,19 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-4 px-4 sm:px-0">
         <button
           onClick={() => navigateToPublic(ROUTES.DAILY_REWARDS)}
-          className="flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-base sm:text-lg shadow-xl transition-all duration-200 bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-orange-200 border-2 border-orange-400 min-h-[48px] sm:min-h-[56px] touch-manipulation w-full sm:w-auto"
+          className="flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-base sm:text-lg shadow-xl transition-all duration-300 bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-400 text-white hover:scale-105 hover:shadow-2xl hover:shadow-yellow-500/50 focus:outline-none focus:ring-4 focus:ring-yellow-300 border-2 border-yellow-400/50 relative overflow-hidden group min-h-[48px] sm:min-h-[56px] touch-manipulation w-full sm:w-auto"
         >
-          <span className="text-xl sm:text-2xl">🎁</span> 
-          <span className="truncate">{t('dailyRewards')}</span>
+          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
+          <span className="text-xl sm:text-2xl relative z-10">🎁</span> 
+          <span className="truncate relative z-10">{t('dailyRewards')}</span>
         </button>
         <button
           onClick={handleOpenTutorial}
-          className="flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-base sm:text-lg shadow-xl transition-all duration-200 bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-200 border-2 border-purple-400 relative min-h-[48px] sm:min-h-[56px] touch-manipulation w-full sm:w-auto"
+          className="flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-8 py-3 sm:py-4 rounded-2xl font-bold text-base sm:text-lg shadow-xl transition-all duration-300 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-500 text-white hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 focus:outline-none focus:ring-4 focus:ring-purple-300 border-2 border-purple-400/50 relative overflow-hidden group min-h-[48px] sm:min-h-[56px] touch-manipulation w-full sm:w-auto"
         >
-          <span className="text-xl sm:text-2xl">📚</span> 
-          <span className="truncate">{t('tutorial') || 'Tutorial'}</span>
-          {/* Tutorial indicator removed - no longer blocking */}
+          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
+          <span className="text-xl sm:text-2xl relative z-10">📚</span> 
+          <span className="truncate relative z-10">{t('tutorial') || 'Tutorial'}</span>
         </button>
       </div>
       </div> {/* Close main content div */}
