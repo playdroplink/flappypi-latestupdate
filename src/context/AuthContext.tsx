@@ -2,6 +2,12 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { useNavigate } from 'react-router-dom';
 import { saveWalletBalance, loadWalletBalance } from '../utils/walletUtils';
 import { PI_CONFIG } from '../config/piConfig';
+import { 
+  isOAuthAuthenticated, 
+  getPiUser as getOAuthUser, 
+  logout as oauthLogout,
+  getAccessToken 
+} from '../services/piAuth';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -59,13 +65,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const piAuthStatus = localStorage.getItem('flappypi-pi-auth') === 'true';
     const savedPiUser = localStorage.getItem('flappypi-pi-user');
     
+    // Check for OAuth authentication
+    const oauthAuthenticated = isOAuthAuthenticated();
+    const oauthUser = getOAuthUser();
+    
     console.log('🔍 AuthContext - localStorage data:', {
       savedUsername,
       savedPassword: savedPassword ? '***' : null,
       piAuthStatus,
       savedPiUser: savedPiUser ? 'exists' : null,
-      savedPiUserContent: savedPiUser ? JSON.parse(savedPiUser) : null
+      savedPiUserContent: savedPiUser ? JSON.parse(savedPiUser) : null,
+      oauthAuthenticated,
+      oauthUser
     });
+
+    // Check OAuth authentication first
+    if (oauthAuthenticated && oauthUser) {
+      console.log('✅ AuthContext - OAuth user authenticated:', oauthUser.username);
+      setIsAuthenticated(true);
+      setIsPiAuth(true);
+      setUsername(oauthUser.username);
+      setPiUser(oauthUser);
+      isCheckingAuth.current = false;
+      return true;
+    }
 
     // Enhanced Pi authentication check with sandbox support
     if (piAuthStatus && savedPiUser) {
@@ -531,6 +554,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = useCallback(async () => {
     try {
       console.log('🚪 Logging out user...');
+      
+      // Clear OAuth authentication data
+      oauthLogout();
       
       // Create backup and sync to cloud before logout if user is logged in
       if (isAuthenticated && piUser?.uid && piUser?.username) {

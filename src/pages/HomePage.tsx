@@ -1202,53 +1202,6 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
                                                   <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse" />
                                                 )}
                                               </button>
-                                              {/* Payment Shop Button */}
-                                              {isPiAuth && (
-                                                <button
-                                                  className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white py-2 px-3 rounded-lg transition-colors font-medium text-sm"
-                                                  onClick={() => setShowPaymentShop(true)}
-                                                  aria-label="Payment Shop"
-                                                >
-                                                  🛒 Shop
-                                                </button>
-                                              )}
-                                              {/* Reserve Connect Button */}
-                                              {isPiAuth && (
-                                                <button
-                                                  className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white py-2 px-3 rounded-lg transition-colors font-medium text-sm"
-                                                  onClick={() => setShowReserveConnect(true)}
-                                                  aria-label="Reserve Connect"
-                                                >
-                                                  🔒 Reserve
-                                                </button>
-                                              )}
-                                              {/* Stream Button */}
-                                              {isPiAuth && (
-                                                <button
-                                                  className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white py-2 px-3 rounded-lg transition-colors font-medium text-sm"
-                                                  onClick={() => setShowStreamPanel(true)}
-                                                  aria-label="Stream"
-                                                >
-                                                  📺 Stream
-                                                </button>
-                                              )}
-                                              {/* Pi Hide Button */}
-                                              {isPiAuth && (
-                                                <button
-                                                  className="bg-gradient-to-r from-gray-500 to-slate-500 hover:from-gray-600 hover:to-slate-600 text-white py-2 px-3 rounded-lg transition-colors font-medium text-sm"
-                                                  onClick={() => setShowPiHidePanel(true)}
-                                                  aria-label="Privacy"
-                                                >
-                                                  🙈 Privacy
-                                                </button>
-                                              )}
-                                              <button
-                                                className={`${theme === 'night' ? 'bg-gray-800 hover:bg-gray-700 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'} rounded-full p-3 transition-all duration-200 hover:scale-105 shadow-md`}
-                                                onClick={() => navigateToPublic('/profile')}
-                                                aria-label={t('profile')}
-                                              >
-                                                <User className="w-5 h-5" />
-                                              </button>
                                             </div>
                   {/* Announcement Modal */}
                   <Dialog open={showAnnouncement} onOpenChange={handleCloseAnnouncement}>
@@ -1465,16 +1418,6 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
             >
               <span className="text-2xl">🌐</span> {t('flappyPiCommunity')}
             </button>
-            {/* Scream Pi Button */}
-            {/* Scream Pi Button Locked for now */}
-            <button
-              disabled
-              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl shadow-lg transition-all duration-200 bg-gradient-to-r from-gray-400 to-gray-500 text-white opacity-60 cursor-not-allowed border-2 border-gray-400"
-              style={{ minHeight: '56px', pointerEvents: 'none' }}
-            >
-              <span className="text-2xl">🔒</span>
-              <span>Scream Pi Mode (Locked)</span>
-            </button>
             
             {/* Flappy Pi Toons Button - DISABLED */}
             {/* 
@@ -1545,9 +1488,9 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
               <img src="/settings.png" alt={t('settings')} className="h-14 w-14 mb-1 group-hover:scale-110 transition-transform" />
               <span className={`text-base font-bold group-hover:text-blue-600 ${theme === 'night' ? 'text-white' : 'text-gray-700'}`}>{t('settings')}</span>
             </button>
-            <button disabled className="flex flex-col items-center group opacity-60 cursor-not-allowed" style={{ background: 'none', border: 'none' }}>
-              <img src="/reserve.png" alt={t('reserve')} className="h-14 w-14 mb-1" />
-              <span className={`text-base font-bold ${theme === 'night' ? 'text-white' : 'text-gray-700'}`}>{t('reserve') || 'Reserve (Locked)'}</span>
+            <button onClick={() => navigateToPublic(ROUTES.RESERVE)} className="flex flex-col items-center group" style={{ background: 'none', border: 'none' }}>
+              <img src="/reserve.png" alt={t('reserve')} className="h-14 w-14 mb-1 group-hover:scale-110 transition-transform" />
+              <span className={`text-base font-bold group-hover:text-blue-600 ${theme === 'night' ? 'text-white' : 'text-gray-700'}`}>{t('reserve')}</span>
             </button>
             <button onClick={() => navigateToPublic(ROUTES.MERCH)} className="flex flex-col items-center group" style={{ background: 'none', border: 'none' }}>
               <img src="/merch.png" alt={t('merch')} className="h-14 w-14 mb-1 group-hover:scale-110 transition-transform" />
