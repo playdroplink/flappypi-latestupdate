@@ -51,29 +51,30 @@ const RevivePrompt: React.FC<RevivePromptProps> = ({
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-sm mx-4 bg-gradient-to-b from-red-900 to-purple-900 text-white border-2 border-yellow-400 shadow-2xl">
-        <CardHeader className="text-center pb-4">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <Card className="w-full max-w-sm mx-4 bg-gradient-to-br from-red-500 via-rose-600 to-pink-600 text-white border-4 border-red-400/50 shadow-2xl relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shine_2s_infinite]"></div>
+        <CardHeader className="text-center pb-4 relative z-10">
           <div className="flex justify-center mb-2">
-            <Heart className="w-16 h-16 text-red-500 animate-pulse" />
+            <Heart className="w-16 h-16 text-red-300 animate-pulse drop-shadow-lg" />
           </div>
-          <CardTitle className="text-2xl font-bold text-yellow-300">
+          <CardTitle className="text-2xl font-bold text-yellow-300 drop-shadow-md">
             {isWatchingAd ? 'Watching Ad...' : 'Second Chance!'}
           </CardTitle>
-          <p className="text-sm text-gray-300">
+          <p className="text-sm text-white/90">
             Score: {score} points
           </p>
         </CardHeader>
         
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 relative z-10">
           {!isWatchingAd ? (
             <>
               <div className="text-center">
                 <p className="text-lg font-semibold mb-2 text-white">Watch a Pi Ad to revive?</p>
-                <p className="text-sm text-gray-300 mb-4">
+                <p className="text-sm text-white/80 mb-4">
                   Continue your flight exactly where you left off!
                 </p>
-                <div className="bg-yellow-900 bg-opacity-50 rounded-lg p-3 border border-yellow-600">
+                <div className="bg-yellow-500/20 rounded-lg p-3 border-2 border-yellow-400/50">
                   <p className="text-xs text-yellow-200">
                     💡 Ads support the game and help fund weekly Pi rewards for top players!
                   </p>
@@ -84,7 +85,7 @@ const RevivePrompt: React.FC<RevivePromptProps> = ({
                 {piAdAvailable && piBrowserRedirect.isInPiBrowser() && (
                   <Button
                     onClick={handleWatchAd}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg border-0 transition-colors duration-200"
+                    className="flex-1 bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-500 hover:from-blue-600 hover:via-blue-700 hover:to-cyan-600 text-white font-semibold py-3 px-4 rounded-xl border-2 border-blue-400/50 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
                     variant="default"
                     type="button"
                   >
@@ -95,7 +96,7 @@ const RevivePrompt: React.FC<RevivePromptProps> = ({
                 {(!piAdAvailable || !piBrowserRedirect.isInPiBrowser()) && (
                   <Button
                     onClick={() => piBrowserRedirect.showPiBrowserMessage()}
-                    className="flex-1 bg-gray-400 text-gray-600 font-semibold py-3 px-4 rounded-lg border-0 cursor-not-allowed"
+                    className="flex-1 bg-gray-500/50 text-gray-300 font-semibold py-3 px-4 rounded-xl border-2 border-gray-400/50 cursor-not-allowed"
                     variant="default"
                     type="button"
                     disabled
@@ -106,7 +107,7 @@ const RevivePrompt: React.FC<RevivePromptProps> = ({
                 <Button
                   onClick={onDecline}
                   variant="destructive"
-                  className="flex-1 bg-gray-700 hover:bg-gray-800 text-gray-300 border-gray-500 border py-3 px-4 rounded-lg transition-colors duration-200"
+                  className="flex-1 bg-gradient-to-br from-gray-600 via-gray-700 to-gray-800 hover:from-gray-700 hover:via-gray-800 hover:to-gray-900 text-white border-2 border-gray-500/50 py-3 px-4 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
                   type="button"
                 >
                   Game Over
@@ -118,12 +119,12 @@ const RevivePrompt: React.FC<RevivePromptProps> = ({
                 <div className="mt-3">
                   <Button
                     onClick={() => piBrowserRedirect.redirectToPiBrowser()}
-                    className="w-full bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 rounded-lg"
+                    className="w-full bg-gradient-to-br from-sky-500 via-blue-600 to-indigo-500 hover:from-sky-600 hover:via-blue-700 hover:to-indigo-600 text-white text-sm font-semibold py-2 px-4 rounded-xl border-2 border-blue-400/50 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
                   >
                     📱 Download Pi Browser
                   </Button>
                   <div className="mt-2 text-center">
-                    <p className="text-orange-400 text-xs font-semibold">
+                    <p className="text-yellow-200 text-xs font-semibold">
                       💡 Download Pi Browser to watch ads and earn rewards!
                     </p>
                   </div>
@@ -134,23 +135,23 @@ const RevivePrompt: React.FC<RevivePromptProps> = ({
             <div className="text-center">
               <div className="text-6xl mb-4">📺</div>
               <h3 className="text-xl font-bold mb-2 text-white">Pi Network Ad</h3>
-              <p className="text-gray-300 mb-4">Please wait while the ad plays...</p>
+              <p className="text-white/80 mb-4">Please wait while the ad plays...</p>
               
               <div className="flex items-center justify-center space-x-2 text-yellow-300">
                 <Clock className="w-5 h-5" />
                 <span className="text-lg font-mono">{countdown}s</span>
               </div>
               
-              <div className="w-full bg-gray-700 rounded-full h-2 mt-4">
+              <div className="w-full bg-white/20 rounded-full h-3 mt-4 overflow-hidden">
                 <div 
-                  className="bg-green-500 h-2 rounded-full transition-all duration-1000"
+                  className="bg-gradient-to-r from-green-400 to-emerald-500 h-full rounded-full transition-all duration-1000"
                   style={{ width: `${((5 - countdown) / 5) * 100}%` }}
                 ></div>
               </div>
             </div>
           )}
           
-          <p className="text-xs text-center text-gray-400">
+          <p className="text-xs text-center text-white/70">
             One revive per game • Supports Pi Network ecosystem
           </p>
         </CardContent>

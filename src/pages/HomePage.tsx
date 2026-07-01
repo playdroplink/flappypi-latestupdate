@@ -1337,18 +1337,17 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
            <div className="flex flex-col gap-4 sm:gap-6 w-full max-w-md mx-auto mt-6 sm:mt-8 mb-12 px-3 sm:px-0">
              <button
                onClick={() => navigateToPublic('/play')}
-               className="w-full flex items-center justify-center gap-2 sm:gap-3 py-4 sm:py-6 px-4 rounded-2xl sm:rounded-3xl font-black text-lg sm:text-3xl transition-all duration-300 bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-400 text-blue-900 border-4 border-yellow-600/50 hover:scale-105 hover:shadow-2xl hover:shadow-yellow-500/50 hover:border-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-300 game-mode-button relative overflow-hidden group"
-               style={{ minHeight: '52px', pointerEvents: 'auto' }}
+               className="w-full flex items-center justify-center gap-2 sm:gap-3 py-4 sm:py-5 px-4 rounded-2xl sm:rounded-3xl font-black text-lg sm:text-2xl transition-all duration-300 bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-400 text-blue-900 border-4 border-yellow-600/50 hover:scale-105 hover:shadow-2xl hover:shadow-yellow-500/50 hover:border-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-300 game-mode-button relative overflow-hidden group"
+               style={{ minHeight: '56px', pointerEvents: 'auto' }}
              >
                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
-               <span className="text-2xl sm:text-3xl relative z-10">▶️</span> 
-               <span className="hidden sm:inline relative z-10">{t('play')}</span>
-               <span className="sm:hidden text-base font-bold relative z-10">{t('play')}</span>
+               <span className="text-xl sm:text-2xl relative z-10">▶️</span> 
+               <span className="text-sm sm:text-base relative z-10">{t('play')}</span>
              </button>
              <button
                onClick={() => navigateToPublic('/play')}
                className="w-full flex items-center justify-center gap-2 sm:gap-3 py-4 sm:py-5 px-4 rounded-2xl sm:rounded-3xl font-black text-lg sm:text-2xl transition-all duration-300 bg-gradient-to-br from-emerald-400 via-green-500 to-teal-400 text-white border-4 border-green-600/50 hover:scale-105 hover:shadow-2xl hover:shadow-green-500/50 hover:border-green-500 focus:outline-none focus:ring-4 focus:ring-green-200 game-mode-button relative overflow-hidden group"
-               style={{ minHeight: '50px', pointerEvents: 'auto' }}
+               style={{ minHeight: '56px', pointerEvents: 'auto' }}
              >
                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
                <span className="text-xl sm:text-2xl relative z-10">🌱</span> 
@@ -1357,7 +1356,7 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
             <button
               onClick={() => navigateToPublic(ROUTES.ENDLESS)}
               className="w-full flex items-center justify-center gap-2 sm:gap-3 py-4 sm:py-5 px-4 rounded-2xl sm:rounded-3xl font-black text-lg sm:text-2xl transition-all duration-300 bg-gradient-to-br from-blue-400 via-cyan-500 to-indigo-400 text-white border-4 border-blue-600/50 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/50 hover:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-200 relative overflow-hidden group"
-              style={{ minHeight: '50px', pointerEvents: 'auto' }}
+              style={{ minHeight: '56px', pointerEvents: 'auto' }}
             >
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
               <span className="text-xl sm:text-2xl relative z-10">∞</span> 
