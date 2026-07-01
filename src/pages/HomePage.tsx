@@ -1329,35 +1329,39 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
            <div className="flex flex-col gap-4 sm:gap-6 w-full max-w-md mx-auto mt-6 sm:mt-8 mb-12 px-3 sm:px-0">
              <button
                onClick={() => navigateToPublic('/play')}
-               className="w-full flex items-center justify-center gap-2 sm:gap-3 py-4 sm:py-6 px-4 rounded-2xl sm:rounded-3xl font-black text-lg sm:text-3xl shadow-lg sm:shadow-xl transition-all duration-200 bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 text-blue-900 border-3 sm:border-4 border-yellow-600 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-yellow-300 animate-bounce-slow game-mode-button"
+               className="w-full flex items-center justify-center gap-2 sm:gap-3 py-4 sm:py-6 px-4 rounded-2xl sm:rounded-3xl font-black text-lg sm:text-3xl transition-all duration-300 bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-400 text-blue-900 border-4 border-yellow-600/50 hover:scale-105 hover:shadow-2xl hover:shadow-yellow-500/50 hover:border-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-300 game-mode-button relative overflow-hidden group"
                style={{ minHeight: '52px', pointerEvents: 'auto' }}
              >
-               <span className="text-2xl sm:text-3xl">▶️</span> 
-               <span className="hidden sm:inline">{t('play')}</span>
-               <span className="sm:hidden text-base font-bold">{t('play')}</span>
+               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
+               <span className="text-2xl sm:text-3xl relative z-10">▶️</span> 
+               <span className="hidden sm:inline relative z-10">{t('play')}</span>
+               <span className="sm:hidden text-base font-bold relative z-10">{t('play')}</span>
              </button>
              <button
                onClick={() => navigateToPublic('/play')}
-               className="w-full flex items-center justify-center gap-2 sm:gap-3 py-4 sm:py-5 px-4 rounded-2xl sm:rounded-3xl font-black text-lg sm:text-2xl shadow-lg transition-all duration-200 bg-green-400 hover:bg-green-500 text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-200 game-mode-button"
+               className="w-full flex items-center justify-center gap-2 sm:gap-3 py-4 sm:py-5 px-4 rounded-2xl sm:rounded-3xl font-black text-lg sm:text-2xl transition-all duration-300 bg-gradient-to-br from-emerald-400 via-green-500 to-teal-400 text-white border-4 border-green-600/50 hover:scale-105 hover:shadow-2xl hover:shadow-green-500/50 hover:border-green-500 focus:outline-none focus:ring-4 focus:ring-green-200 game-mode-button relative overflow-hidden group"
                style={{ minHeight: '50px', pointerEvents: 'auto' }}
              >
-               <span className="text-xl sm:text-2xl">🌱</span> 
-               <span className="text-sm sm:text-base">{t('classic')}</span>
+               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
+               <span className="text-xl sm:text-2xl relative z-10">🌱</span> 
+               <span className="text-sm sm:text-base relative z-10">{t('classic')}</span>
              </button>
             <button
               onClick={() => navigateToPublic(ROUTES.ENDLESS)}
-              className="w-full flex items-center justify-center gap-2 sm:gap-3 py-4 sm:py-5 px-4 rounded-2xl sm:rounded-3xl font-black text-lg sm:text-2xl shadow-lg transition-all duration-200 bg-blue-400 hover:bg-blue-500 text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200"
+              className="w-full flex items-center justify-center gap-2 sm:gap-3 py-4 sm:py-5 px-4 rounded-2xl sm:rounded-3xl font-black text-lg sm:text-2xl transition-all duration-300 bg-gradient-to-br from-blue-400 via-cyan-500 to-indigo-400 text-white border-4 border-blue-600/50 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/50 hover:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-200 relative overflow-hidden group"
               style={{ minHeight: '50px', pointerEvents: 'auto' }}
             >
-              <span className="text-xl sm:text-2xl">∞</span> 
-              <span className="text-sm sm:text-base">{t('endless')}</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
+              <span className="text-xl sm:text-2xl relative z-10">∞</span> 
+              <span className="text-sm sm:text-base relative z-10">{t('endless')}</span>
             </button>
             <button
               onClick={() => navigateToPublic(ROUTES.CHALLENGE)}
-              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl shadow-lg transition-all duration-200 bg-purple-500 hover:bg-purple-600 text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-200"
+              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl transition-all duration-300 bg-gradient-to-br from-purple-500 via-violet-600 to-fuchsia-500 text-white border-4 border-purple-600/50 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 hover:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-200 relative overflow-hidden group"
               style={{ minHeight: '56px', pointerEvents: 'auto' }}
             >
-              <span className="text-2xl">🏆</span> {t('challenge')}
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
+              <span className="text-2xl relative z-10">🏆</span> <span className="relative z-10">{t('challenge')}</span>
             </button>
 
             {/* PvP Duels Button - Next Season Modal */}
@@ -1366,10 +1370,11 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
                 setNextSeasonFeature('pvp-duels');
                 setShowNextSeasonModal(true);
               }}
-              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl shadow-lg transition-all duration-200 bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-200"
+              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl transition-all duration-300 bg-gradient-to-br from-red-500 via-orange-500 to-amber-500 text-white border-4 border-red-600/50 hover:scale-105 hover:shadow-2xl hover:shadow-red-500/50 hover:border-red-500 focus:outline-none focus:ring-4 focus:ring-red-200 relative overflow-hidden group"
               style={{ minHeight: '56px', pointerEvents: 'auto' }}
             >
-              <span className="text-2xl">⚔️</span> PvP Duels
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
+              <span className="text-2xl relative z-10">⚔️</span> <span className="relative z-10">PvP Duels</span>
             </button>
             
             {/* Test Duels Button - DEMO - DISABLED */}
@@ -1399,24 +1404,27 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
             </button> */}
             <button
               onClick={() => navigateToPublic(ROUTES.SUBSCRIPTION_PLANS)}
-              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl shadow-lg transition-all duration-200 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-pink-200"
+              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl transition-all duration-300 bg-gradient-to-br from-fuchsia-500 via-pink-500 to-rose-500 text-white border-4 border-pink-600/50 hover:scale-105 hover:shadow-2xl hover:shadow-pink-500/50 hover:border-pink-500 focus:outline-none focus:ring-4 focus:ring-pink-200 relative overflow-hidden group"
               style={{ minHeight: '56px', pointerEvents: 'auto' }}
             >
-              <span className="text-2xl">💎</span> {t('subscriptionPlans')}
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
+              <span className="text-2xl relative z-10">💎</span> <span className="relative z-10">{t('subscriptionPlans')}</span>
             </button>
             <button
               onClick={() => navigateToPublic(ROUTES.SOCIAL_CHALLENGE)}
-              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl shadow-lg transition-all duration-200 bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-pink-200"
+              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl transition-all duration-300 bg-gradient-to-br from-violet-500 via-purple-600 to-indigo-500 text-white border-4 border-purple-600/50 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 hover:border-purple-500 focus:outline-none focus:ring-4 focus:ring-purple-200 relative overflow-hidden group"
               style={{ minHeight: '56px', pointerEvents: 'auto' }}
             >
-              <span className="text-2xl">🎮</span> {t('socialChallenge')}
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
+              <span className="text-2xl relative z-10">🎮</span> <span className="relative z-10">{t('socialChallenge')}</span>
             </button>
             <button
               onClick={() => navigateToPublic(ROUTES.COMMUNITY)}
-              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl shadow-lg transition-all duration-200 bg-blue-600 hover:bg-blue-700 text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-200"
+              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl transition-all duration-300 bg-gradient-to-br from-sky-500 via-blue-600 to-cyan-500 text-white border-4 border-blue-600/50 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/50 hover:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-200 relative overflow-hidden group"
               style={{ minHeight: '56px', pointerEvents: 'auto' }}
             >
-              <span className="text-2xl">🌐</span> {t('flappyPiCommunity')}
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
+              <span className="text-2xl relative z-10">🌐</span> <span className="relative z-10">{t('flappyPiCommunity')}</span>
             </button>
             
             {/* Flappy Pi Toons Button - DISABLED */}
@@ -1438,11 +1446,12 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
             {/* Flappy Pi DeFi Button */}
             <button
               onClick={() => navigate('/flappy-pi-defi')}
-              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl shadow-lg transition-all duration-200 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-200"
+              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl transition-all duration-300 bg-gradient-to-br from-amber-500 via-yellow-500 to-orange-500 text-white border-4 border-yellow-600/50 hover:scale-105 hover:shadow-2xl hover:shadow-yellow-500/50 hover:border-yellow-500 focus:outline-none focus:ring-4 focus:ring-yellow-200 relative overflow-hidden group"
               style={{ minHeight: '56px', pointerEvents: 'auto' }}
             >
-              <span className="text-2xl">💰</span>
-              <span>Flappy Pi DeFi</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
+              <span className="text-2xl relative z-10">💰</span>
+              <span className="relative z-10">Flappy Pi DeFi</span>
             </button>
             
             {/* Dino Pi Button - Next Season Modal */}
@@ -1451,11 +1460,12 @@ const HomePage: React.FC<HomePageProps> = ({ piUser, adNetworkSupported, musicEn
                 setNextSeasonFeature('dino-pi');
                 setShowNextSeasonModal(true);
               }}
-              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl shadow-lg transition-all duration-200 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-200"
+              className="w-full flex items-center justify-center gap-3 py-5 rounded-3xl font-black text-xl sm:text-2xl transition-all duration-300 bg-gradient-to-br from-emerald-500 via-green-600 to-teal-500 text-white border-4 border-green-600/50 hover:scale-105 hover:shadow-2xl hover:shadow-green-500/50 hover:border-green-500 focus:outline-none focus:ring-4 focus:ring-green-200 relative overflow-hidden group"
               style={{ minHeight: '56px', pointerEvents: 'auto' }}
             >
-              <img src="/dino pi/dinopi logo.png" alt="Dino Pi Logo" className="w-8 h-8 mr-2" />
-              <span>Dino Pi</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></span>
+              <img src="/dino pi/dinopi logo.png" alt="Dino Pi Logo" className="w-8 h-8 mr-2 relative z-10" />
+              <span className="relative z-10">Dino Pi</span>
             </button>
             
             
